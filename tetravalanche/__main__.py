@@ -1,32 +1,163 @@
 """
-tested with katasdk 0.0.6
-
+ Tetravalanche
+   ported to KataSDK 0.0.9
+-----
+march 18th 22
 """
+
 import json
 import random
 from collections import defaultdict
 
-import katagames_sdk.api as katapi
-import katagames_sdk.engine as kataen
-from katagames_sdk.capsule.engine_ground.BaseGameState import BaseGameState
-from katagames_sdk.capsule.engine_ground.runners import StackBasedGameCtrl
-from katagames_sdk.capsule.struct.misc import enum_builder
 
-import glvars
+import katagames_sdk as katasdk
+kengi = katasdk.bootstrap()
+
+katapi = katasdk.api
+pygame = kengi.pygame
+SCR_W = SCR_H = None  # to be set in pgm body
+
+enum_builder = kengi.struct.enum
+BaseGameState = kengi.BaseGameState
+EngineEvTypes = kengi.event.EngineEvTypes
+EventReceiver = kengi.event.EventReceiver
+CgmEvent = kengi.event.CgmEvent
+
+ASSET_ALIASES = {
+    'musiquefond': 'tetrav/myassets/chiptronic.ogg',
+    'bruitage_menu': 'tetrav/myassets/coinlow.wav',
+    'valid_menu': 'tetrav/myassets/coinhigh.wav',
+    'explo': 'tetrav/myassets/explo_basique.wav',
+    'quake': 'tetrav/myassets/crumble.wav',
+    'fond_gameover': 'tetrav/myassets/img_bt_rouge.png'
+}
+
+# ----------------------------- pseudo glvars module -------------
+my_fonts = {
+    # 'larger': ('freesansbold.ttf', 27),
+    # 'xl': ('freesansbold.ttf', 35),
+    # 'display_font': ('freesansbold.ttf', 22),
+    # 'basic': ('freesansbold.ttf', 16),
+    # 'medium': ('freesansbold.ttf', 21),
+
+    # -multiples de 16 fortement recommandé
+    'tiny_monopx': ('monogram.ttf', 16),
+    'sm_monopx': ('monogram.ttf', 28),
+    'moderne': ('monogram.ttf', 32),
+    'moderne_big': ('monogram.ttf', 64)
+}
+
+my_colors = {
+    'c_black': '#000000',
+    'c_white': '#ffffff',
+    'c_cherokee': '#924a40',
+    'c_oceanblue': '#84c5cc',
+
+    'c_plum': '#9351b6',
+    'c_leafgreen': '#72b14b',
+    'c_purple': '#483aaa',
+    'c_sunny': '#d5df7c',
+
+    'c_brown': '#99692d',
+    'c_mud': '#675200',
+    'c_skin': '#c18178',
+    'c_gray1': '#606060',
+
+    'c_gray2': '#8a8a8a',
+    'c_pastelgreen': '#b3ec91',
+    'c_lightpurple': '#867ade',
+    'c_gray3': '#b3b3b3',
+}
 
 
-pygame = kataen.import_pygame()
-CogObject = kataen.CogObject
-EngineEvTypes = kataen.EngineEvTypes
-EventReceiver = kataen.EventReceiver
-HttpServer = katapi.HttpServer
+# ----------------------
+#  CONSTANTS
+DEV_MODE = False
+SKIP_MINING = False
+MAX_FPS = 45
+VERSION = '0.20.1a'
+RESSOURCE_LOC = ['.']
+CHOSEN_LANG = 'fr'
+GAME_ID = 5  # tetravalanche
+
+
+#  GLOBAL VARIABLES
+# ----------------------
+
+glvars = katasdk.Objectifier(**{
+    'DEV_MODE': True,
+    'GAME_ID': 5,  # euhmmm Jen suis mm pas sur!
+
+    'username': None,
+    'acc_id': None,
+    'song': None,
+    'snd_channels': dict(),
+    'num_lastchannel': 0,
+    'copie_solde': None,
+    'colors': dict(),
+    'fonts': dict(),
+
+    'num_challenge': None,  # sera un entier
+    'chall_seed': None,  # sera un entier déterminant cmt générateur aléatoire va sortir les données du problème d'optim.
+
+    'multiplayer_mode': None,  # sera déterminé en fct de s'il y a des joueurs "remote"
+    'server_host': None,  # recevra un str
+    'server_port': None,  # recevra un int
+    'server_debug': None,
+    'solde_gp': None
+})
+
+
+def glvars_init_sound():
+    if len(glvars.snd_channels) < 1:
+        capital_n = 3
+        pygame.mixer.set_num_channels(capital_n)
+        for k in range(capital_n):
+            glvars.snd_channels[k] = pygame.mixer.Channel(k)
+
+
+def glvars_is_sfx_playin():
+    for cn in range(2):
+        if glvars.snd_channels[cn].get_busy():
+            return True
+    return False
+
+
+def glvars_playmusic():
+    if glvars.song is None:
+        pygame.mixer.music.load(ASSET_ALIASES['musiquefond'])
+        glvars.song = 1
+    pygame.mixer.music.play(-1)
+
+
+def glvars_playsfx(pygamesound):
+    # TODO this is temp fix, for web ctx
+    pygamesound.play()
+
+
+def glvars_init_fonts_n_colors():
+    pygame.font.init()
+    for name, v in my_colors.items():
+        glvars.colors[name] = pygame.Color(v)
+    for name, t in my_fonts.items():
+        glvars.fonts[name] = pygame.font.Font(None, t[1])
+
+# -------------------fin pseudo glvars mod -----------------------
+
 
 SCR_W, SCR_H = -1, -1  # will be set when run_game() called
 
 GameStates = enum_builder(
+    # avant on utilisait Login defini dans ce mm programme,
+    # mais depuis sdk 0.0.7 il est préconisé d' utiliser le
+    # Kata bioslike truc et cest ce quon va faire! Voir corps du programme
+    # 'Login',
+    # il recoit l identifiant -1
+
     'Menu',
-    'Tetris',
+    'Tetris'
 )
+
 Labels = enum_builder(
     'PoidsTotal',
     'UtiliteTotale',
@@ -59,7 +190,8 @@ Labels = enum_builder(
     'CompteRequis',
     'CoutDefi'
 )
-MyEvTypes = kataen.enum_for_custom_event_types(
+
+MyEvTypes = kengi.event.enum_ev_types(
     'Drop',  # contains new_level
     'Shake',
     'LevelUp',  # contains level
@@ -122,9 +254,9 @@ def get_solde():
 
 def set_solde(val):
     glvars.solde_gp = val
-    manager = kataen.get_manager()
+    manager = kengi.core.get_manager()
     manager.post(
-        kataen.CgmEvent(MyEvTypes.BalanceChanges, value=val)
+        CgmEvent(MyEvTypes.BalanceChanges, value=val)
     )
 
 
@@ -151,7 +283,7 @@ class Etiquette:
         self.img = self.ft_obj.render(self._text, True, self._color)
 
 
-class MenuModel(CogObject):
+class MenuModel(kengi.event.CogObj):
     """
     stocke l'info. si le joueur est connecté ou nom
     """
@@ -161,7 +293,7 @@ class MenuModel(CogObject):
 
     def __init__(self):
         super().__init__()
-        self._curr_choice = self.CHOIX_START
+        self._curr_choice = self.CHOIX_LOGIN
         self._logged_in = False
 
     def reset_choice(self):
@@ -209,6 +341,7 @@ class MenuModel(CogObject):
         # glvars.cli_logout()
 
     def can_bet(self):
+        print('----- can bet test ----')
         if not self._logged_in:
             return False
         if get_solde() is None:
@@ -246,8 +379,8 @@ class MenuView(EventReceiver):
         self.BG_COLOR = glvars.colors['c_purple']
         self.SELEC_COLOR = glvars.colors['c_oceanblue']
         # - son
-        self.sfx_low = pygame.mixer.Sound('assets/coinlow.wav')
-        self.sfx_high = pygame.mixer.Sound('assets/coinhigh.wav')
+        self.sfx_low = pygame.mixer.Sound(ASSET_ALIASES['bruitage_menu'])
+        self.sfx_high = pygame.mixer.Sound(ASSET_ALIASES['valid_menu'])
         # - polices de car.
         self._bigfont = glvars.fonts['moderne_big']
         self._medfont = glvars.fonts['moderne']
@@ -261,8 +394,10 @@ class MenuView(EventReceiver):
         self._codeselection_to_img = dict()
         self._codeselection_to_rect = dict()
         self._codeselection_to_pos = dict()
+
         for code in self._options_menu.keys():
             self._reset_label_option(code)
+
         self._mem_option_active = None
         self.activation_option(ref_mod.get_curr_choice())
         # ****************** prepa pour effets particules ******************
@@ -305,20 +440,21 @@ class MenuView(EventReceiver):
         base_y = 128
         base_x = SCR_W // 2
         offset = 40
-        tmp = (MenuModel.CHOIX_START, MenuModel.CHOIX_CRED, MenuModel.CHOIX_QUIT)
-        try:
-            i = tmp.index(code)
-            pos = (base_x - (adhoc_label.get_size()[0] // 2), base_y + i * offset)
-            self._codeselection_to_pos[code] = pos
-            tmp_rect.topleft = pos
-            self._codeselection_to_rect[code] = tmp_rect
-        except ValueError:
-            pass
+        tmp = (MenuModel.CHOIX_LOGIN, MenuModel.CHOIX_START, MenuModel.CHOIX_CRED, MenuModel.CHOIX_QUIT)
+
+        if code not in tmp:
+            raise ValueError('code ds _refresh_rect nest pas correct!')
+        i = tmp.index(code)
+
+        pos = (base_x - (adhoc_label.get_size()[0] // 2), base_y + i * offset)
+        self._codeselection_to_pos[code] = pos
+        tmp_rect.topleft = pos
+        self._codeselection_to_rect[code] = tmp_rect
 
     def activation_option(self, code):
         if self._mem_option_active != code:
             if self._mem_option_active is not None:
-                glvars.playsfx(self.sfx_low)
+                glvars_playsfx(self.sfx_low)
                 self._reset_label_option(self._mem_option_active)
             tmp = self._options_menu[code]
             txt = MenuView.prettify(tmp)
@@ -328,7 +464,7 @@ class MenuView(EventReceiver):
             self._mem_option_active = code
 
     def validate_effect(self):
-        glvars.playsfx(self.sfx_high)
+        glvars_playsfx(self.sfx_high)
 
     def refresh_graphic_state(self):
         label_user = tsl(Labels.Utilisateur)
@@ -443,6 +579,10 @@ class MenuView(EventReceiver):
 
 
 class MenuCtrl(EventReceiver):
+    """
+    possède un attribut
+     self.nextmode_buffer pour signaler dans quel etat on va passer
+    """
     POLLING_FREQ = 4  # sec. de délai entre deux appels serveur
 
     def __init__(self, mod, view):
@@ -452,15 +592,16 @@ class MenuCtrl(EventReceiver):
         # - prepa de quoi changer de mode de jeu...
         self.nextmode_buffer = None
         self._assoc_cchoix_event = {
-            MenuModel.CHOIX_QUIT: kataen.CgmEvent(pygame.QUIT),
-            MenuModel.CHOIX_CRED: None,  # kataen.CgmEvent(EngineEvTypes.PUSHSTATE, state_ident=GameStates.Credits),
+            MenuModel.CHOIX_QUIT: CgmEvent(pygame.QUIT),
+            MenuModel.CHOIX_CRED: None,  # kengi.CgmEvent(EngineEvTypes.PUSHSTATE, state_ident=GameStates.Credits),
             MenuModel.CHOIX_START: None,  # celui-ci est géré via un evenement MyEvTypes.DemandeTournoi !
             MenuModel.CHOIX_LOGIN: None  # CgmEvent(EngineEvTypes.PUSHSTATE, state_ident=defs.GameStates.Login)
         }
         # - misc
         self.last_pol = None
         self.polling_mode = True
-        self.serv = HttpServer.instance()
+
+        self.serv = kengi.network.HttpServer.instance()
 
     def pause_polling(self):
         self.polling_mode = False
@@ -469,47 +610,30 @@ class MenuCtrl(EventReceiver):
         self.polling_mode = True
 
     def __handlelogic(self, ev):
-        if self.nextmode_buffer is not None:
-            if glvars.is_sfx_playin():
+        if self.nextmode_buffer is None:
+            if is_user_logged():
+                if self.polling_mode:
+                    if (self.last_pol is None) or (ev.curr_t - self.last_pol > self.POLLING_FREQ):
+                        self.last_pol = ev.curr_t
+                        nouv_solde = self._recup_solde_serveur()
+                        set_solde(nouv_solde)
+
+        else:  # -----------------------------------------------
+            if glvars_is_sfx_playin():
                 pass
             else:
-                # traitement nextmode_buffer...
-                if self.nextmode_buffer == MenuModel.CHOIX_START:
+                # traitement du nextmode_buffer
+                if self.nextmode_buffer == MenuModel.CHOIX_LOGIN:
+                    self.pev(EngineEvTypes.PUSHSTATE, state_ident=GameStates.Login)
+
+                elif self.nextmode_buffer == MenuModel.CHOIX_START:
                     self.pev(MyEvTypes.DemandeTournoi)
                 else:
                     ev = self._assoc_cchoix_event[self.nextmode_buffer]
                     if ev is not None:
-                        kataen.get_manager().post(ev)
+                        kengi.core.get_manager().post(ev)
                 # reset du champ concerné
                 self.nextmode_buffer = None
-            return  # ---------------------------------------------------------------
-        if is_user_logged():
-            if self.polling_mode:
-                if (self.last_pol is None) or (ev.curr_t - self.last_pol > self.POLLING_FREQ):
-                    self.last_pol = ev.curr_t
-                    nouv_solde = self._recup_solde_serveur()
-                    set_solde(nouv_solde)
-
-    # --------------------------------------
-    #  Gestion des évènements
-    # --------------------------------------
-    def proc_event(self, ev, source):
-        if ev.type == EngineEvTypes.LOGICUPDATE:
-            self.__handlelogic(ev)
-        elif ev.type == MyEvTypes.DemandeTournoi:
-            if self.ref_mod.can_bet() and self._procedure_debut_challenge():
-                self.pev(EngineEvTypes.PUSHSTATE, state_ident=GameStates.Tetris)
-        elif ev.type == pygame.KEYDOWN:
-            if ev.key == pygame.K_UP:
-                self.ref_mod.move(-1)
-            elif ev.key == pygame.K_DOWN:
-                self.ref_mod.move(1)
-            elif ev.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                self.nextmode_buffer = self.ref_mod.get_curr_choice()
-                self.ref_view.validate_effect()
-        elif ev.type == MyEvTypes.ChoixMenuValidation:
-            self.nextmode_buffer = self.ref_mod.get_curr_choice()
-            self.ref_view.validate_effect()
 
     def _procedure_debut_challenge(self):
         """
@@ -560,6 +684,34 @@ class MenuCtrl(EventReceiver):
             self.ref_mod.mark_auth_done(glvars.username, glvars.copie_solde)
             self.ref_view.refresh_graphic_state()
 
+    # --------------------------------------
+    #  Gestion des évènements
+    # --------------------------------------
+    def _validation_choix_opt(self):
+        choix = self.ref_mod.get_curr_choice()
+        print(' Le gars a choisi', choix)
+        self.ref_view.validate_effect()  # play sfx
+        self.nextmode_buffer = self.ref_mod.get_curr_choice()
+
+    def proc_event(self, ev, source):
+        if ev.type == EngineEvTypes.LOGICUPDATE:
+            self.__handlelogic(ev)
+
+        elif ev.type == MyEvTypes.DemandeTournoi:
+            if self.ref_mod.can_bet() and self._procedure_debut_challenge():
+                self.pev(EngineEvTypes.PUSHSTATE, state_ident=GameStates.Tetris)
+
+        elif ev.type == pygame.KEYDOWN:
+            if ev.key == pygame.K_UP:
+                self.ref_mod.move(-1)
+            elif ev.key == pygame.K_DOWN:
+                self.ref_mod.move(1)
+            elif ev.key == pygame.K_RETURN or ev.key == pygame.K_KP_ENTER:
+                self._validation_choix_opt()
+
+        elif ev.type == MyEvTypes.ChoixMenuValidation:  # SUITE A UN CLIC
+            self._validation_choix_opt()
+
 
 class MenuState(BaseGameState):
     def __init__(self, gs_id, name):
@@ -568,6 +720,7 @@ class MenuState(BaseGameState):
         self.der_lstate = None
 
     def enter(self):
+        print('enter in Menu State')
         if self.m is None:
             self.m = MenuModel()
         self.v = MenuView(self.m)
@@ -576,9 +729,9 @@ class MenuState(BaseGameState):
             self.c = MenuCtrl(self.m, self.v)
             self.c.impacte_retour_login()
         self.c.turn_on()
-        glvars.init_sound()
-        # disabled for now (music)
-        # glvars.playmusic()
+        glvars_init_sound()
+
+        glvars_playmusic()
 
     def resume(self):
         self.c.impacte_retour_login()
@@ -699,7 +852,7 @@ class Piece:
         return p
 
 
-class Board(CogObject):
+class Board(kengi.event.CogObj):
     def __init__(self, n_columns, n_rows, autogen=True):
         super().__init__()
         self.height = n_rows
@@ -899,7 +1052,7 @@ class TetrisCtrl(EventReceiver):
     @staticmethod
     def commit_score(valeur_score):
         # envoir vers le SERVEUR
-        serv = HttpServer.instance()
+        serv = kengi.network.HttpServer.instance()
         url = serv.get_ludo_app_url() + 'tournois.php'
         params = {
             'fct': 'pushscore',
@@ -936,8 +1089,8 @@ class TetrisCtrl(EventReceiver):
             self.flag_games_over()
             pygame.time.set_timer(MyEvTypes.Drop, 0)
             pygame.time.set_timer(MyEvTypes.Shake, 0)
-            # kataen.get_manager().xtimer_set_timer(MyEvTypes.Drop, 0)
-            # kataen.get_manager().xtimer_set_timer(MyEvTypes.Shake, 0)
+            # kengi.get_manager().xtimer_set_timer(MyEvTypes.Drop, 0)
+            # kengi.get_manager().xtimer_set_timer(MyEvTypes.Shake, 0)
         elif ev.type == pygame.KEYDOWN:
             self.key_handler(ev.key)
         # elif ev.type == self.DROP_EV:
@@ -948,12 +1101,12 @@ class TetrisCtrl(EventReceiver):
             self.boardmodel.more_quake()
         elif ev.type == MyEvTypes.FlatWorld:
             pygame.time.set_timer(MyEvTypes.Shake, 0)
-            # kataen.get_manager().xtimer_set_timer(MyEvTypes.Shake, 0)
+            # kengi.get_manager().xtimer_set_timer(MyEvTypes.Shake, 0)
         elif ev.type == MyEvTypes.LevelUp:
             pygame.time.set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(ev.level))
             pygame.time.set_timer(MyEvTypes.Shake, 50)
-            # kataen.get_manager().xtimer_set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(ev.level))
-            # kataen.get_manager().xtimer_set_timer(MyEvTypes.Shake, 50)
+            # kengi.get_manager().xtimer_set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(ev.level))
+            # kengi.get_manager().xtimer_set_timer(MyEvTypes.Shake, 50)
 
     def key_handler(self, key):
         if key == pygame.K_ESCAPE:
@@ -1012,15 +1165,15 @@ class TetrisCtrl(EventReceiver):
     @staticmethod
     def setup_ctrl():
         pygame.time.set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(1))
-        # kataen.get_manager().xtimer_set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(1))
+        # kengi.get_manager().xtimer_set_timer(MyEvTypes.Drop, TetrisCtrl.get_level_speed(1))
 
 
 class TetrisView(EventReceiver):
     def proc_event(self, ev, source):
         if ev.type == MyEvTypes.LineDestroyed:
-            glvars.playsfx(self.sfx_crumble)
+            glvars_playsfx(self.sfx_crumble)
         elif ev.type == MyEvTypes.BlocksCrumble:
-            glvars.playsfx(self.sfx_explo)
+            glvars_playsfx(self.sfx_explo)
 
     BOARD_BORDER_SIZE = 5
     SCORE_PADDING = 5
@@ -1058,9 +1211,10 @@ class TetrisView(EventReceiver):
         self.level = None
         self.__fond_gameover = None
         self.__label_gameover = None
+
         # sons
-        self.sfx_explo = pygame.mixer.Sound('assets/explo_basique.wav')
-        self.sfx_crumble = pygame.mixer.Sound('assets/crumble.wav')
+        self.sfx_explo = pygame.mixer.Sound(ASSET_ALIASES['explo'])
+        self.sfx_crumble = pygame.mixer.Sound(ASSET_ALIASES['quake'])
 
     def clear(self):
         self.rows = [[TetColor.CLEAR] * self.width for _ in range(self.height)]
@@ -1102,7 +1256,7 @@ class TetrisView(EventReceiver):
     def show_game_over(self, ecran):
         # -- affiche simili -popup
         if not self.__fond_gameover:
-            self.__fond_gameover = pygame.image.load('assets/img_bt_rouge.png')
+            self.__fond_gameover = pygame.image.load(ASSET_ALIASES['fond_gameover'])
         targetp = [self.view_width // 2, self.view_height // 2]
         targetp[0] -= self.__fond_gameover.get_size()[0] // 2
         targetp[1] -= self.__fond_gameover.get_size()[1] // 2
@@ -1193,12 +1347,13 @@ class TetrisState(BaseGameState):
             # before :
             # da_cfonts["game_over"] = pygame.font.SysFont("ni7seg", 60)
             # da_cfonts["score"] = pygame.font.SysFont("ni7seg", 18)
-            # TODO fix this temp patch for web ctx
+            # TODO fix this temp patch for web ctx
             da_cfonts["game_over"] = pygame.font.Font(None, 66)
             da_cfonts["score"] = pygame.font.Font(None, 18)
+
         # - view creation
         self.ma_vue = TetrisView(
-            kataen.get_screen().get_size(), glvars.colors['c_purple'], glvars.colors['c_lightpurple']
+            (SCR_W,SCR_H), glvars.colors['c_purple'], glvars.colors['c_lightpurple']
         )
         self.ma_vue.turn_on()
         # - ctrl
@@ -1289,34 +1444,28 @@ def tsl(cle):
     return _str_repo[cle]
 
 
-def run_game():
-    global SCR_H, SCR_W
+if __name__ == "__main__":
+    SCR_W, SCR_H = kengi.core.get_screen().get_size()
+
     glvars.CHOSEN_LANG = 'en'
     init_repo_strings(glvars.CHOSEN_LANG)
-    kataen.init()
-    SCR_W, SCR_H = kataen.get_screen().get_size()
-    glvars.init_fonts_n_colors()
-    dico_statename_statecls = {
-        'MenuState': MenuState,
-        'TetrisState': TetrisState
-    }
-    # - previously
-    # kataen.tag_multistate(GameStates, glvars, True, dico)
-    # game_ctrl = kataen.get_game_ctrl()
-    # - 007+
-    game_ctrl = StackBasedGameCtrl(
-        kataen.get_game_ctrl(),
-        GameStates,
-        glvars,
-        True,
-        dico_statename_statecls
+    glvars_init_fonts_n_colors()
+
+    # in the sdk0.0.9+ fashion:
+    kengi.core.declare_states(
+        {
+            -1: katasdk.bios.KataFrameState,
+            GameStates.Menu: MenuState,
+            GameStates.Tetris: TetrisState
+        },
+        glvars
     )
+    game_ctrl = kengi.core.get_game_ctrl()
+
+    # start game
     game_ctrl.turn_on()
     game_ctrl.loop()
 
+    # clean exit
     pygame.mixer.stop()
-    kataen.cleanup()
-
-
-if __name__ == "__main__":
-    run_game()
+    kengi.quit()
