@@ -1,0 +1,22 @@
+{
+    "vmlib_ver": "23_9a5",
+    "dependencies": {
+        "pyved_engine": "???"
+    },
+    "description": "this is a placeholder so you can describe your game",
+    "author": "tom",
+    "assets": [
+		"assets/img_bt_rouge.png",
+		"assets/mining_btc.png"
+	],
+    "sounds": [
+		"chiptronic.ogg",
+		"coinhigh.wav",
+		"coinlow.wav",
+		"crumble.wav",
+		"explo_basique.wav"
+	],
+    "cartridge": "Tetrav",
+    "game_title": "Tetravalanche",
+    "build_date": "Mon Feb 26 09:55:31 2024"
+}
