@@ -61,8 +61,8 @@ class TaxPaymentView(EventReceiver):
         super().__init__()
         pt_central = (400, 280)
 
-        src = 'assets/mining_btc.png'
-        self.img_crypto_cartoon = pygame.image.load(src)
+        # src = 'assets/mining_btc.png'
+        self.img_crypto_cartoon = pyv.vars.images['mining_btc']
 
         self._pos_img_crypto = list(pt_central)
         self._pos_img_crypto[0] -= self.img_crypto_cartoon.get_size()[0] // 2

@@ -1,4 +1,6 @@
-import pyved_engine as pyv
+from ... import pimodules
+
+pyv = pimodules.pyved_engine
 from ... import glvars
 from ...ev_types import MyEvTypes
 # from katagames_sdk.api import HttpServer
@@ -35,7 +37,10 @@ class TetrisCtrl(pyv.EvListener):
 
     @staticmethod
     def commit_score(valeur_score):
-        # envoir vers le SERVEUR
+        return
+        # TODO fix
+
+        # envoyer info vers le SERVEUR
         serv = HttpServer.instance()
         url = serv.get_ludo_app_url() + 'tournois.php'
 
@@ -102,13 +107,17 @@ class TetrisCtrl(pyv.EvListener):
     def on_drop(self, ev):
         self.boardmodel.drop_piece()
 
-    def proc_event(self, ev, source):
-        if ev.type == MyEvTypes.GameLost:
-            self.flag_games_over()
-            pygame.time.set_timer(self.DROP_EV, 0)
-            pygame.time.set_timer(self.SHAKE_EV, 0)
+    def on_game_lost(self, ev):
+        self.flag_games_over()
+        glvars.ev_manager.set_interval(
+            TetrisCtrl.get_level_speed(1),
+            MyEvTypes.Drop  # self.DROP_EV,
+        )
+        # TODO fix
+        # pygame.time.set_timer(self.SHAKE_EV, 0)
 
-        elif ev.type == self.SHAKE_EV:
+    def proc_event(self, ev, source):
+        if ev.type == self.SHAKE_EV:
             self.boardmodel.more_quake()
 
         elif ev.type == MyEvTypes.FlatWorld:

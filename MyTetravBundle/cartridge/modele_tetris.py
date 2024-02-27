@@ -1,7 +1,9 @@
 from collections import defaultdict
 import random
 
-import pyved_engine
+from . import pimodules
+
+pyv = pimodules.pyved_engine
 
 from .ev_types import MyEvTypes
 
@@ -128,7 +130,7 @@ class Piece:
         return p
 
 
-class Board(pyved_engine.Emitter):
+class Board(pyv.Emitter):
 
     def __init__(self, n_columns, n_rows, autogen=True):
         super().__init__()

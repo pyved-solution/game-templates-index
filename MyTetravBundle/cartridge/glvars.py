@@ -1,5 +1,8 @@
-from pyved_engine.custom_struct import enum
-import pyved_engine as pyv
+from . import pimodules
+
+pyv = pimodules.pyved_engine
+
+enum = pyv.custom_struct.enum
 
 
 pygame = pyv.pygame

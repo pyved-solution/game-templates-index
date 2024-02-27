@@ -6,8 +6,8 @@
     "description": "this is a placeholder so you can describe your game",
     "author": "tom",
     "assets": [
-		"assets/img_bt_rouge.png",
-		"assets/mining_btc.png"
+		"img_bt_rouge.png",
+		"mining_btc.png"
 	],
     "sounds": [
 		"chiptronic.ogg",
@@ -16,7 +16,7 @@
 		"crumble.wav",
 		"explo_basique.wav"
 	],
-    "cartridge": "Tetrav",
-    "game_title": "Tetravalanche",
-    "build_date": "Mon Feb 26 09:55:31 2024"
+    "cartridge": "MyTetravBundle",
+    "game_title": "MyTetravBundle",
+    "build_date": "Mon Feb 26 13:00:19 2024"
 }

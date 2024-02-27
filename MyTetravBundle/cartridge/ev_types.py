@@ -1,4 +1,6 @@
-import pyved_engine as pyv
+from . import pimodules
+
+pyv = pimodules.pyved_engine
 
 
 MyEvTypes = pyv.game_events_enum((

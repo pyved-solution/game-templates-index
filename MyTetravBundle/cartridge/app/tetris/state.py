@@ -1,5 +1,7 @@
 from ... import glvars
-import pyved_engine as pyv
+from ... import pimodules
+
+pyv = pimodules.pyved_engine
 
 # import katagames_sdk.engine as kataen
 # from katagames_sdk.engine import BaseGameState

@@ -1,4 +1,7 @@
-from pyved_engine.custom_struct import enum
+from . import pimodules
+
+pyv = pimodules.pyved_engine
+enum = pyv.custom_struct.enum
 
 
 Labels = enum(

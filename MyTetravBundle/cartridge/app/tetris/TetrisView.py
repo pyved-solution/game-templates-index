@@ -1,4 +1,7 @@
-import pyved_engine as pyv
+from ... import pimodules
+
+pyv = pimodules.pyved_engine
+
 from ... import glvars
 from ...ev_types import MyEvTypes
 from ...modele_tetris import TetColor
@@ -105,7 +108,7 @@ class TetrisView(pyv.EvListener):
     def show_game_over(self, ecran):
         # -- affiche simili -popup
         if not self.__fond_gameover:
-            self.__fond_gameover = pygame.image.load('assets/img_bt_rouge.png')
+            self.__fond_gameover = pyv.vars.images['img_bt_rouge']
 
         targetp = [self.view_width // 2, self.view_height // 2]
         targetp[0] -= self.__fond_gameover.get_size()[0] // 2
