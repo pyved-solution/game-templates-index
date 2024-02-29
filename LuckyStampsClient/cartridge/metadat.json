@@ -1,0 +1,15 @@
+{
+    "vmlib_ver": "23_9a5",
+    "dependencies": {
+        "pyved_engine": "???"
+    },
+    "description": "this is a placeholder so you can describe your game",
+    "author": "tom",
+    "assets": [
+		"canada-orange.png"
+	],
+    "sounds": [],
+    "cartridge": "LuckyStampsClient",
+    "game_title": "Lucky Stamps",
+    "build_date": "Wed Feb 28 09:16:55 2024"
+}
