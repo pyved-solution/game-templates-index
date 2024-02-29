@@ -8,7 +8,6 @@ import requests
 # pyv = pyved_engine  # pimodules.pyved_engine
 import pyved_engine
 
-
 THECOLORS = pyv.pygame.color.THECOLORS
 
 MyEvTypes = pyv.game_events_enum((
@@ -32,9 +31,11 @@ replayed = False
 STAMPW, STAMPH = 149, 175
 
 
-class GameModel(pyv.Emitter):
+class LsGameModel(pyv.Emitter):
     BOMB_CODE = -1
     BONUS_CODE = 0
+    binfx, binfy = 100, 88
+    BLOCK_SPEED = 32
 
     def __init__(self, serial):
         super().__init__()
@@ -45,14 +46,25 @@ class GameModel(pyv.Emitter):
         self.remainning_rounds = 3
         # self.fake_button = pyv.gui.
 
-        allboxes = dict()
-        anim_ended = dict()
+        self.event_cursor = 0
+
+        # pr gérer animations
+        self.allboxes = dict()
+        self.anim_ended = dict()
+        self.curr_box = None
+        self.autoplay = False
 
     def init_animation(self):
+        # TODO solve the problem:
+        # we have not detected the explosion properly,
+        # that is: we only display the final result of the column,
+        # the roll that contains the BOMB is never displayed
+
         if self.current_tirage in self.replayed_set:
             print('warning: trying to replay twice the same tirage!')
             return
         self.replayed_set.add(self.current_tirage)
+
         cls = self.__class__
 
         print('___replaying events, tirage:', self.current_tirage)
@@ -60,18 +72,50 @@ class GameModel(pyv.Emitter):
         for e in li_events:
             if e[0] == self.current_tirage:
                 # avant: (sans anim)
-                self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[4])
-                self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[3])
-                self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[2])
+                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[4])
+                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[3])
+                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[2])
                 if e[4] == cls.BONUS_CODE or e[3] == cls.BONUS_CODE or e[2] == cls.BONUS_CODE:
                     self.remainning_rounds += 2
                 self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
                 # avec anim
                 # for c in range(5):
-                #     for r in range(3):
-                #         key = f'c{c}r{r}'
-                #         allboxes = [colno*153, ]
+                #    for r in range(3):
+                c = int(e[1][1])
+                for r in range(3):
+                    key = f'c{c}r{r}'
+                    self.allboxes[key] = [cls.binfx + c * 153, -200, STAMPW, STAMPH, e[r + 2]]  # computes the position
+
+        self.curr_box = 'c0r2'
+        self.autoplay = True
+
         self.pev(MyEvTypes.Earnings, value=li_gains[self.current_tirage])
+
+    def update(self):
+        cls = self.__class__
+        if self.curr_box is None:
+            return
+
+        if self.curr_box not in self.anim_ended:
+            self.allboxes[self.curr_box][1] += cls.BLOCK_SPEED
+            n = int(self.curr_box[3])
+            targety = cls.binfy + n * (STAMPH+4)
+
+            if self.allboxes[self.curr_box][1] > targety:  # detection de "collision"
+                self.allboxes[self.curr_box][1] = targety
+                # passe à l'anim suivante
+                self.anim_ended[self.curr_box] = True
+
+                c = int(self.curr_box[1])
+                if n > 0:
+                    n -= 1
+                else:
+                    n = 2
+                    c += 1
+                self.curr_box = f'c{c}r{n}'
+                if self.curr_box == 'c5r2':  # out of bounds
+                    self.curr_box = None
+                    self.autoplay = False
 
     def get_rounds(self):
         return self.remainning_rounds
@@ -81,6 +125,8 @@ class GameModel(pyv.Emitter):
         self.remainning_rounds -= 1
         self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
         print('new tirage is:', self.current_tirage)
+
+        self.anim_ended.clear()
         self.pev(MyEvTypes.NewRound)
 
 
@@ -88,9 +134,10 @@ class MyController(pyv.EvListener):
     def __init__(self, mod):
         super().__init__()
         self.mod = mod
-        self.autoplay = False  # to handle the animation
 
     def on_gui_launch_round(self, ev):
+        if self.mod.autoplay:  # ignore re-roll if anim not ended
+            return
         if self.mod.get_rounds() > 0:
             self.mod.next_tirage()
             self.mod.init_animation()
@@ -102,6 +149,9 @@ class MyController(pyv.EvListener):
 
     def on_earnings(self, ev):
         print('congrats! You have earned:', ev.value)
+
+    def on_update(self, ev):
+        self.mod.update()
 
 
 class LsView(pyv.EvListener):
@@ -116,7 +166,7 @@ class LsView(pyv.EvListener):
     }
 
     # spr_sheet = pyv.gfx.JsonBasedSprSheet('cartes')
-    def __init__(self, refmod):
+    def __init__(self, refmod: LsGameModel):
         super().__init__()
         self.grid = [
             [None, None, None] for _ in range(5)
@@ -147,6 +197,10 @@ class LsView(pyv.EvListener):
     def on_paint(self, ev):
         cls = __class__
         ev.screen.fill(pyv.pal.c64['blue'])
+
+        # -----------
+        # paint grid
+        # -----------
         binfx, binfy = 100, 88
         for col_no in range(5):
             for row_no in range(3):
@@ -159,10 +213,24 @@ class LsView(pyv.EvListener):
                     pyv.draw_rect(ev.screen, cls.color_mapping[cell_v], r4infos)
                 elif cell_v == self.mod.BONUS_CODE:
                     ev.screen.blit(pyv.vars.images['canada-orange'], r4infos[:2])
-        # affiche compteur
-        ev.screen.blit(
-            self.label_rounds_cpt, (180, 64)
-        )
+
+        # ------------
+        # paint counter
+        # ------------
+        ev.screen.blit(self.label_rounds_cpt, (180, 64))
+
+        # ------------
+        # paint falling blocks
+        # ------------
+        for k, blockinfos in self.mod.allboxes.items():
+            elt_type = blockinfos[4]
+            if elt_type == self.mod.BOMB_CODE:
+                color = 'red'
+            elif elt_type == self.mod.BONUS_CODE:
+                color = 'black'
+            else:
+                color = cls.color_mapping[elt_type]
+            pyv.draw_rect(ev.screen, color, blockinfos[:4])
 
 
 @pyv.declare_begin
@@ -195,7 +263,7 @@ def init_game(vmst=None):
     tirage_result = response.text
 
     # - algo juste pour tester
-    my_mod = GameModel(tirage_result)
+    my_mod = LsGameModel(tirage_result)
 
     v = LsView(my_mod)
     c = MyController(my_mod)
