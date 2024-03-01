@@ -9,7 +9,7 @@
 		"canada-orange.png"
 	],
     "sounds": [],
-    "cartridge": "LuckyStampsClient",
-    "game_title": "Lucky Stamps",
-    "build_date": "Wed Feb 28 09:16:55 2024"
+    "slug": "LuckyStClient",
+    "build_date": "Wed Feb 28 09:16:55 2024",
+	"title": "Lucky Stamps"
 }
