@@ -3,10 +3,13 @@ from . import shared
 from . import systems
 from .world import blocks_create, player_create, ball_create
 import json
-import pyved_engine as pyv
+# import pyved_engine as pyv
 import requests
-# pyv = pyved_engine  # pimodules.pyved_engine
-import pyved_engine
+from . import pimodules
+
+
+pyv = pimodules.pyved_engine
+
 
 THECOLORS = pyv.pygame.color.THECOLORS
 
@@ -15,7 +18,8 @@ MyEvTypes = pyv.game_events_enum((
     'Earnings',  # contient value
     'NewRound',
     'GuiLaunchRound',
-    'ForceUpdateRounds'  # contient new_val
+    'ForceUpdateRounds',  # contient new_val
+    # 'BombExplodes'
 ))
 
 # pyv = pimodules.pyved_engine
@@ -39,20 +43,24 @@ class LsGameModel(pyv.Emitter):
 
     def __init__(self, serial):
         super().__init__()
-        self.obj = json.loads(serial)
-        print(self.obj)
+        print('-'*60)
+        print('SERIAL RECEIVED:')
+        print(serial)
+        print('-' * 60)
+        print()
+
+        self.li_events, self.li_gains = json.loads(serial)
         self.current_tirage = -1
         self.replayed_set = set()
         self.remainning_rounds = 3
-        # self.fake_button = pyv.gui.
 
-        self.event_cursor = 0
-
-        # pr gérer animations
+        # tout ca pr gérer les animations
         self.allboxes = dict()
         self.anim_ended = dict()
+        self.dangerous_columns = set()
         self.curr_box = None
         self.autoplay = False
+        self.cursor = 0  # in the list of events
 
     def init_animation(self):
         # TODO solve the problem:
@@ -68,28 +76,61 @@ class LsGameModel(pyv.Emitter):
         cls = self.__class__
 
         print('___replaying events, tirage:', self.current_tirage)
-        li_events, li_gains = self.obj
-        for e in li_events:
-            if e[0] == self.current_tirage:
-                # avant: (sans anim)
-                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[4])
-                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[3])
-                # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[2])
-                if e[4] == cls.BONUS_CODE or e[3] == cls.BONUS_CODE or e[2] == cls.BONUS_CODE:
-                    self.remainning_rounds += 2
-                self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
-                # avec anim
-                # for c in range(5):
-                #    for r in range(3):
-                c = int(e[1][1])
-                for r in range(3):
-                    key = f'c{c}r{r}'
-                    self.allboxes[key] = [cls.binfx + c * 153, -200, STAMPW, STAMPH, e[r + 2]]  # computes the position
 
-        self.curr_box = 'c0r2'
+        # puts the cursor on the first event that matching the current round
+        while self.cursor < len(self.li_events):
+            e = self.li_events[self.cursor]
+            if not(e[0] < self.current_tirage):
+                break
+            self.cursor += 1
+
+        for k in range(5):
+            e = self.li_events[self.cursor+k]
+            # avant: (sans anim)
+            # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[4])
+            # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[3])
+            # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[2])
+            if e[4] == cls.BONUS_CODE or e[3] == cls.BONUS_CODE or e[2] == cls.BONUS_CODE:
+                self.remainning_rounds += 2
+            self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
+            # avec anim
+            # for c in range(5):
+            #    for r in range(3):
+            column_no = int(e[1][1])
+            for row_no in range(3):
+                key = f'c{column_no}r{row_no}'
+                elt_type = e[2+row_no]
+                self.allboxes[key] = [
+                    cls.binfx + column_no * 153,  # computing the position
+                    -200,
+                    STAMPW, STAMPH,
+                    elt_type
+                ]
+                if elt_type == cls.BOMB_CODE:
+                    self.dangerous_columns.add(column_no)
+        self.cursor += 5
+
+        self.curr_box = 'c0r2'  # for animation
         self.autoplay = True
 
-        self.pev(MyEvTypes.Earnings, value=li_gains[self.current_tirage])
+        self.pev(MyEvTypes.Earnings, value=self.li_gains[self.current_tirage])
+
+    def select_next_box(self):
+        # returns True if we can select another box to animate
+        c = int(self.curr_box[1])
+        n = int(self.curr_box[3])
+        if n > 0:
+            n -= 1
+        else:
+            n = 2
+            c += 1
+
+        self.curr_box = f'c{c}r{n}'
+        if self.curr_box == 'c5r2':
+            return False
+        if self.curr_box in self.anim_ended:  # out of bounds or no anim
+            return False
+        return True
 
     def update(self):
         cls = self.__class__
@@ -106,28 +147,59 @@ class LsGameModel(pyv.Emitter):
                 # passe à l'anim suivante
                 self.anim_ended[self.curr_box] = True
 
-                c = int(self.curr_box[1])
-                if n > 0:
-                    n -= 1
-                else:
-                    n = 2
-                    c += 1
-                self.curr_box = f'c{c}r{n}'
-                if self.curr_box == 'c5r2':  # out of bounds
+                if not self.select_next_box():
                     self.curr_box = None
                     self.autoplay = False
 
     def get_rounds(self):
         return self.remainning_rounds
 
+    # def next_step(self):
+    #     # if bombs left -> go replace the adhoc column
+    #     if self.nb_bombs > 0 and not self.autoplay:
+    #         self.proc_bomb()
+
     def next_tirage(self):
+        print('CALL NXT TIRAGE!')
         self.current_tirage += 1
         self.remainning_rounds -= 1
+        # self.cursor = 0
         self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
-        print('new tirage is:', self.current_tirage)
-
         self.anim_ended.clear()
         self.pev(MyEvTypes.NewRound)
+
+    def try_proc_bombs(self):
+        if self.autoplay:
+            raise ValueError('FATAL: That method shouldnt be called unless stamps movement is over!')
+
+        if len(self.dangerous_columns) > 0:
+            print('dangerous columns:', self.dangerous_columns)
+
+            e = self.li_events[self.cursor]
+            print('cursor==', self.cursor, e)
+            print('boom, {} explodes!'.format(e[1]))
+            self.cursor += 1
+            column_no = int(e[1][1])
+            self.dangerous_columns.remove(column_no)
+
+            for row_no in range(3):
+                key = f'c{column_no}r{row_no}'
+                elt_type = e[2 + row_no]
+                self.allboxes[key] = [
+                    self.__class__.binfx + column_no * 153,  # computing the position
+                    -200,
+                    STAMPW, STAMPH,
+                    elt_type
+                ]
+                if elt_type == self.__class__.BOMB_CODE:
+                    self.dangerous_columns.add(column_no)
+
+            # restore animations
+            self.curr_box = 'c{}r2'.format(column_no)  # for animation
+            for r in range(3):
+                key = 'c{}r{}'.format(column_no, r)
+                del self.anim_ended[key]
+            self.autoplay = True
 
 
 class MyController(pyv.EvListener):
@@ -136,13 +208,14 @@ class MyController(pyv.EvListener):
         self.mod = mod
 
     def on_gui_launch_round(self, ev):
-        if self.mod.autoplay:  # ignore re-roll if anim not ended
-            return
-        if self.mod.get_rounds() > 0:
-            self.mod.next_tirage()
-            self.mod.init_animation()
+        if not self.mod.autoplay:  # ignore re-roll if anim not ended
+            if self.mod.get_rounds() > 0:
+                self.mod.next_tirage()
+                self.mod.init_animation()
+            else:
+                print('no round left')  # cant re-roll if no roond left!
         else:
-            print('no round left')  # cant re-roll if no roond left!
+            print('ctrl tries to re-roll but autoplay is still active')
 
     def on_element_drop(self, ev):
         print(ev.column, '-', ev.elt_type)
@@ -152,6 +225,8 @@ class MyController(pyv.EvListener):
 
     def on_update(self, ev):
         self.mod.update()
+        if not self.mod.autoplay:
+            self.mod.try_proc_bombs()  # can pursue the animation!
 
 
 class LsView(pyv.EvListener):
