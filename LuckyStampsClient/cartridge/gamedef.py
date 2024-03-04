@@ -15,7 +15,7 @@ THECOLORS = pyv.pygame.color.THECOLORS
 
 MyEvTypes = pyv.game_events_enum((
     'ElementDrop',  # contient column_idx et elt_type
-    'Earnings',  # contient value
+    'EarningsUpdate',  # contient value
     'NewRound',
     'GuiLaunchRound',
     'ForceUpdateRounds',  # contient new_val
@@ -38,8 +38,9 @@ STAMPW, STAMPH = 149, 175
 class LsGameModel(pyv.Emitter):
     BOMB_CODE = -1
     BONUS_CODE = 0
-    binfx, binfy = 100, 88
-    BLOCK_SPEED = 32
+    binfx, binfy = 100, 90
+    starting_y = -176
+    BLOCK_SPEED = 2*18
 
     def __init__(self, serial):
         super().__init__()
@@ -50,6 +51,8 @@ class LsGameModel(pyv.Emitter):
         print()
 
         self.li_events, self.li_gains = json.loads(serial)
+        self.total_earnings = 0
+
         self.current_tirage = -1
         self.replayed_set = set()
         self.remainning_rounds = 3
@@ -102,7 +105,7 @@ class LsGameModel(pyv.Emitter):
                 elt_type = e[2+row_no]
                 self.allboxes[key] = [
                     cls.binfx + column_no * 153,  # computing the position
-                    -200,
+                    cls.starting_y,
                     STAMPW, STAMPH,
                     elt_type
                 ]
@@ -112,8 +115,6 @@ class LsGameModel(pyv.Emitter):
 
         self.curr_box = 'c0r2'  # for animation
         self.autoplay = True
-
-        self.pev(MyEvTypes.Earnings, value=self.li_gains[self.current_tirage])
 
     def select_next_box(self):
         # returns True if we can select another box to animate
@@ -140,7 +141,7 @@ class LsGameModel(pyv.Emitter):
         if self.curr_box not in self.anim_ended:
             self.allboxes[self.curr_box][1] += cls.BLOCK_SPEED
             n = int(self.curr_box[3])
-            targety = cls.binfy + n * (STAMPH+4)
+            targety = cls.binfy + n*(STAMPH+4) - 2
 
             if self.allboxes[self.curr_box][1] > targety:  # detection de "collision"
                 self.allboxes[self.curr_box][1] = targety
@@ -148,6 +149,11 @@ class LsGameModel(pyv.Emitter):
                 self.anim_ended[self.curr_box] = True
 
                 if not self.select_next_box():
+                    # animation ended
+                    if self.li_gains[self.current_tirage] != 0:
+                        self.total_earnings += self.li_gains[self.current_tirage]
+                        self.pev(MyEvTypes.EarningsUpdate, value=self.total_earnings)
+
                     self.curr_box = None
                     self.autoplay = False
 
@@ -187,7 +193,7 @@ class LsGameModel(pyv.Emitter):
                 elt_type = e[2 + row_no]
                 self.allboxes[key] = [
                     self.__class__.binfx + column_no * 153,  # computing the position
-                    -200,
+                    self.__class__.starting_y,
                     STAMPW, STAMPH,
                     elt_type
                 ]
@@ -220,8 +226,11 @@ class MyController(pyv.EvListener):
     def on_element_drop(self, ev):
         print(ev.column, '-', ev.elt_type)
 
-    def on_earnings(self, ev):
-        print('congrats! You have earned:', ev.value)
+    def on_earnings_update(self, ev):
+        print('[Ctrl] Detection: you will earn a total of {}'.format(ev.value))
+
+    def on_quit(self, ev):
+        pyv.vars.gameover = True
 
     def on_update(self, ev):
         self.mod.update()
@@ -251,10 +260,24 @@ class LsView(pyv.EvListener):
             self.line_idx_by_column[k] = 2
         self.mod = refmod
         self.ft = pyv.pygame.font.Font(None, 22)
-        self.label_rounds_cpt = self.ft.render(str(refmod.get_rounds()), False, 'orange')
+
+        self._label_rounds_cpt = None
+        self.label_earnings = None
+        self._refresh_cpt()
+        self._refresh_earnings()
+
+    def _refresh_cpt(self):
+        self.label_rounds_cpt = self.ft.render(str(self.mod.get_rounds()), False, 'orange')
+
+    def _refresh_earnings(self):
+        self.label_earnings = self.ft.render('earings: {} credits'.format(self.mod.total_earnings), False, 'orange')
 
     def on_mousedown(self, ev):
         self.pev(MyEvTypes.GuiLaunchRound)
+
+    def on_earnings_update(self, ev):
+        print('call refresh earnings')
+        self._refresh_earnings()
 
     def on_element_drop(self, ev):
         k = self.line_idx_by_column[ev.column]
@@ -267,11 +290,11 @@ class LsView(pyv.EvListener):
             self.line_idx_by_column[k] = 2
 
     def on_force_update_rounds(self, ev):
-        self.label_rounds_cpt = self.ft.render(str(ev.new_val), False, 'orange')
+        self._refresh_cpt()
 
     def on_paint(self, ev):
         cls = __class__
-        ev.screen.fill(pyv.pal.c64['blue'])
+        ev.screen.fill(pyv.pal.japan['darkblue'])
 
         # -----------
         # paint grid
@@ -283,16 +306,17 @@ class LsView(pyv.EvListener):
                 r4infos = [a, b, STAMPW, STAMPH]
                 cell_v = self.grid[col_no][row_no]
                 if cell_v is None:
-                    pyv.draw_rect(ev.screen, 'red', r4infos, 1)
+                    pyv.draw_rect(ev.screen, pyv.pal.punk['darkblue'], r4infos, 1)
                 elif 1 <= cell_v < 8:
                     pyv.draw_rect(ev.screen, cls.color_mapping[cell_v], r4infos)
                 elif cell_v == self.mod.BONUS_CODE:
                     ev.screen.blit(pyv.vars.images['canada-orange'], r4infos[:2])
 
         # ------------
-        # paint counter
+        # paint counter + earnings
         # ------------
         ev.screen.blit(self.label_rounds_cpt, (180, 64))
+        ev.screen.blit(self.label_earnings, (400+180, 64))
 
         # ------------
         # paint falling blocks
@@ -300,12 +324,21 @@ class LsView(pyv.EvListener):
         for k, blockinfos in self.mod.allboxes.items():
             elt_type = blockinfos[4]
             if elt_type == self.mod.BOMB_CODE:
-                color = 'red'
+                pyv.draw_rect(ev.screen, 'red', blockinfos[:4])
+
             elif elt_type == self.mod.BONUS_CODE:
-                color = 'black'
+                ev.screen.blit(
+                    pyv.vars.images['canada-orange'],
+                (blockinfos[0], blockinfos[1]))
+
+            elif elt_type == 1:
+                ev.screen.blit(
+                    pyv.vars.images['young-prince'],
+                    (blockinfos[0], blockinfos[1]))
+
             else:
-                color = cls.color_mapping[elt_type]
-            pyv.draw_rect(ev.screen, color, blockinfos[:4])
+                color = self.__class__.color_mapping[elt_type]
+                pyv.draw_rect(ev.screen, color, blockinfos[:4])
 
 
 @pyv.declare_begin
