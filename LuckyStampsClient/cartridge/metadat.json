@@ -6,7 +6,16 @@
     "description": "this is a placeholder so you can describe your game",
     "author": "tom",
     "assets": [
-		"canada-orange.png"
+		"img/canada-orange.png",
+        "img/young-prince.png",
+		"img/brightpink-prince.png",
+		"img/deepblue-queen.png",
+		"img/medaillon-queen.png",
+		"img/seven-pence.png",
+		"img/five-pounds.png",
+		"img/rare-shilling.png",
+		"img/lion.png",
+		"img/bonus-rolls.png"
 	],
     "sounds": [],
     "slug": "LuckyStClient",
