@@ -83,9 +83,7 @@ class LsGameModel(pyv.Emitter):
             # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[4])
             # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[3])
             # self.pev(MyEvTypes.ElementDrop, column=int(e[1][1]), elt_type=e[2])
-            if e[4] == cls.BONUS_CODE or e[3] == cls.BONUS_CODE or e[2] == cls.BONUS_CODE:
-                self.remainning_rounds += 2
-            self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
+
             # avec anim
             # for c in range(5):
             #    for r in range(3):
@@ -106,6 +104,10 @@ class LsGameModel(pyv.Emitter):
         self.curr_box = 'c0r2'  # for animation
         self.autoplay = True
 
+        if self.li_gains[self.current_tirage] != 0:
+            self.total_earnings += self.li_gains[self.current_tirage]
+            self.pev(MyEvTypes.EarningsUpdate, value=self.total_earnings)
+
     def select_next_box(self):
         # returns True if we can select another box to animate
         c = int(self.curr_box[1])
@@ -121,6 +123,11 @@ class LsGameModel(pyv.Emitter):
             return False
         if self.curr_box in self.anim_ended:  # out of bounds or no anim
             return False
+
+        etype = self.allboxes[self.curr_box][4]
+        if etype == self.__class__.BONUS_CODE:
+            self.remainning_rounds += 2
+            self.pev(MyEvTypes.ForceUpdateRounds, new_val=self.remainning_rounds)
         return True
 
     def update(self):
@@ -140,10 +147,6 @@ class LsGameModel(pyv.Emitter):
 
                 if not self.select_next_box():
                     # animation ended
-                    if self.li_gains[self.current_tirage] != 0:
-                        self.total_earnings += self.li_gains[self.current_tirage]
-                        self.pev(MyEvTypes.EarningsUpdate, value=self.total_earnings)
-
                     self.curr_box = None
                     self.autoplay = False
 
@@ -228,9 +231,15 @@ class MyController(pyv.EvListener):
             self.mod.try_proc_bombs()  # can pursue the animation!
 
 
+# forced_serial = None
+forced_serial = """
+[[[0,"C0",3,4,2],[0,"C1",2,5,2],[0,"C2",-1,1,-1],[0,"C3",6,1,4],[0,"C4",1,5,3],[0,"C2",5,2,6],[1,"C0",6,3,-1],[1,"C1",4,4,6],[1,"C2",2,6,7],[1,"C3",6,1,7],[1,"C4",-1,7,7],[1,"C0",7,4,5],[1,"C4",4,3,2],[2,"C0",0,2,1],[2,"C1",4,5,3],[2,"C2",7,1,2],[2,"C3",6,1,6],[2,"C4",1,4,6],[3,"C0",5,4,1],[3,"C1",4,3,3],[3,"C2",4,0,-1],[3,"C3",4,1,2],[3,"C4",6,6,3],[3,"C2",3,3,1],[4,"C0",4,1,-1],[4,"C1",7,4,4],[4,"C2",7,6,1],[4,"C3",6,4,0],[4,"C4",3,1,-1],[4,"C0",3,2,7],[4,"C4",4,5,2],[5,"C0",6,2,5],[5,"C1",5,5,2],[5,"C2",6,3,2],[5,"C3",-1,6,3],[5,"C4",-1,3,6],[5,"C3",6,1,7],[5,"C4",5,7,7],[6,"C0",5,1,5],[6,"C1",3,5,1],[6,"C2",2,6,6],[6,"C3",6,1,2],[6,"C4",0,5,5],[7,"C0",2,6,1],[7,"C1",3,7,2],[7,"C2",1,5,5],[7,"C3",1,4,4],[7,"C4",1,7,5],[8,"C0",2,-1,5],[8,"C1",5,3,1],[8,"C2",5,7,1],[8,"C3",1,2,2],[8,"C4",7,5,3],[8,"C0",6,7,3],[9,"C0",3,6,2],[9,"C1",2,-1,-1],[9,"C2",1,5,7],[9,"C3",5,5,2],[9,"C4",3,3,4],[9,"C1",5,5,6],[10,"C0",7,6,3],[10,"C1",-1,6,6],[10,"C2",5,3,6],[10,"C3",2,0,2],[10,"C4",4,2,6],[10,"C1",0,4,4],[11,"C0",7,4,4],[11,"C1",4,6,4],[11,"C2",2,6,6],[11,"C3",3,7,6],[11,"C4",3,2,7],[12,"C0",7,7,5],[12,"C1",6,7,4],[12,"C2",5,5,1],[12,"C3",7,3,3],[12,"C4",4,6,2]],[0,0,0,0,0,0,0,0,0,0,0,0,0]]
+"""
+
+
 @pyv.declare_begin
 def init_game(vmst=None):
-    global my_mod, ev_manager, gscreen
+    global my_mod, ev_manager, gscreen, forced_serial
     pyv.init()
     ev_manager = pyv.get_ev_manager()
     ev_manager.setup(MyEvTypes)
@@ -247,15 +256,16 @@ def init_game(vmst=None):
     pyv.bulk_add_systems(systems)
 
     # - fetch info depuis le serveur
-    url = "https://hiddenpath.kata.games/game_configs/lucky-stamps.json"
-    response = requests.get(url)
-    response_json = response.json()
-    target_host = response_json['url']
-
-    # get tirage result
-    print('accès sur', target_host)
-    response = requests.get(target_host)
-    tirage_result = response.text
+    if forced_serial is None:
+        url = "https://hiddenpath.kata.games/game_configs/lucky-stamps.json"
+        response = requests.get(url)
+        response_json = response.json()
+        target_host = response_json['url']
+        print('accès sur', target_host)
+        response = requests.get(target_host)
+        tirage_result = response.text
+    else:
+        tirage_result = forced_serial
 
     # - algo juste pour tester
     my_mod = LsGameModel(tirage_result)

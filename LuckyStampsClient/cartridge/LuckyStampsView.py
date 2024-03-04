@@ -8,14 +8,13 @@ class LuckyStampsView(pyv.EvListener):
     elt_type_to_imgname_mapping = {
         -1: 'img/lion',
         0: 'img/bonus-rolls',
-
         1: 'img/brightpink-prince',
         2: 'img/young-prince',
         3: 'img/rare-shilling',
-        4: 'img/canada-orange',
-        5: 'img/medaillon-queen',
-        6: 'img/deepblue-queen',
-        7: 'img/seven-pence',
+        4: 'img/medaillon-queen',
+        5: 'img/deepblue-queen',
+        6: 'img/seven-pence',
+        7: 'img/canada-orange',
     }
 
     # color_mapping = {
@@ -72,7 +71,6 @@ class LuckyStampsView(pyv.EvListener):
         self._refresh_cpt()
 
     def on_paint(self, ev):
-        cls = __class__
         ev.screen.fill(pyv.pal.japan['darkblue'])
 
         # -----------
