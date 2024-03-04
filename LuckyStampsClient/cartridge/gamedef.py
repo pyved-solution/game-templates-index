@@ -1,26 +1,16 @@
-# from . import pimodules
-from . import shared
 from . import systems
 from .world import blocks_create, player_create, ball_create
 import json
 # import pyved_engine as pyv
 import requests
 from . import pimodules
+from .LuckyStampsView import LuckyStampsView
+from .shared import MyEvTypes
 
 
 pyv = pimodules.pyved_engine
-
-
 THECOLORS = pyv.pygame.color.THECOLORS
 
-MyEvTypes = pyv.game_events_enum((
-    'ElementDrop',  # contient column_idx et elt_type
-    'EarningsUpdate',  # contient value
-    'NewRound',
-    'GuiLaunchRound',
-    'ForceUpdateRounds',  # contient new_val
-    # 'BombExplodes'
-))
 
 # pyv = pimodules.pyved_engine
 pygame = pyv.pygame
@@ -238,109 +228,6 @@ class MyController(pyv.EvListener):
             self.mod.try_proc_bombs()  # can pursue the animation!
 
 
-class LsView(pyv.EvListener):
-    color_mapping = {
-        1: THECOLORS['papayawhip'],
-        2: THECOLORS['antiquewhite2'],
-        3: THECOLORS['paleturquoise3'],
-        4: THECOLORS['gray31'],
-        5: THECOLORS['plum2'],
-        6: THECOLORS['seagreen3'],
-        7: THECOLORS['sienna1']
-    }
-
-    # spr_sheet = pyv.gfx.JsonBasedSprSheet('cartes')
-    def __init__(self, refmod: LsGameModel):
-        super().__init__()
-        self.grid = [
-            [None, None, None] for _ in range(5)
-        ]
-        self.line_idx_by_column = dict()
-        for k in range(5):
-            self.line_idx_by_column[k] = 2
-        self.mod = refmod
-        self.ft = pyv.pygame.font.Font(None, 22)
-
-        self._label_rounds_cpt = None
-        self.label_earnings = None
-        self._refresh_cpt()
-        self._refresh_earnings()
-
-    def _refresh_cpt(self):
-        self.label_rounds_cpt = self.ft.render(str(self.mod.get_rounds()), False, 'orange')
-
-    def _refresh_earnings(self):
-        self.label_earnings = self.ft.render('earings: {} credits'.format(self.mod.total_earnings), False, 'orange')
-
-    def on_mousedown(self, ev):
-        self.pev(MyEvTypes.GuiLaunchRound)
-
-    def on_earnings_update(self, ev):
-        print('call refresh earnings')
-        self._refresh_earnings()
-
-    def on_element_drop(self, ev):
-        k = self.line_idx_by_column[ev.column]
-        self.line_idx_by_column[ev.column] -= 1
-        self.grid[ev.column][k] = ev.elt_type  # affectation
-
-    def on_new_round(self, ev):
-        # reset stack position
-        for k in range(5):
-            self.line_idx_by_column[k] = 2
-
-    def on_force_update_rounds(self, ev):
-        self._refresh_cpt()
-
-    def on_paint(self, ev):
-        cls = __class__
-        ev.screen.fill(pyv.pal.japan['darkblue'])
-
-        # -----------
-        # paint grid
-        # -----------
-        binfx, binfy = 100, 88
-        for col_no in range(5):
-            for row_no in range(3):
-                a, b = col_no * 153 + binfx, row_no * 179 + binfy,
-                r4infos = [a, b, STAMPW, STAMPH]
-                cell_v = self.grid[col_no][row_no]
-                if cell_v is None:
-                    pyv.draw_rect(ev.screen, pyv.pal.punk['darkblue'], r4infos, 1)
-                elif 1 <= cell_v < 8:
-                    pyv.draw_rect(ev.screen, cls.color_mapping[cell_v], r4infos)
-                elif cell_v == self.mod.BONUS_CODE:
-                    ev.screen.blit(pyv.vars.images['canada-orange'], r4infos[:2])
-
-        # ------------
-        # paint counter + earnings
-        # ------------
-        ev.screen.blit(self.label_rounds_cpt, (180, 64))
-        ev.screen.blit(self.label_earnings, (400+180, 64))
-
-        # ------------
-        # paint falling blocks
-        # ------------
-        for k, blockinfos in self.mod.allboxes.items():
-            elt_type = blockinfos[4]
-            if elt_type == self.mod.BOMB_CODE:
-                pyv.draw_rect(ev.screen, 'red', blockinfos[:4])
-
-            elif elt_type == self.mod.BONUS_CODE:
-                ev.screen.blit(
-                    pyv.vars.images['canada-orange'],
-                (blockinfos[0], blockinfos[1]))
-
-            elif elt_type == 1:
-                ev.screen.blit(
-                    pyv.vars.images['young-prince'],
-                    (blockinfos[0], blockinfos[1]))
-
-            else:
-                color = self.__class__.color_mapping[elt_type]
-                pyv.draw_rect(ev.screen, color, blockinfos[:4])
-
-
 @pyv.declare_begin
 def init_game(vmst=None):
     global my_mod, ev_manager, gscreen
@@ -373,7 +260,7 @@ def init_game(vmst=None):
     # - algo juste pour tester
     my_mod = LsGameModel(tirage_result)
 
-    v = LsView(my_mod)
+    v = LuckyStampsView(my_mod)
     c = MyController(my_mod)
     v.turn_on()
     c.turn_on()

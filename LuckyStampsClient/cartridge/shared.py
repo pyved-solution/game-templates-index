@@ -1,3 +1,15 @@
+from . import pimodules
+
+
+MyEvTypes = pimodules.pyved_engine.game_events_enum((
+    'ElementDrop',  # contient column_idx et elt_type
+    'EarningsUpdate',  # contient value
+    'NewRound',
+    'GuiLaunchRound',
+    'ForceUpdateRounds',  # contient new_val
+    # 'BombExplodes'
+))
+
 
 screen = None
 blocks_pop = None
