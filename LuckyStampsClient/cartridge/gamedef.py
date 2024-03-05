@@ -32,15 +32,20 @@ class LsGameModel(pyv.Emitter):
     starting_y = -176
     BLOCK_SPEED = 2*18
 
-    def __init__(self, serial):
+    def __init__(self, serial, li_events=None):
         super().__init__()
-        print('-'*60)
-        print('SERIAL RECEIVED:')
-        print(serial)
-        print('-' * 60)
-        print()
 
-        self.li_events, self.li_gains = json.loads(serial)
+        if li_events is not None:
+            self.li_events = li_events
+            self.li_gains = [0 for _ in range(7)]
+        else:
+            print('-'*60)
+            print('SERIAL RECEIVED:')
+            print(serial)
+            print('-' * 60)
+            print()
+            self.li_events, self.li_gains = json.loads(serial)
+
         self.total_earnings = 0
 
         self.current_tirage = -1
@@ -275,9 +280,20 @@ def init_game(vmst=None):
     else:
         tirage_result = forced_serial
 
-    # - algo juste pour tester
     my_mod = LsGameModel(tirage_result)
 
+    # - s'il fallait simplement play une partie sans les gains
+    # my_mod = LsGameModel(None
+    # li_events =
+    # [
+    #   [0,"C0",4,3,1],[0,"C1",-1,-1,3],[0,"C2",3,4,0],[0,"C3",6,7,3],[0,"C4",2,7,-1],[0,"C1",1,3,5],[0,"C4",7,3,3],
+    #   [1,"C0",4,3,5],[1,"C1",4,6,1],[1,"C2",6,-1,2],[1,"C3",0,2,7],[1,"C4",5,4,1],[1,"C2",6,6,6],[2,"C0",7,5,5],
+    #   [2,"C1",5,1,2],[2,"C2",6,7,6],[2,"C3",5,7,5],[2,"C4",5,6,3],[3,"C0",3,5,7],[3,"C1",1,-1,-1],[3,"C2",5,1,-1],
+    #   [3,"C3",7,5,2],[3,"C4",7,2,5],[3,"C1",6,2,2],[3,"C2",3,6,2],[4,"C0",6,7,6],[4,"C1",4,7,4],[4,"C2",-1,-1,3],
+    #   [4,"C3",2,3,3],[4,"C4",4,7,-1],[4,"C2",1,7,6],[4,"C4",4,4,1],[5,"C0",7,5,7],[5,"C1",3,-1,7],[5,"C2",7,7,2],
+    #   [5,"C3",6,7,5],[5,"C4",6,3,1],[5,"C1",5,2,1],[6,"C0",2,5,5],[6,"C1",3,-1,4],[6,"C2",2,2,2],[6,"C3",2,2,2],
+    #   [6,"C4",6,1,5],[6,"C1",2,2,2]]
+    # )
     v = LuckyStampsView(my_mod)
     c = MyController(my_mod)
     v.turn_on()
