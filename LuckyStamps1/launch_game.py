@@ -47,7 +47,12 @@ class Injector:
     def set_lazy_loaded_module(self, sub_module_name, python_path):
         self.lazy_loading[sub_module_name] = _PyModulePromise(sub_module_name, python_path, self.package_arg)
     def __getitem__(self, item):
-        return self.registered_modules.get(item, self.lazy_loading[item].result)
+        print(f"importing[{item}]")
+        print(self.registered_modules)
+        print()
+        if item in self.registered_modules:
+            return self.registered_modules[item]
+        return self.lazy_loading[item].result
     def is_loaded(self, package_name):
         return package_name in self.registered_modules or self.lazy_loading[package_name].is_ready()
 def upward_link(link_to_pimodules):
@@ -82,7 +87,9 @@ def bootgame(metadata):
         from .cartridge import pimodules
         rel_imports = True
     mon_inj = Injector(None)
+    from . import network
     mon_inj.set_lazy_loaded_module('pyved_engine', 'pyved_engine')
+    mon_inj.set_preloaded_module('network', network)
     upward_link(mon_inj)
     if rel_imports:
         pimodules.upward_link = mon_inj
