@@ -12,7 +12,7 @@ from . import pimodules
 pyv = pimodules.pyved_engine
 pyv.bootstrap_e()
 
-from . import chdefs
+
 from . import glvars
 from .state_intro import ChessintroState
 from .state_compete import CompeteState
@@ -21,20 +21,22 @@ from .state_compete import CompeteState
 pyg = pyv.pygame
 
 
-@pyv.Singleton
-class SharedStorage:
-    def __init__(self):
-        self.ev_manager = pyv.get_ev_manager()
-        self.ev_manager.setup(chdefs.ChessEvents)
-        self.screen = pyv.get_surface()
+# @pyv.Singleton
+# class SharedStorage:
+#     def __init__(self):
+#         self.ev_manager = pyv.get_ev_manager()
+#         self.ev_manager.setup(chdefs.ChessEvents)
+#         self.screen = pyv.get_surface()
 
 
 @pyv.declare_begin
 def beginchess(vmst=None):
     pyv.init()
+    glvars.screen = pyv.get_surface()
     glvars.ev_manager = pyv.get_ev_manager()
+    glvars.ev_manager.setup()
 
-    estoragevars = SharedStorage.instance()
+    # estoragevars = SharedStorage.instance()
 
     # sq_size_pixels = (100, 100)
     # for iname, sv in pyv.vars.images.items():
@@ -55,12 +57,12 @@ def beginchess(vmst=None):
 
 @pyv.declare_update
 def updatechess(info_t):
-    glvars = SharedStorage.instance()
+    # glvars = SharedStorage.instance()
 
     glvars.ev_manager.post(pyv.EngineEvTypes.Update, curr_t=info_t)
     glvars.ev_manager.post(pyv.EngineEvTypes.Paint, screen=glvars.screen)
-
     glvars.ev_manager.update()
+
     pyv.flip()
 
 

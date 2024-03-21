@@ -1,4 +1,4 @@
-from . import chdefs
+# from . import chdefs
 from . import glvars
 from . import pimodules
 
@@ -55,33 +55,33 @@ class IntroCompo(pyv.EvListener):
         self._update_playertypes()
 
         # - v: buttons
-        def rotatepl1():
-            self.idx_pl1 = (self.idx_pl1 + 1) % len(chdefs.OMEGA_PL_TYPES)
-            self._update_playertypes()
-
-        def rotatepl2():
-            self.idx_pl2 = (self.idx_pl2 + 1) % len(chdefs.OMEGA_PL_TYPES)
-            self._update_playertypes()
-
-        def rotleft_pl1():
-            self.idx_pl1 = (self.idx_pl1 - 1)
-            if self.idx_pl1 < 0:
-                self.idx_pl1 = -1 + len(chdefs.OMEGA_PL_TYPES)
-            self._update_playertypes()
-
-        def rotleft_pl2():
-            self.idx_pl2 = (self.idx_pl2 - 1)
-            if self.idx_pl2 < 0:
-                self.idx_pl2 = -1 + len(chdefs.OMEGA_PL_TYPES)
-            self._update_playertypes()
-
-        self.buttons = [
-            Button(None, 'Start Chessmatch', (128, 256), callback=proc_start),
-            Button(None, ' > ', (128 + 200 + 25, 140), callback=rotatepl1),
-            Button(None, ' < ', (128 - 25 - 60, 140), callback=rotleft_pl1),
-            Button(None, ' > ', (128 + 200 + 25, 200), callback=rotatepl2),
-            Button(None, ' < ', (128 - 25 - 60, 200), callback=rotleft_pl2),
-        ]
+        # def rotatepl1():
+        #     self.idx_pl1 = (self.idx_pl1 + 1) % len(chdefs.OMEGA_PL_TYPES)
+        #     self._update_playertypes()
+        #
+        # def rotatepl2():
+        #     self.idx_pl2 = (self.idx_pl2 + 1) % len(chdefs.OMEGA_PL_TYPES)
+        #     self._update_playertypes()
+        #
+        # def rotleft_pl1():
+        #     self.idx_pl1 = (self.idx_pl1 - 1)
+        #     if self.idx_pl1 < 0:
+        #         self.idx_pl1 = -1 + len(chdefs.OMEGA_PL_TYPES)
+        #     self._update_playertypes()
+        #
+        # def rotleft_pl2():
+        #     self.idx_pl2 = (self.idx_pl2 - 1)
+        #     if self.idx_pl2 < 0:
+        #         self.idx_pl2 = -1 + len(chdefs.OMEGA_PL_TYPES)
+        #     self._update_playertypes()
+        #
+        # self.buttons = [
+        #     Button(None, 'Start Chessmatch', (128, 256), callback=proc_start),
+        #     Button(None, ' > ', (128 + 200 + 25, 140), callback=rotatepl1),
+        #     Button(None, ' < ', (128 - 25 - 60, 140), callback=rotleft_pl1),
+        #     Button(None, ' > ', (128 + 200 + 25, 200), callback=rotatepl2),
+        #     Button(None, ' < ', (128 - 25 - 60, 200), callback=rotleft_pl2),
+        # ]
 
         for b in self.buttons:
             b.set_debug_flag()
@@ -209,9 +209,10 @@ class CompeteState(pyv.BaseGameState):
 
     def __init__(self, ident):
         super().__init__(ident)
-        self.compo = CompeteComponent()
+        self.compo = None
 
     def enter(self):
+        self.compo = CompeteComponent()  # reset the game everytime we enter
         self.compo.turn_on()
         print('entered in a new game state!')
 
