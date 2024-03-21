@@ -1,13 +1,10 @@
-# from . import chdefs
 from . import glvars
 from . import pimodules
 
 
+# aliases
 pyv = pimodules.pyved_engine
-# TODO activation
-# netw = pimodules.network
-
-# - alias
+netw = pimodules.network
 pygame = pyv.pygame
 EngineEvTypes = pyv.EngineEvTypes
 Button = pyv.gui.Button2
@@ -25,11 +22,11 @@ class IntroCompo(pyv.EvListener):
     main component for this game state
     """
 
-    def _update_playertypes(self):
-        chdefs.pltype1 = chdefs.OMEGA_PL_TYPES[self.idx_pl1]
-        chdefs.pltype2 = chdefs.OMEGA_PL_TYPES[self.idx_pl2]
-        self.pltypes_labels[0].text = chdefs.pltype1
-        self.pltypes_labels[1].text = chdefs.pltype2
+    # def _update_playertypes(self):
+    #     chdefs.pltype1 = chdefs.OMEGA_PL_TYPES[self.idx_pl1]
+    #     chdefs.pltype2 = chdefs.OMEGA_PL_TYPES[self.idx_pl2]
+    #     self.pltypes_labels[0].text = chdefs.pltype1
+    #     self.pltypes_labels[1].text = chdefs.pltype2
 
     def __init__(self):
         super().__init__()
@@ -163,6 +160,11 @@ class CompeteComponent(pyv.EvListener):
 
     def on_update(self, ev):
         if self.prev_t is None:
+            # - debug initial en entrant
+            print(netw.get_jwt())
+            print(netw.get_username())
+            print(netw.get_user_id())
+
             self.prev_t = ev.curr_t
             return
 
