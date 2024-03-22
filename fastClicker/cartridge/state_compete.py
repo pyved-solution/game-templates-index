@@ -13,10 +13,6 @@ Button = pyv.gui.Button2
 BGCOLOR = 'antiquewhite3'
 
 
-def proc_start():
-    pyv.get_ev_manager().post(EngineEvTypes.StatePush, state_ident=glvars.MyGameStates.Chessmatch)
-
-
 class IntroCompo(pyv.EvListener):
     """
     main component for this game state
@@ -119,6 +115,8 @@ class CompeteComponent(pyv.EvListener):
 
     def __init__(self):
         super().__init__()
+        self.saved_payment_token = None
+
         self.nb_clicks = 0
         self.ft = pygame.font.Font(None, 45)
         self.ft2 = pygame.font.Font(None, 64)
@@ -137,6 +135,7 @@ class CompeteComponent(pyv.EvListener):
         self.competiting = False
 
         self.reassuring_msg = None
+        self.need_to_push_score = False
 
     def _refresh_counter(self):
         self.label_counter = self.ft2.render(str(self.counter), False, 'red')
@@ -159,6 +158,22 @@ class CompeteComponent(pyv.EvListener):
                 ev.screen.blit(self.reassuring_msg, (CPOS[0], CPOS[1]+96))
 
     def on_update(self, ev):
+        if self.saved_payment_token is None:
+            tmp = netw.pay_challenge(glvars.stored_jwt, glvars.GAME_ID)
+            self.saved_payment_token = tmp['token_code']  # on a payé!
+
+        if self.need_to_push_score:
+            score = self.counter
+            # commit réseau effectif!
+            netwinfo = netw.register_score(score, self.saved_payment_token)
+            # info msg
+            msg = netwinfo['message']
+            self.reassuring_msg = self.ft.render(
+                f"Final score {score} | {msg}",
+                False, 'royalblue'
+            )
+            self.need_to_push_score = False
+
         if self.prev_t is None:
             # - debug initial en entrant
             print(netw.get_jwt())
@@ -177,21 +192,16 @@ class CompeteComponent(pyv.EvListener):
         elif self.competiting:
             elapsed = ev.curr_t - self.prev_t
             remains = CompeteComponent.CHALL_DURATION - elapsed
-            if remains <= 0.0:
-                self._refresh_chrono(0.0)
-
-                print('Game over!')
-                print()
-                self.competiting = False
-
-                score = self.counter
-                self.reassuring_msg = self.ft.render(f"Final score: {score} was automatically pushed to the server",
-                                                     False, 'royalblue')
-                # TODO
-                # netw.pay_challenge(glvars.stored_jwt)
-
-            else:
+            if remains > 0.0:
                 self._refresh_chrono(remains)
+                return
+
+            self._refresh_chrono(0.0)
+
+            print('Game over!')
+            print()
+            self.competiting = False
+            self.need_to_push_score = True
 
     def on_mousedown(self, ev):
         if not self.mouse_b_pressed_flag and self.competiting:

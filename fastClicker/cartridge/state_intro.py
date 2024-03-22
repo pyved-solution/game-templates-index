@@ -36,14 +36,54 @@ class IntroCompo(pyv.EvListener):
     #     self.pltypes_labels[1].text = chdefs.pltype2
 
     def _refresh_user_status(self):
+        offset = 44
         sh = pyv.get_surface().get_height()
         self.is_logged = not (netw.get_user_id() is None)
-        if self.is_logged:
-            self.user_infos = pyv.gui.Label(
-                (32, -150+sh//2),
-                'user_infos'+str(netw.get_user_infos(netw.get_user_id())),
+        if not self.is_logged:
+            self.labels[1] = pyv.gui.Label(
+                (32, (1 * offset) - 250 + sh // 2),
+                'user is not auth, please login before running that game',
                 txt_size=32
             )
+            return
+
+        self.labels[1] = pyv.gui.Label(
+            (32, (1*offset)-250+sh//2),
+            'user_infos'+str(netw.get_user_infos(netw.get_user_id())),
+            txt_size=32
+        )
+
+        # --------
+        # chall costs + wealth info
+        # --------
+        tmp = netw.get_challenge_entry_price(glvars.GAME_ID)
+        challprice = tmp['entry_price']
+
+        glvars.stored_jwt = netw.get_jwt()  # store the value that was used to check can_pay_challenge
+        rez = netw.can_pay_challenge(netw.get_jwt(), glvars.GAME_ID)
+        self.can_pay_flag = rez['can_pay']
+
+        self.labels[2] = pyv.gui.Label(
+            (32, (2*offset)-250+sh//2),
+            f"chall costs {challprice} CR, " + ("you can pay" if self.can_pay_flag else "you CANT pay it now"),
+            txt_size=24
+        )
+
+        # ---------
+        #  make rank info readable
+        # ---------
+        result_getrank = netw.get_rank(netw.get_user_id(), glvars.GAME_ID)
+
+        if result_getrank['score'] is None:  # never played
+            rankmessage = 'no score found, looks like youve never played'
+        else:
+            a, b = result_getrank['score'], result_getrank['rank']
+            rankmessage = f"your best score so far is {a}, current rank:{b}"
+        self.labels[3] = pyv.gui.Label(
+            (32, (3*offset)-250+sh//2),
+            rankmessage,
+            txt_size=24
+        )
 
     def __init__(self):
         super().__init__()
@@ -66,14 +106,25 @@ class IntroCompo(pyv.EvListener):
         title.textsize = 122
         title.color = 'darkblue'
 
-        # TODO ajout d'autres labels permettant de voir auth status
+        # tous les labels permettant de voir:
+        #  titre jeu + info de statut user...
         self.labels = [
+            # fixed rules:
+            # 0-> title, 1-> user_infos, 2-> wealthinfo, 3-> current rank
             title,
+            pyv.gui.Label((0, 0), '.', txt_size=8),
+            pyv.gui.Label((0, 0), '.', txt_size=8),
+            pyv.gui.Label((0, 0), '.', txt_size=8),
         ]
         self.info_label = pyv.gui.Label((32, -128+sh//2), 'cannot start challenge if youre not auth', txt_size=32)
 
+        # to display user status
         self.user_infos = None
+        self.can_pay_chall_label = None
+
         self.is_logged = False
+        self.can_pay_flag = False
+
         self._refresh_user_status()
 
         self.pltypes_labels = [
@@ -121,23 +172,29 @@ class IntroCompo(pyv.EvListener):
 
     def on_update(self, ev):
         # lock buttons if not locgged
-        if self.is_logged and not self.active_buttons:
-            for b in self.buttons:
-                b.set_active()
-            self.active_buttons = True
+        if not self.active_buttons:
+            if self.is_logged and self.can_pay_flag:
+                for b in self.buttons:
+                    b.set_active()
+                self.active_buttons = True
 
     def on_paint(self, ev):
         ev.screen.fill(BGCOLOR)
 
         for lab in self.labels:
             lab.draw()
-        if not self.is_logged:
-            self.info_label.draw()
-        if self.user_infos:
-            self.user_infos.draw()
 
-        for b in self.buttons:
-            b.draw()
+        # if not self.is_logged:
+        #     self.info_label.draw()
+        # if self.user_infos:
+        #     self.user_infos.draw()
+        #     self.can_pay_chall_label.draw()
+
+        wi_obj = self.buttons[0]
+        tmp = pygame.Rect(wi_obj.collision_rect).inflate(4, 4)
+        adhoc_color = 'green' if self.active_buttons else 'red'
+        pygame.draw.rect(ev.screen, adhoc_color, tmp)
+        wi_obj.draw()
 
     def on_keydown(self, ev):
         if ev.key == pygame.K_ESCAPE:
@@ -157,12 +214,21 @@ class ChessintroState(pyv.BaseGameState):
         self.icompo = None
 
     def enter(self):
+        # -- debug
+        print(netw.get_jwt())
+        print(netw.get_username())
+        print(netw.get_user_id())
+        uid = netw.get_user_id()
+        # print(netw.get_challenge_entry_price(glvars.GAME_ID))
+
         self.icompo = IntroCompo()
         self.icompo.turn_on()
 
     def resume(self):
         global was_sent
         was_sent = False
+
+        self.icompo = IntroCompo()  # lets reset the state, fully
         self.icompo.turn_on()
 
     def release(self):
