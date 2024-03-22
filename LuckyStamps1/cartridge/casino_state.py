@@ -1,3 +1,5 @@
+from json import JSONDecodeError
+
 from . import pimodules
 from .shared import MyEvTypes
 from . import glvars
@@ -5,6 +7,7 @@ import json
 
 
 pyv = pimodules.pyved_engine
+EngineEvTypes = pyv.EngineEvTypes
 netw = pimodules.network
 pygame = pyv.pygame
 
@@ -441,6 +444,9 @@ class LuckyStamController(pyv.EvListener):
             print(netw.pay_p2e(glvars.TEST_GAME_ID, auth_user_id, 5))
             print('---------------')
 
+        elif ev.key == pygame.K_ESCAPE:
+            self.pev(EngineEvTypes.StatePop)
+
         # elif ev.key == pygame.K_c:
         #     print('les trois der functions de l\'api CHALLENGE **************')
         #     print('PAY CHALL')
@@ -520,7 +526,21 @@ class CasinoState(pyv.BaseGameState):
             else:
                 target_game_host = expected_host
 
-            tirage_result = pimodules.network.get(target_game_host).text
+            # we have to use .text on the result bc we wish to pass a raw Serial to the model class
+            netw_reply = pimodules.network.get(target_game_host, data={'jwt': glvars.stored_jwt})
+            print('dd NETW_REPLY --> ', netw_reply.text)
+            # only to check if no error
+            json_err = False
+            try:
+                x = json.loads(netw_reply.text)
+                if len(x) != 2 or not(isinstance(x, list)):
+                    json_err = True
+            except JSONDecodeError:
+                json_err = True
+            # TODO est ce qu'on peut trouver cette erreur et la gérer plus
+            if json_err:
+                raise ValueError('tried to pay the server but it replied LATE, that insufficient funds')
+            tirage_result = netw_reply.text
             netw.api_url = saved_config
         else:
             print(' ** ]]]]]]]]]]]]] mode: forced serial activ **')

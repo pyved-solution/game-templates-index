@@ -7,8 +7,10 @@ forced_serial = None
 GAME_PRICE = 5
 
 # netw
+stored_jwt = None
 GAME_CONFIG_SOURCE = "https://hiddenpath.kata.games/game_configs/lucky-stamps.json"
-FORCED_GAME_HOST = "https://games.gaudia-tech.com/lucky-stamps/testluck.php"  # handy for debug
+# FORCED_GAME_HOST = "https://games.gaudia-tech.com/lucky-stamps/testluck.php"  # handy for debug
+FORCED_GAME_HOST = None
 
 # ------------------
 # taille (px) attendue pour les <stamps> img = 149x175

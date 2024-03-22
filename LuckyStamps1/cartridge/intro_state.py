@@ -28,7 +28,6 @@ class IntroCompo(pyv.EvListener):
     """
     main component for this game state
     """
-
     # def _update_playertypes(self):
     #     chdefs.pltype1 = chdefs.OMEGA_PL_TYPES[self.idx_pl1]
     #     chdefs.pltype2 = chdefs.OMEGA_PL_TYPES[self.idx_pl2]
@@ -54,8 +53,10 @@ class IntroCompo(pyv.EvListener):
         )
 
         if self.is_logged:
-            rtest = netw.can_pay_game_fee(netw.get_jwt(), glvars.GAME_PRICE)
-            self.can_pay_flag = rtest  # forcing it to be equal to the return of can_pay_fee
+            tested_token = netw.get_jwt()
+            rtest = netw.can_pay_game_fee(tested_token, glvars.GAME_PRICE)
+            self.can_pay_flag = rtest['can_pay']  # forcing it to be equal to the return of can_pay_fee
+            glvars.stored_jwt = tested_token
             print('can pay?? ', self.can_pay_flag)
 
         # --------
@@ -134,7 +135,7 @@ class IntroCompo(pyv.EvListener):
         ]
 
         self.buttons = [
-            Button(self.large_ft, 'Enter the challenge', (80, 333), callback=proc_start),
+            Button(self.large_ft, 'Play game (fees apply)', (80, 333), callback=proc_start),
             # Button(None, ' > ', (128 + 200 + 25, 140), callback=rotatepl1),
             # Button(None, ' < ', (128 - 25 - 60, 140), callback=rotleft_pl1),
             # Button(None, ' > ', (128 + 200 + 25, 200), callback=rotatepl2),
