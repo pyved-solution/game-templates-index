@@ -1,7 +1,8 @@
-import katagames_sdk as katasdk
-import katagames_engine as kengi
+from . import glvars
 
-GameStates = kengi.struct.enum(
+pyv = glvars.katasdk.pyved_engine
+
+GameStates = pyv.e_struct.enum(
     'TitleScreen',  # first in the list => initial gamestate
     'Credits',
     'Puzzle',

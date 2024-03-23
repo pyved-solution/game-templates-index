@@ -1,7 +1,11 @@
-import katagames_engine as kengi
 
+from . import glvars
 
-MyEvTypes = kengi.event.enum_ev_types(
+pyv = glvars.katasdk.pyved_engine
+
+BlokuEvents = pyv.game_events_enum((
+    'Validation',
+
     # - LoginState
     'LoginStUsernameChanges',  # contains txt
     'LoginStPwdChanges',  # contains txt(not a plain pwd str!)
@@ -23,15 +27,4 @@ MyEvTypes = kengi.event.enum_ev_types(
 
     # - Taxpayment state
     'LoadingBarMoves',
-
-    # 'ItemGetsPlaced',  # contient cell une paire ij, ref_repr_g la référence sur item cliquable
-    # 'ItemDragged',  # contient ref_item
-    # 'ItemDrops',  # item cliquable déposé contient ref_item
-
-    # 'LoginModUpdate',  # contient valeurs pr: login, pwd
-    # 'FakeLogin',
-    # 'ContentChanges',  # quand un item est pris/déposé
-)
-
-# - pr auto inspection, mais c pas obligatoire!
-# CgmEvent.inject_custom_names(MyEvTypes)  # pour avoir les noms affichés par CgmEvent.__str__
+))

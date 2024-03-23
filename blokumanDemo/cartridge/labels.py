@@ -1,8 +1,10 @@
-import katagames_sdk as katasdk
-kataen = katasdk.import_kengi()
+from . import glvars
 
 
-Labels = kataen.struct.enum(
+kengi = glvars.katasdk.pyved_engine
+
+
+Labels = kengi.e_struct.enum(
     'PoidsTotal',
     'UtiliteTotale',
 
