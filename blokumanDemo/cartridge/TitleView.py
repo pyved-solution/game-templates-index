@@ -1,20 +1,17 @@
 import random
 
-import glvars
-import katagames_sdk.capsule.event as kevent
-import katagames_sdk.engine as kataen
-from app.title_screen.TitleModel import TitleModel
-from ev_types import MyEvTypes
-from katagames_sdk.engine import EventReceiver
-from katagames_sdk.engine import gui
-from labels import Labels
-from loctexts import tsl
+from . import glvars
+from . import util
+from .ev_types import BlokuEvents
+from .labels import Labels
+from .loctexts import tsl
 
 
-pygame = kataen.import_pygame()
+kengi = glvars.katasdk.pyved_engine
+pygame = kengi.pygame
 
 
-class TitleView(EventReceiver):
+class TitleView(kengi.EvListener):
     """
     se basera sur un modèle pouvant alterner entre DEUX etats:
     (1) guest, et (2) player_known
@@ -36,8 +33,9 @@ class TitleView(EventReceiver):
 
     def __init__(self, ref_mod):
         super().__init__()
+        self._pos_labels = dict()
 
-        self.scr_size = kataen.get_screen().get_size()
+        self.scr_size = kengi.get_surface().get_size()
         self.midx = self.scr_size[0]//2
 
         # - retro effect, part 1
@@ -45,8 +43,8 @@ class TitleView(EventReceiver):
         # self._vscreen = pygame.Surface(self._vscr_size)
 
         # - son
-        self.sfx_low = pygame.mixer.Sound('assets/coinlow.wav')
-        self.sfx_high = pygame.mixer.Sound('assets/coinhigh.wav')
+        self.sfx_low = kengi.vars.sounds['coinlow']  # pygame.mixer.Sound('user_assets/coinlow.wav')
+        self.sfx_high = kengi.vars.sounds['coinhigh']  # pygame.mixer.Sound('user_assets/coinhigh.wav')
 
         # - polices de car.
         self._bigfont = glvars.fonts['moderne_big']
@@ -54,14 +52,14 @@ class TitleView(EventReceiver):
 
         # ****************** creation etiquettes pr le menu ******************
         self._options_menu = {
-            TitleModel.CHOIX_LOGIN: 'Se connecter',
-            TitleModel.CHOIX_START: 'Demarrer defi',
-            TitleModel.CHOIX_CRED: 'Voir info.',
-            TitleModel.CHOIX_QUIT: 'Quitter'
+            glvars.CHOIX_LOGIN: 'Start game',
+            glvars.CHOIX_START: 'Demarrer defi',
+            glvars.CHOIX_CRED: '?? Unavaible yet',
+            glvars.CHOIX_QUIT: 'Exit game'
         }
-        # TODO clean up
-        if kataen.runs_in_web():
-            self._options_menu[TitleModel.CHOIX_QUIT] = 'Log out'
+        # # TODO clean up
+        # if kataen.runs_in_web():
+        #     self._options_menu[TitleModel.CHOIX_QUIT] = 'Log out'
 
         self._options_labels = dict()
         for code in self._options_menu.keys():
@@ -71,14 +69,14 @@ class TitleView(EventReceiver):
         self.activation_option(ref_mod.get_curr_choice())
 
         # ****************** prepa pour effets particules ******************
-        self._allwalker_pos = list()
-        self._walker_speed = dict()
-
-        for k in range(20):
-            self._walker_speed[k] = random.randint(1, 6)
-
-            i, j = random.randint(0, self.scr_size[0] - 1), random.randint(0, self.scr_size[1] - 1)
-            self._allwalker_pos.append([i, j])
+        # self._allwalker_pos = list()
+        # self._walker_speed = dict()
+        #
+        # for k in range(20):
+        #     self._walker_speed[k] = random.randint(1, 6)
+        #
+        #     i, j = random.randint(0, self.scr_size[0] - 1), random.randint(0, self.scr_size[1] - 1)
+        #     self._allwalker_pos.append([i, j])
 
         self._label_titre = self._bigfont.render(
             self.REAL_TITLE, False, self.TITLE_COLOR
@@ -99,7 +97,7 @@ class TitleView(EventReceiver):
         self.bt_exit = None
 
         # - crea etiquettes qui habillent bouton challenge
-        gui.Etiquette.set_font(glvars.fonts['moderne'])
+        kengi.gui.Etiquette.set_font(glvars.fonts['moderne'])
         self._etq_user = None
         self._etq_solde = None
         self.refresh_graphic_state()
@@ -115,7 +113,7 @@ class TitleView(EventReceiver):
 
     def activation_option(self, code):
         if self._mem_option_active is not None:
-            glvars.playsfx(self.sfx_low)
+            util.playsfx(self.sfx_low)
             self._reset_label_option(self._mem_option_active)
 
         tmp = self._options_menu[code]
@@ -126,7 +124,7 @@ class TitleView(EventReceiver):
         self._mem_option_active = code
 
     def validate_effect(self):
-        glvars.playsfx(self.sfx_high)
+        util.playsfx(self.sfx_high)
 
     def refresh_graphic_state(self):
         label_user = tsl(Labels.Utilisateur)
@@ -142,87 +140,67 @@ class TitleView(EventReceiver):
         else:
             self._etq_solde = None
 
-    def proc_event(self, ev, source):
-        if ev.type == kevent.EngineEvTypes.PAINT:
+    def on_event(self, ev):
+        if ev.type == kengi.EngineEvTypes.Paint:
             self._paint(ev.screen)
 
-        elif ev.type == MyEvTypes.ChoiceChanges:
+        elif ev.type == kengi.EngineEvTypes.Mousemotion:
+            mx, my = kengi.proj_to_vscreen(ev.pos)
+            for cod, lbl in self._options_labels.items():
+                if cod in self._pos_labels:
+                    ix, iy = self._pos_labels[cod]
+                    w, h = lbl.get_size()
+                    if ix < mx < ix+w:
+                        if iy < my < iy+h:
+                            if self.mod.get_curr_choice()!= cod:
+                                self.mod.set_choice(cod)
+
+        elif ev.type == kengi.EngineEvTypes.Mousedown:
+            self.validate_effect()
+            self.pev(BlokuEvents.Validation)
+
+        elif ev.type == BlokuEvents.ChoiceChanges:
             self.activation_option(ev.code)
 
-        elif ev.type == MyEvTypes.BalanceChanges:
+        elif ev.type == BlokuEvents.BalanceChanges:
             self.refresh_graphic_state()
 
-        # -- cétait pour tester
-        # elif ev.type == MyEvTypes.FakeLogin:
-        #     self.mod.mark_auth_done('Roger', 997)
-        #     self.bt_login.turn_off()
-        #     self.refresh_graphic_state()
-
     def dessin_boutons(self, screen):
-
         base_y = 128
         base_x = self.midx
         offset = 0
         if glvars.username:
-            omega_choix = (TitleModel.CHOIX_START, TitleModel.CHOIX_CRED, TitleModel.CHOIX_QUIT)
+            omega_choix = (glvars.CHOIX_START, glvars.CHOIX_CRED, glvars.CHOIX_QUIT)
         else:
-            omega_choix = (TitleModel.CHOIX_LOGIN, TitleModel.CHOIX_CRED, TitleModel.CHOIX_QUIT)
+            omega_choix = (glvars.CHOIX_LOGIN, glvars.CHOIX_CRED, glvars.CHOIX_QUIT)
 
         for c in omega_choix:
             label = self._options_labels[c]
             pos = (base_x - (label.get_size()[0] // 2), base_y + offset)
             offset += 40
-            screen.blit(label, pos)
-
-        # for bt in self._boutons:
-        #     # les boutons login & chall font l'objet d'un traitement a part
-        #     if bt in (self.bt_login, self.bt_chall):
-        #         continue
-        #
-        #     if bt == self.bt_exit:
-        #         screen.blit(self.img_bt_rouge, (bt.position[0] - 4, bt.position[1] + decal_y))
-        #
-        #     elif bt == self.bt_training:  # signe désactivation bt training
-        #         screen.blit(self.img_bt_gris, (bt.position[0] - 4, bt.position[1] + decal_y))
-        #     else:
-        #         screen.blit(self.img_bt_bleu, (bt.position[0] - 4, bt.position[1] + decal_y))
-        #
-        #     screen.blit(bt.image, bt.position)
-        #
-        # # - dessin (traitement particulier) bt login !
-        # if not self.mod.is_logged():  # on cache le bouton login
-        #     screen.blit(self.img_bt_vert, (self.bt_login.position[0] - 4, self.bt_login.position[1] + decal_y))
-        #     screen.blit(self.bt_login.image, self.bt_login.position)
-        #
-        # # - dessin (traitement particulier) bt chall !
-        # if self.mod.can_bet():
-        #     img_adhoc = self.img_bt_bleu
-        # else:
-        #     img_adhoc = self.img_bt_gris
-        #
-        # screen.blit(img_adhoc, (self.bt_chall.position[0] - 4, self.bt_chall.position[1] + decal_y))
-        # screen.blit(self.bt_chall.image, self.bt_chall.position)
+            self._pos_labels[c] = list(pos)
+            screen.blit(label, self._pos_labels[c])
 
     def _paint(self, screen):
         screen.fill(self.BG_COLOR)
 
         # - dessin bonhommes
-        for k, pos in enumerate(self._allwalker_pos):
-            spd = self._walker_speed[k]
-            pos[1] += spd
-            if spd in (1, 2):
-                spd_based_color = glvars.colors['c_mud']
-            elif spd in (3, 4):
-                spd_based_color = glvars.colors['c_brown']
-            else:
-                spd_based_color = glvars.colors['c_gray1']
-
-            pos[1] = pos[1] % self.scr_size[1]
-            pygame.draw.rect(screen, spd_based_color, (pos[0], pos[1], 4, 6))
+        # for k, pos in enumerate(self._allwalker_pos):
+        #     spd = self._walker_speed[k]
+        #     pos[1] += spd
+        #     if spd in (1, 2):
+        #         spd_based_color = glvars.colors['c_mud']
+        #     elif spd in (3, 4):
+        #         spd_based_color = glvars.colors['c_brown']
+        #     else:
+        #         spd_based_color = glvars.colors['c_gray1']
+        #
+        #     pos[1] = pos[1] % self.scr_size[1]
+        #     pygame.draw.rect(screen, spd_based_color, (pos[0], pos[1], 4, 6))
 
         # - dessin titre
         if random.random() < 0.1:
-            if random.random() > 0.5:
+            if random.random() > 0.8:
                 txt = self.REAL_TITLE
             else:
                 txt = self.BROKEN_TIT

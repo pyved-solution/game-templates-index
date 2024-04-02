@@ -1,0 +1,23 @@
+{
+	"vmlib_ver": "23_9a5",
+	"dependencies": {
+		"pyved_engine": "???"
+	},
+	"description": "this game is a puzzle game, it's pretty basic!",
+	"instructions": "not provided",
+	"author": "Thomas",
+	"assets": [
+		"blokuman-bt_rouge.png"
+	],
+	"sounds": [
+		"crumble.wav",
+		"coinhigh.wav",
+		"coinlow.wav"
+	],
+	"slug": "blokumanDemo",
+	"ktg_services": false,
+	"build_date": "Wed Feb 28 09:16:55 2024",
+	"title": "Blokuman: The Majestic Puzzle",
+	"thumbnail512x384": "thumb_2.png",
+	"thumbnail512x512": "thumb_1.png"
+}

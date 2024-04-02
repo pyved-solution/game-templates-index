@@ -3,7 +3,7 @@ _str_repo = dict()
 
 def init_repo(lang):
     global _str_repo
-    from labels import Labels
+    from .labels import Labels
 
     # ---------------------------
     #  Version anglaise

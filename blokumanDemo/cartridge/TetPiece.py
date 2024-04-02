@@ -1,6 +1,6 @@
 import random
 
-from app.puzzle.TetColors import TetColors
+from .TetColors import TetColors
 
 
 MONOCHROM = TetColors.Pink
