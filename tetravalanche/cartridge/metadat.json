@@ -1,5 +1,5 @@
 {
-    "vmlib_ver": "23_9a5",
+    "vmlib_ver": "24_5a1",
     "dependencies": {
         "pyved_engine": "???"
     },
@@ -16,7 +16,11 @@
 		"crumble.wav",
 		"explo_basique.wav"
 	],
-    "cartridge": "MyTetravBundle",
-    "game_title": "MyTetravBundle",
-    "build_date": "Mon Feb 26 13:00:19 2024"
+    "slug": "tetravalanche",
+    "title": "Tetravalanche the game",
+	"instructions":"no instructions provided",
+    "thumbnail512x384": "thumb_2.png",
+    "thumbnail512x512": "thumb_1.png",
+    "ktg_services": false,
+    "build_date": "Mon May 13 14:39:52 2024"
 }
