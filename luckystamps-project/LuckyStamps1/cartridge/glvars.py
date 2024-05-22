@@ -8,7 +8,8 @@ GAME_PRICE = 5
 
 # netw
 stored_jwt = None
-GAME_CONFIG_SOURCE = "https://hiddenpath.kata.games/game_configs/lucky-stamps.json"
+GAME_CONFIG_SOURCE = "https://beta-services.kata.games/game-configs/lucky-stamps.json"
+
 # FORCED_GAME_HOST = "https://games.gaudia-tech.com/lucky-stamps/testluck.php"  # handy for debug
 FORCED_GAME_HOST = None
 
@@ -22,7 +23,7 @@ DEFAULT_USER_ID = 8
 # used to debug netw.chall_* functions, but its not really needed now
 DUMMY_SCORE = 9998
 
-MyGameStates = pimodules.pyved_engine.e_struct.enum(
+MyGameStates = pimodules.pyved_engine.enum(
     'IntroState',
     'CasinoState'
 )
