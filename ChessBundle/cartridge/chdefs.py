@@ -5,7 +5,7 @@ from . import pimodules
 pyv = pimodules.pyved_engine
 
 
-ChessGstates = pyv.e_struct.enum(
+ChessGstates = pyv.enum(
     'Chessintro',
     'Chessmatch',
 )
