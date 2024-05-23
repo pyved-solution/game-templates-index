@@ -5,13 +5,15 @@ import requests
 import json
 
 
-api_url = 'https://t-api-beta.kata.games'
+api_url = 'https://beta-services.kata.games'
 
 
 # ----dummy----, thats not network
 def get_jwt():
     #return None
-    return '3f289658cf5fc1bcf7bc96a4b534ca175e35de59f501922f' #1
+    return '9467e3e3a7b1c2837744d79a47147318ce99f4771ce594ce'
+    # return 'e13059b6ac587ad5e98b451f59546229356fcaac382ffe57'
+    # return '3f289658cf5fc1bcf7bc96a4b534ca175e35de59f501922f' #1
     # '0e96cfd68afd2208fe192a0204bff4be8b33be2cba0e6f46'  # user 8
 
 

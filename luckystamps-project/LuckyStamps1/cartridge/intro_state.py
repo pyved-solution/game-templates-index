@@ -37,7 +37,11 @@ class IntroCompo(pyv.EvListener):
     def _refresh_user_status(self):
         offset = 44
         sh = pyv.get_surface().get_height()
-        self.is_logged = not (netw.get_user_id() is None)
+        if netw.get_jwt() is None or netw.get_user_id() is None:
+            self.is_logged = False
+        else:
+            self.is_logged = True
+
         if not self.is_logged:
             self.labels[1] = pyv.gui.Label(
                 (32, (1 * offset) - 250 + sh // 2),
