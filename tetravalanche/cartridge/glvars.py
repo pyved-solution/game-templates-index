@@ -7,6 +7,7 @@ pyv = pimodules.pyved_engine
 
 # ----------------------
 #  CONSTANTS
+SCR_SIZE = (960, 720)
 DEV_MODE = False
 SKIP_MINING = False
 MAX_FPS = 45
@@ -19,23 +20,15 @@ GAME_ID = 5
 song = None
 snd_channels = dict()
 num_lastchannel = 0  # pr alterner entre 0 et 1
-username = None  # indique si on est log
-copie_solde = None
+
 
 colors = dict()
 fonts = dict()
-
-num_challenge = None  # sera un entier
-chall_seed = None  # sera un entier déterminant cmt générateur aléatoire va sortir les données du problème d'optim.
 
 multiplayer_mode = None  # sera déterminé en fct de s'il y a des joueurs "remote"
 server_host = None  # recevra un str
 server_port = None  # recevra un int
 server_debug = None
-nom_utilisateur = None
-
-solde_gp = None
-id_perso = None
 
 ev_manager = None  # will be set once the game begins
 screen = None  # idem
@@ -46,6 +39,25 @@ GameStates = pyv.custom_struct.enum(
     'Credits',
     'TaxPayment'
 )
+ChoixMenu = pyv.custom_struct.enum(
+    'DemoMode',
+    'StartChallenge',
+    'SeeInfos',
+    'QuitGame'
+)
+# ---------------
+# linked to katagames services
+# ---------------
+user_id = None
+username = None  # indique si on est log
+stored_session = None  # jwt
+
+cr_balance = None
+ready_to_compete = False  # will be True when at the same time user auth + can_pay_challenge has been called
+
+payment_token = None
+# num_challenge = None  # sera un entier
+chall_seed = None  # sera un entier déterminant cmt générateur aléatoire va sortir les données du problème d'optim.
 
 
 def cli_logout():
