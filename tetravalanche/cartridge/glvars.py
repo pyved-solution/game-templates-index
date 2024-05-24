@@ -1,22 +1,9 @@
 from . import pimodules
 
+
+# aliases
 pyv = pimodules.pyved_engine
 
-enum = pyv.custom_struct.enum
-
-
-pygame = pyv.pygame
-
-ev_manager = None  # will be set once the game begins
-screen = None  # idem
-
-GameStates = enum(
-    'Menu',
-    'Login',
-    'Tetris',
-    'Credits',
-    'TaxPayment'
-)
 
 # ----------------------
 #  CONSTANTS
@@ -26,13 +13,7 @@ MAX_FPS = 45
 VERSION = '0.20.1a'
 RESSOURCE_LOC = ['.']
 CHOSEN_LANG = 'fr'
-
-# if DEV_MODE:
-#   RESSOURCE_LOC.insert(0, '..')
-
 GAME_ID = 5
-
-
 # ----------------------
 #  GLOBAL VARIABLES
 song = None
@@ -56,6 +37,16 @@ nom_utilisateur = None
 solde_gp = None
 id_perso = None
 
+ev_manager = None  # will be set once the game begins
+screen = None  # idem
+GameStates = pyv.custom_struct.enum(
+    'Menu',
+    'Login',
+    'Tetris',
+    'Credits',
+    'TaxPayment'
+)
+
 
 def cli_logout():
     global nom_utilisateur, solde_gp, id_perso
@@ -78,12 +69,12 @@ def load_server_config():
 
 def init_sound():
     global snd_channels
-
+    pyg = pyv.pygame
     if len(snd_channels) < 1:
         capital_n = 3
-        pygame.mixer.set_num_channels(capital_n)
+        pyg.mixer.set_num_channels(capital_n)
         for k in range(capital_n):
-            snd_channels[k] = pygame.mixer.Channel(k)
+            snd_channels[k] = pyg.mixer.Channel(k)
 
 
 def is_sfx_playin():
@@ -96,23 +87,19 @@ def is_sfx_playin():
 
 def playmusic():
     global snd_channels, song
-
     if song is None:
-        #song = pygame.mixer.Sound('chiptronic.ogg')
-
-    #musicchannel = snd_channels[2]
-    #musicchannel.play(song)
-        pygame.mixer.music.load('assets/chiptronic.ogg')
+        # song = pygame.mixer.Sound('chiptronic.ogg')
+        # musicchannel = snd_channels[2]
+        # musicchannel.play(song)
+        pyv.pygame.mixer.music.load('assets/chiptronic.ogg')
         song = 1
-
-    pygame.mixer.music.play(-1)
+    pyv.pygame.mixer.music.play(-1)
 
 
 def playsfx(pygamesound):
     # global snd_channels, num_lastchannel
     # num_lastchannel = (num_lastchannel + 1) % 2
     # snd_channels[num_lastchannel].play(pygamesound)
-
     # TODO this is temp fix, for web ctx
     pygamesound.play()
 
@@ -120,15 +107,13 @@ def playsfx(pygamesound):
 def init_fonts_n_colors():
     global colors, fonts
     from .fonts_n_colors import my_fonts, my_colors
-
-    pygame.font.init()
+    pyv.pygame.font.init()
     
     for name, v in my_colors.items():
-        colors[name] = pygame.Color(v)
+        colors[name] = pyv.pygame.Color(v)
 
     for name, t in my_fonts.items():
         # tmp = list(RESSOURCE_LOC)
         # tmp.append(t[0])
         # source = os.path.join(*tmp)
-        fonts[name] = pygame.font.Font(None, t[1])
-
+        fonts[name] = pyv.pygame.font.Font(None, t[1])
