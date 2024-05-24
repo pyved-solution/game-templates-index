@@ -1,30 +1,28 @@
 # PY CONNECTOR, automatically gen. Do not modify by hand!
 # filename:autogened_localctx_connector.py
-# Generation date: 2024-03-22 09:24:01
+# Generation date: 2024-05-22 23:06:11
 import requests
 import json
 
-
-api_url = 'https://t-api-beta.kata.games'
-
+slugname = ''
 
 # ----dummy----, thats not network
-def get_jwt():
-    # return None
-    return '3f289658cf5fc1bcf7bc96a4b534ca175e35de59f501922f' #1
-    # '0e96cfd68afd2208fe192a0204bff4be8b33be2cba0e6f46'  # user 8
+def read_config():
+    global slugname
+    with open(slugname+'/pyconnector_config.json', 'r') as file:
+        return json.load(file)
 
+def get_jwt():
+    config = read_config()
+    return config.get('jwt')
 
 def get_username():
-    #return None
-    return 'Mickeys38'
-    # 'rogergo'
-
+    config = read_config()
+    return config.get('username')
 
 def get_user_id():
-    # return None
-    return 1
-    # 8
+    config = read_config()
+    return config.get('user_id')
 
 
 class GetResult:
@@ -43,6 +41,8 @@ def _ensure_type_hexstr(data):
 
 
 def _get_request(url, given_data=None):
+    config = read_config()
+    api_url = config.get('api_url')
     try:
         response = requests.get(f"{api_url}{url}", params=given_data)
         print('sending GET, url:', f"{api_url}{url}")
@@ -61,6 +61,8 @@ def get(url, data=None):
 
 
 def _post_request(url, given_data=None):
+    config = read_config()
+    api_url = config.get('api_url')
     try:
         print('sending POST, url:', f"{api_url}{url}")
         print('sending POST, params:', given_data)
@@ -68,6 +70,26 @@ def _post_request(url, given_data=None):
         response.raise_for_status()
         print('raw result:', response.text)
         return GetResult(response.text)
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
+
+def get_challenge_entry_price(game_id: int):
+    # GET request to /challenge/entryPrice
+    try:
+        resobj = _get_request('/challenge/entryPrice', {'game_id': game_id})
+        return resobj.to_json()
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
+
+def get_challenge_seed(game_id: int):
+    # GET request to /user/infos
+    try:
+        resobj = _get_request('/challenge/seed', {'game_id': game_id})
+        return resobj.to_json()
     except requests.exceptions.RequestException as e:
         print('Error:', e)
         return None
@@ -167,26 +189,6 @@ def auth(username: str, password: str):
     # GET request to /user/auth
     try:
         resobj = _get_request('/user/auth', {'username': username, 'password': password})
-        return resobj.to_json()
-    except requests.exceptions.RequestException as e:
-        print('Error:', e)
-        return None
-
-
-def get_challenge_entry_price(game_id: int):
-    # GET request to /challenge/entryPrice
-    try:
-        resobj = _get_request('/challenge/entryPrice', {'game_id': game_id})
-        return resobj.to_json()
-    except requests.exceptions.RequestException as e:
-        print('Error:', e)
-        return None
-
-
-def get_challenge_seed(game_id: int):
-    # GET request to /challenge/seed
-    try:
-        resobj = _get_request('/challenge/seed', {'game_id': game_id})
         return resobj.to_json()
     except requests.exceptions.RequestException as e:
         print('Error:', e)

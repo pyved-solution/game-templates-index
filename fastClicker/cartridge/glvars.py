@@ -8,7 +8,7 @@ ev_manager = screen = None
 
 pyv = pimodules.pyved_engine
 
-MyGameStates = pyv.e_struct.enum(
+MyGameStates = pyv.custom_struct.enum(
     'TitleScreen',
     'CompeteNow',
 )
