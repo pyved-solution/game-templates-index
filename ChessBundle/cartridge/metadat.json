@@ -5,24 +5,46 @@
     },
     "description": "this is a placeholder so you can describe your game",
     "author": "tom",
-    "assets": [
-        "black_bishop.png",
-        "black_king.png",
-        "black_knight.png",
-        "black_pawn.png",
-        "black_queen.png",
-        "black_rook.png",
-        "white_bishop.png",
-        "white_king.png",
-        "white_knight.png",
-        "white_pawn.png",
-        "white_queen.png",
-        "white_rook.png",
+    "asset_base_folder" : "lalassets",
+    "asset_list": [
+	    "white/white_queen.png",
+		
+	    "white/white_king.png",
+        "white/white_knight.png",
+		
+        "black/black_bishop.png",
+        "black/black_king.png",
+        "black/black_knight.png",
+        "black/black_pawn.png",
+        "black/black_queen.png",
+        "black/black_rook.png",
+        "white/white_bishop.png",
+
+        "white/white_pawn.png",
+        
+        "white/white_rook.png",
         "white_square.png",
         "brown_square.png",
         "cyan_square.png"
     ],
-    "sounds": [],
+    "sound_base_folder" : "xysounds",
+    "sound_list": ["test.ogg"],
+    "data_files" : ["bidule.csv"],
+    "source_files":[
+		"model/PlayerModel.py",
+		"model/CarModel.py",
+		"classes/fake_submodule/attempt.py",
+		"classes/fake_submodule/so_complex/google.py",
+
+		"classes/PythonChessAIStats.py",
+		"classes/ChessGameParams.py",
+		"classes/ChessGUI_text.py",
+		"classes/ChessmatchMod.py",
+		"classes/ScrollingTextBox.py",
+		"gamedef.py",
+		"ai_players.py"
+    ],
+
     "slug": "ChessBundle",
     "game_title": "classicchess",
     "build_date": "Mon Feb 26 12:42:11 2024"
