@@ -1,32 +1,34 @@
 # PY CONNECTOR, automatically gen. Do not modify by hand!
 # filename:autogened_localctx_connector.py
-# Generation date: 2024-03-22 09:24:01
+# Generation date: 2024-05-22 23:06:11
 import requests
 import json
 
 
-api_url = 'https://beta-services.kata.games'
+slugname = ''
+# don't set "api_url" here because it will be overriden by the session config anywayz!
 
 
 # ----dummy----, thats not network
+def read_config():
+    global slugname
+    with open(slugname + '/pyconnector_config.json', 'r') as file:
+        return json.load(file)
+
+
 def get_jwt():
-    #return None
-    return '9467e3e3a7b1c2837744d79a47147318ce99f4771ce594ce'
-    # return 'e13059b6ac587ad5e98b451f59546229356fcaac382ffe57'
-    # return '3f289658cf5fc1bcf7bc96a4b534ca175e35de59f501922f' #1
-    # '0e96cfd68afd2208fe192a0204bff4be8b33be2cba0e6f46'  # user 8
+    config = read_config()
+    return config.get('jwt')
 
 
 def get_username():
-    # return None
-    return 'Mickeys38'
-    # 'rogergo'
+    config = read_config()
+    return config.get('username')
 
 
 def get_user_id():
-    # return None
-    return 1
-    # 8
+    config = read_config()
+    return config.get('user_id')
 
 
 class GetResult:
@@ -44,7 +46,10 @@ def _ensure_type_hexstr(data):
     return False
 
 
-def _get_request(url, given_data=None):
+def _get_request(url, given_data=None, api_url=None):
+    if api_url is None:
+        config = read_config()
+        api_url = config.get('api_url')
     try:
         response = requests.get(f"{api_url}{url}", params=given_data)
         print('sending GET, url:', f"{api_url}{url}")
@@ -58,11 +63,13 @@ def _get_request(url, given_data=None):
 
 
 # added alias
-def get(url, data=None):
-    return _get_request(url, data)
+def get(api_url, url, data=None):
+    return _get_request(url, data, api_url=api_url)
 
 
 def _post_request(url, given_data=None):
+    config = read_config()
+    api_url = config.get('api_url')
     try:
         print('sending POST, url:', f"{api_url}{url}")
         print('sending POST, params:', given_data)
@@ -70,6 +77,26 @@ def _post_request(url, given_data=None):
         response.raise_for_status()
         print('raw result:', response.text)
         return GetResult(response.text)
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
+
+def get_challenge_entry_price(game_id: int):
+    # GET request to /challenge/entryPrice
+    try:
+        resobj = _get_request('/challenge/entryPrice', {'game_id': game_id})
+        return resobj.to_json()
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
+
+def get_challenge_seed(game_id: int):
+    # GET request to /user/infos
+    try:
+        resobj = _get_request('/challenge/seed', {'game_id': game_id})
+        return resobj.to_json()
     except requests.exceptions.RequestException as e:
         print('Error:', e)
         return None
@@ -98,7 +125,7 @@ def get_user_infos(user_id: int):
 def can_pay_challenge(jwt: str, game_id: int):
     # GET request to /challenge/canPay
     if not _ensure_type_hexstr(jwt):
-        raise Exception("hexstr type not recognized! Value: "+str(jwt))
+        raise Exception("hexstr type not recognized! Value: " + str(jwt))
     try:
         resobj = _get_request('/challenge/canPay', {'jwt': jwt, 'game_id': game_id})
         return resobj.to_json()
@@ -120,7 +147,7 @@ def get_rank(user_id: int, game_id: int):
 def can_pay_game_fee(jwt: str, game_price: int):
     # GET request to /games/canPayGameFee
     if not _ensure_type_hexstr(jwt):
-        raise Exception("hexstr type not recognized! Value: "+str(jwt))
+        raise Exception("hexstr type not recognized! Value: " + str(jwt))
     try:
         resobj = _get_request('/games/canPayGameFee', {'jwt': jwt, 'game_price': game_price})
         return resobj.to_json()
@@ -132,7 +159,7 @@ def can_pay_game_fee(jwt: str, game_price: int):
 def pay_challenge(jwt: str, game_id: int):
     # GET request to /challenge/pay
     if not _ensure_type_hexstr(jwt):
-        raise Exception("hexstr type not recognized! Value: "+str(jwt))
+        raise Exception("hexstr type not recognized! Value: " + str(jwt))
     try:
         resobj = _get_request('/challenge/pay', {'jwt': jwt, 'game_id': game_id})
         return resobj.to_json()
@@ -144,7 +171,7 @@ def pay_challenge(jwt: str, game_id: int):
 def register_score(score: int, token: str):
     # GET request to /challenge/score
     if not _ensure_type_hexstr(token):
-        raise Exception("hexstr type not recognized! Value: "+str(token))
+        raise Exception("hexstr type not recognized! Value: " + str(token))
     try:
         resobj = _get_request('/challenge/score', {'score': score, 'token': token})
         return resobj.to_json()
@@ -156,7 +183,7 @@ def register_score(score: int, token: str):
 def pay_game_fee(jwt: str, game_id: int, game_price: int):
     # GET request to /games/payGameFee
     if not _ensure_type_hexstr(jwt):
-        raise Exception("hexstr type not recognized! Value: "+str(jwt))
+        raise Exception("hexstr type not recognized! Value: " + str(jwt))
     try:
         resobj = _get_request('/games/payGameFee', {'jwt': jwt, 'game_id': game_id, 'game_price': game_price})
         return resobj.to_json()
@@ -169,26 +196,6 @@ def auth(username: str, password: str):
     # GET request to /user/auth
     try:
         resobj = _get_request('/user/auth', {'username': username, 'password': password})
-        return resobj.to_json()
-    except requests.exceptions.RequestException as e:
-        print('Error:', e)
-        return None
-
-
-def get_challenge_entry_price(game_id: int):
-    # GET request to /challenge/entryPrice
-    try:
-        resobj = _get_request('/challenge/entryPrice', {'game_id': game_id})
-        return resobj.to_json()
-    except requests.exceptions.RequestException as e:
-        print('Error:', e)
-        return None
-
-
-def get_challenge_seed(game_id: int):
-    # GET request to /challenge/seed
-    try:
-        resobj = _get_request('/challenge/seed', {'game_id': game_id})
         return resobj.to_json()
     except requests.exceptions.RequestException as e:
         print('Error:', e)
