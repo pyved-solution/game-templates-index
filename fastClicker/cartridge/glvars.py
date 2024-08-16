@@ -1,7 +1,7 @@
 from . import pimodules
 
 
-GAME_ID = 16
+GAME_ID = 3
 
 stored_jwt = None
 ev_manager = screen = None
