@@ -1,21 +1,19 @@
 <?php
-include('../dbconnection.php');
 require_once('secretdraw.php');
 require_once('gains.php');
 
 // REMARQUE TOM
 // provoquait erreur:
 // ... has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header contains multiple values '*, *', but only one is allowed.
-
 // je pense que ca venait du fait qu'on a un doublon avec le .htaccess
 // du coup faut choisir: soit l'un soit l'autre !
-
 // header('Access-Control-Allow-Origin: *');
 
+$API_URL = "https://services-beta.kata.games/pvp";
+$ADMIN_MODE = false;  // set this constant to true if you need to by-pass credit system temporarly
+$GAME_ID = "4"; // Game ID
 
-
-//
-header('Content-Type: application/json');
+$paymentToken = null;
 
 
 function generateRandomNumbersForColumn($rows) {
@@ -116,17 +114,16 @@ function generateRandomArray($rows, $columns, &$generations) {
 //     $stmt->execute(['userId' => $userId, 'creditsToAdd' => $totalCreditsWon]);
 // }
 function updateUserCredits($userId, $totalCreditsWon) {
-    global $apiUrl, $token, $gameId;
+	global $API_URL, $GAME_ID, $paymentToken;
 
     $description = "Lucky Stamps winnings";
     // Prepare the URL with parameters
-    $getUrl = $apiUrl . '/games/getPaid';
+    $getUrl = $API_URL . '/games/getPaid';
     $getUrl .= '?user_id=' . $userId;
-    $getUrl .= '&game_id=' . urlencode($gameId);
+    $getUrl .= '&game_id=' . urlencode($GAME_ID);
     $getUrl .= '&amount=' . urlencode($totalCreditsWon);
-    $getUrl .= '&token=' . urlencode($token);
+    $getUrl .= '&token=' . urlencode($paymentToken);
     $getUrl .= '&description=' . urlencode($description);
-
 
     // Initialize cURL session
     $ch = curl_init($getUrl);
@@ -152,11 +149,11 @@ function updateUserCredits($userId, $totalCreditsWon) {
 }
 
 
-function payGameFee($userId, $gameId, $gamePrice) {
-    global $apiUrl, $token; // Use the global variable for API URL
+function payGameFee($userId, $gameId, $gamePrice,$jwtToken) {
+	global $API_URL, $paymentToken;
 
-    $getUrl = $apiUrl . '/games/payGameFee';
-    $getUrl .= '?jwt=' . urlencode($token);
+    $getUrl = $API_URL . '/games/payGameFee';
+    $getUrl .= '?jwt=' . urlencode($jwtToken);
     $getUrl .= '&game_id=' . urlencode($gameId);
     $getUrl .= '&game_price=' . urlencode($gamePrice);
 
@@ -175,47 +172,52 @@ function payGameFee($userId, $gameId, $gamePrice) {
     $responseData = json_decode($response, true);
     if (isset($responseData['reply_code']) && $responseData['reply_code'] == "200") {
         if (!empty($responseData['token_code'])) {
-            $token = $responseData['token_code'];
+            $paymentToken = $responseData['token_code'];
         } else {
             throw new Exception("API did not return a tokenCode.");
         }
     } else {
-        die('"'.$responseData['message'].'"');
+        die('"Error in payGameFee ->'.$responseData['message'].'"');
     }
 }
 
-$apiUrl = "https://t-api-beta.kata.games"; 
-$gameId = "11"; // Game ID
-$mode_admin = false;
 $userId = null;
 $gamePrice = null;
-$token = null;
-if(!isset($_GET['user_id'])){
-    $mode_admin = true;
-}else{
-    $userId = $_GET['user_id'];
+$jwtValue = null;
+
+if(!$ADMIN_MODE){
+	if(!isset($_GET['user_id'])){
+		throw new Exception('user_id not provided!');
+	}
+	if(!isset($_GET['game_price'])){
+		throw new Exception('game_price not provided!');
+	}
+	if(!isset($_GET['jwt'])){
+		throw new Exception('jwt not provided!');
+	}
+
+	$userId = $_GET['user_id'];
     $gamePrice = $_GET['game_price'];
-    $token = $_GET['token'];
+	$jwtValue = $_GET['jwt'];
+	payGameFee($userId, $GAME_ID, $gamePrice,$jwtValue);
 }
 
-if(!$mode_admin){
-    payGameFee($userId, $gameId, $gamePrice);
-}
 $rows = 3;
 $columns = 5;
 $generations = 3; // Nombre initial de générations
 $min = -1;
 $max = 8;
 $data = generateRandomArray(3, 5, $generations);  // la var. generations est mise à jour par retour de param.
-
-
 $li_credit_gains = compute_credit_gains($data, 3, 5, $generations);
 
-$totalCreditsWon = array_sum($li_credit_gains);
-if ($userId !== null && !$mode_admin) {
-    updateUserCredits($userId, $totalCreditsWon);
+if(!$ADMIN_MODE){
+	$totalCreditsWon = array_sum($li_credit_gains);
+	updateUserCredits($userId, $totalCreditsWon, $jwtValue);
 }
 
-$response = [$data,$li_credit_gains];
-ob_flush();
+$response = [$data,$li_credit_gains,$ADMIN_MODE];
+
+//ob_flush();
+
+header('Content-Type: application/json');
 echo json_encode($response);

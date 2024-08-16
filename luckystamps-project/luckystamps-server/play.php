@@ -1,10 +1,14 @@
 <?php
+$slugName = "LuckyStamps1";
+$GAME_PRICE = 5;
+
 
 function getUserIdByJwt($jwt) {
     // JWT token to be sent in the API call
 
     // API endpoint URL
-    $endpoint = "https://t-api-beta.kata.games/user/jwt?jwt=" . urlencode($jwt);
+    // $endpoint = "https://services-beta.kata.games/pvp/user/jwt?jwt=" . urlencode($jwt);
+$endpoint = "https://cms-beta.kata.games/content/plugins/facade/user/jwt?jwt=" . urlencode($jwt);
 
     // Initialize cURL session
     $curl = curl_init();
@@ -28,40 +32,51 @@ function getUserIdByJwt($jwt) {
         $error_message = curl_error($curl);
         // Handle cURL error
         echo "Error: $error_message";
+
+		curl_close($curl);  // Close cURL session
         return null;
-    } else {
-        // API call successful
-        $http_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($http_status_code === 200) {
-            // Parse and process the API response
-            $data = json_decode($response, true);
-            // Access the user_id from the response
-            $user_id = $data['user_id'];
-            // Return the user ID
-            return $user_id;
-        } else {
-            // Handle non-200 HTTP response
-            echo "HTTP Error: $http_status_code";
-            return null;
-        }
     }
 
-    // Close cURL session
-    curl_close($curl);
+	// API call successful
+	$http_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+	if ($http_status_code != 200) {
+		// Handle non-200 HTTP response
+		echo "HTTP Error: $http_status_code";
+		curl_close($curl);  // Close cURL session
+		return null;
+    }
+
+	// Parse and process the API response
+	$data = json_decode($response, true);
+	// var_dump($data);
+	if ($data['reply_code']!=200){
+		echo "WARNING: was impossible to find the UserId tied to the Jwt provided: $jwt";
+		return null;
+	}
+	// Access the user_id from the response
+	$user_id = $data['user_id'];
+
+	curl_close($curl);  // Close cURL session
+	return $user_id;
 }
-if(isset($_REQUEST['jwt'])) {
-    $token = $_REQUEST['jwt'];
 
+
+if (isset($_GET['jwt'])) {
+
+    $token = $_GET['jwt'];
     $userId = getUserIdByJwt($token);
-    $gamePrice = 5; 
-
+	if ($userId==NULL){
+		var_dump($userId);
+		die("no valid JWT, no userId found" );
+	}
     // Send parameters as part of the URL 
-    $url = 'https://' . $_SERVER['HTTP_HOST'] . '/lucky-stamps/testluck.php';
-    $params = http_build_query(['user_id' => $userId, 'game_price' => $gamePrice, 'token' => $token]);
+    $urlPourTestLuck = 'https://' . $_SERVER['HTTP_HOST'] . "/game-servers/$slugName/testluck.php";
+    $params = http_build_query(['user_id' => $userId, 'game_price' => $GAME_PRICE, 'jwt' => $token]);
+
     // $jsonObj = json_decode(file_get_contents($url . '?' . $params), true);
     header('Content-Type: application/json');
-
-    echo file_get_contents($url . '?' . $params);
+    echo file_get_contents($urlPourTestLuck . '?' . $params);
 } else {
-    echo 'No jwt sent';
+
+    echo '!!! No JWT sent';
 }
