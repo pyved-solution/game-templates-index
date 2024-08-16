@@ -31,7 +31,8 @@ class LuckyStamModel(pyv.Emitter):
             print(serial)
             print('-' * 60)
             print()
-            self.li_events, self.li_gains = json.loads(serial)
+            json_obj = json.loads(serial)
+            self.li_events, self.li_gains = json_obj[0], json_obj[1]
 
         self.total_earnings = 0
 
@@ -492,30 +493,17 @@ class CasinoState(pyv.BaseGameState):
         self.icompo = None
 
     def enter(self):
-        gscreen = pyv.get_surface()
         # shared.screen = screen
         pyv.init(wcaption='Lucky Stamps: the game')
-        # pyv.define_archetype('player', ('body', 'speed', 'controls'))
-        # pyv.define_archetype('block', ('body',))
-        # pyv.define_archetype('ball', ('body', 'speed_Y', 'speed_X'))
-        # blocks_create()
-        # player_create()
-        # ball_create()
-        # pyv.bulk_add_systems(systems)
 
-        localCtx = True  # TODO trouve autre solution
         # - fetch info depuis le serveur
         if glvars.forced_serial is None:
-            print()
-            print('forced_serial est à None ------------- ')
-            # LOCAL
-            # import requests
-            # hack
-            saved_config = netw.api_url
-            netw.api_url = ''
+            print('-----> forced_serial est à None <-----')
 
-            url = glvars.GAME_CONFIG_SOURCE
-            expected_host = pimodules.network.get(url).to_json()['url']
+            expected_host = pimodules.network.get(
+                'http://pyvm.kata.games', '/servers.json'
+            ).to_json()['LuckyStamps1']['url']
+
             if glvars.FORCED_GAME_HOST:
                 print('********* WARNING ************')
                 print()
@@ -527,25 +515,17 @@ class CasinoState(pyv.BaseGameState):
                 target_game_host = expected_host
 
             # we have to use .text on the result bc we wish to pass a raw Serial to the model class
-            netw_reply = pimodules.network.get(target_game_host, data={'jwt': glvars.stored_jwt})
-            print('dd NETW_REPLY --> ', netw_reply.text)
-            # only to check if no error
-            json_err = False
-            try:
-                x = json.loads(netw_reply.text)
-                if len(x) != 2 or not(isinstance(x, list)):
-                    json_err = True
+            netw_reply = pimodules.network.get('', target_game_host, data={'jwt': glvars.stored_jwt})
+
+            try:  # stop if error, stop right now as it will be easier to debug
+                json.loads(netw_reply.text)
             except JSONDecodeError:
-                json_err = True
-            # TODO est ce qu'on peut trouver cette erreur et la gérer plus
-            if json_err:
-                raise ValueError('tried to pay the server but it replied LATE, that insufficient funds')
+                raise ValueError('Error in decoding the JSON (reply) right after calling play.php')
+
             tirage_result = netw_reply.text
-            netw.api_url = saved_config
         else:
             print(' ** ]]]]]]]]]]]]] mode: forced serial activ **')
             tirage_result = glvars.forced_serial
-
         self.m = LuckyStamModel(tirage_result)
         self.v = LuckyStamView(self.m)
         self.c = LuckyStamController(self.m)
