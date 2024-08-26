@@ -36,6 +36,10 @@ def initfunc(vmst=None):
         }
     )
     glvars.ev_manager.post(pyv.EngineEvTypes.Gamestart)
+    print()
+    print('-max fps is now:-')
+    pyv.vars.maxfps = 0  # hack: replace the default value, to maximize speed execution
+    print(pyv.vars.maxfps)
 
 
 @pyv.declare_update

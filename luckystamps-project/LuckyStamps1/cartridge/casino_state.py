@@ -17,7 +17,7 @@ class LuckyStamModel(pyv.Emitter):
     BONUS_CODE = 0
     binfx, binfy = 100, 90
     starting_y = -176
-    BLOCK_SPEED = 2 * 18
+    BLOCK_SPEED = 81  # how fast blocks move
 
     def __init__(self, serial, li_events=None):
         super().__init__()
