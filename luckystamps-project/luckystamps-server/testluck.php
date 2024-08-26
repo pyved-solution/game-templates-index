@@ -1,6 +1,7 @@
 <?php
 require_once('secretdraw.php');
 require_once('gains.php');
+require_once('low_level.php');
 
 // REMARQUE TOM
 // provoquait erreur:
@@ -125,24 +126,8 @@ function updateUserCredits($userId, $totalCreditsWon) {
     $getUrl .= '&token=' . urlencode($paymentToken);
     $getUrl .= '&description=' . urlencode($description);
 
-    // Initialize cURL session
-    $ch = curl_init($getUrl);
+    $responseData = std_curl_call($getUrl);
 
-    // Set cURL options
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPGET, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-    ]);
-
-    $response = curl_exec($ch);
-    if (curl_errno($ch)) {
-        throw new Exception(curl_error($ch));
-    }
-
-    curl_close($ch);
-
-    $responseData = json_decode($response, true);
     if (isset($responseData['success']) && !$responseData['success']) {
         throw new Exception("Failed to update user credits through API.");
     }
@@ -157,19 +142,8 @@ function payGameFee($userId, $gameId, $gamePrice,$jwtToken) {
     $getUrl .= '&game_id=' . urlencode($gameId);
     $getUrl .= '&game_price=' . urlencode($gamePrice);
 
-    $ch = curl_init($getUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPGET, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    $response = curl_exec($ch);
+    $responseData = std_curl_call($getUrl);
 
-    if (curl_errno($ch)) {
-        curl_close($ch);
-        throw new Exception(curl_error($ch));
-    }
-    curl_close($ch);
-
-    $responseData = json_decode($response, true);
     if (isset($responseData['reply_code']) && $responseData['reply_code'] == "200") {
         if (!empty($responseData['token_code'])) {
             $paymentToken = $responseData['token_code'];
@@ -212,7 +186,9 @@ $li_credit_gains = compute_credit_gains($data, 3, 5, $generations);
 
 if(!$ADMIN_MODE){
 	$totalCreditsWon = array_sum($li_credit_gains);
-	updateUserCredits($userId, $totalCreditsWon, $jwtValue);
+	if ($totalCreditsWon>0){
+	  updateUserCredits($userId, $totalCreditsWon, $jwtValue);
+	}
 }
 
 $response = [$data,$li_credit_gains,$ADMIN_MODE];
