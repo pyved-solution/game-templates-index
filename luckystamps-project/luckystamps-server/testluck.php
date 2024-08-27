@@ -11,14 +11,19 @@ require_once('low_level.php');
 // header('Access-Control-Allow-Origin: *');
 
 $API_URL = "https://services-beta.kata.games/pvp";
-$ADMIN_MODE = false;  // set this constant to true if you need to by-pass credit system temporarly
+$ADMIN_MODE = true;  // set this constant to true if you need to by-pass credit system temporarly
 $GAME_ID = "4"; // Game ID
 
 $paymentToken = null;
+
+
 $BONUS_STAMP_CODE = 0;
+$EXPLOSION_STAMP_CODE = -1;
 
 
 function generateRandomNumbersForColumn($rows, &$alreadyFoundBonus) {
+	global $BONUS_STAMP_CODE;
+
     $numbers = [];
     for ($j = 0; $j < $rows; $j++) {
         do {
@@ -33,7 +38,12 @@ function generateRandomNumbersForColumn($rows, &$alreadyFoundBonus) {
     return $numbers;
 }
 
-function verifyAndRegenerate($array, $rows, $generationCounter, &$alreadyFoundBonus, &$additionalGenerationsRequired) {
+function generateFurtherColumns($array, $rows, $generationCounter, &$alreadyFoundBonus) {
+	// goal of this function is to extend the given grid, whenever "exploding stamps" are found
+	// array represents a 3-column grid with stamp codes
+
+	global $BONUS_STAMP_CODE;
+
     $regeneratedArrays = [];
     $alreadyFoundBonusInRegeneration = false;
 
@@ -47,57 +57,73 @@ function verifyAndRegenerate($array, $rows, $generationCounter, &$alreadyFoundBo
             $newRow = [$generationCounter, $row[1]];
             foreach ($newNumbers as $number) {
                 $newRow[] = $number;
-                if ($number === $BONUS_STAMP_CODE && !$alreadyFoundBonusInRegeneration && !$alreadyFoundBonus) {
-                    $alreadyFoundBonusInRegeneration = true;
-                    $alreadyFoundBonus = true;
-                }
             }
             $regeneratedArrays[] = $newRow;
         }
     }
 
-    if ($alreadyFoundBonusInRegeneration) {
-        $additionalGenerationsRequired += 2;
-    }
-
     return array_merge($array, $regeneratedArrays);
 }
 
+function checkForBonuses($arrays) {
+    global $BONUS_STAMP_CODE, $EXPLOSION_STAMP_CODE;
+    
+    $validBonusCount = 0;
+    $columnsWithExplosion = [];
+
+    // First pass: identify columns with explosions
+    foreach ($arrays as $array) {
+        $columnIndex = $array[1]; // "C0", "C1", etc.
+        if (in_array($EXPLOSION_STAMP_CODE, array_slice($array, 2))) {
+            $columnsWithExplosion[] = $columnIndex;
+        }
+    }
+
+    // Second pass: count valid bonuses
+    foreach ($arrays as $array) {
+        $columnIndex = $array[1];
+        // Skip columns with explosions
+        if (in_array($columnIndex, $columnsWithExplosion)) {
+            continue;
+        }
+        // Count bonuses in valid columns
+        $validBonusCount += count(array_filter(array_slice($array, 2), function($stamp) use ($BONUS_STAMP_CODE) {
+            return $stamp === $BONUS_STAMP_CODE;
+        }));
+    }
+
+    return $validBonusCount;
+}
+
 function generateRandomArray($rows, $columns, &$generations) {
+    global $BONUS_STAMP_CODE, $EXPLOSION_STAMP_CODE;
+    
+    $remainingGen = $generations;
     $allData = [];
     $g = 0;
-    $additionalGenerationsRequired = 0;
 
-    while ($g < $generations + $additionalGenerationsRequired) {
+    while ($remainingGen > 0) {
         $array = [];
         $alreadyFoundBonus = false;
-        $foundNegativeOne = false;
 
         for ($i = 0; $i < $columns; $i++) {
             $numbers = generateRandomNumbersForColumn($rows, $alreadyFoundBonus);
             $row = [$g, "C$i"];
-            
-            foreach ($numbers as $number) {
-                $row[] = $number;
-                if ($number === $BONUS_STAMP_CODE) {
-                    $alreadyFoundBonus = true;
-                }
-                if ($number === -1) {
-                    $foundNegativeOne = true;
-                }
-            }
+            $row = array_merge($row, $numbers);
             $array[] = $row;
         }
 
-        $array = verifyAndRegenerate($array, $rows, $g, $alreadyFoundBonus, $additionalGenerationsRequired);
+        $array = generateFurtherColumns($array, $rows, $g, $alreadyFoundBonus);
         $allData = array_merge($allData, $array);
-        
-        if ($alreadyFoundBonus && !$foundNegativeOne) {
-            $generations += 2;
-        }
 
+        // Check for valid bonuses
+        $validBonusCount = checkForBonuses($array);
+        $remainingGen += (2 * $validBonusCount);
+
+        $remainingGen--;
         $g++;
     }
+    $generations = $g;
     return $allData;
 }
 
