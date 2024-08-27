@@ -28,12 +28,12 @@ function generateRandomNumbersForColumn($rows, &$alreadyFoundBonus) {
     for ($j = 0; $j < $rows; $j++) {
         do {
             $stamp = draw_a_stamp();
-        } while ($alreadyFoundBonus && $stamp == $BONUS_STAMP_CODE);
+        } while ($stamp == $BONUS_STAMP_CODE && $alreadyFoundBonus);
         
-        if ($stamp == $BONUS_STAMP_CODE) {
+        array_push($numbers, $stamp);
+		if ($stamp == $BONUS_STAMP_CODE) {
             $alreadyFoundBonus = true; // Rule : There can be only one bonus per grid generated
         }
-        $numbers[] = $stamp;
     }
     return $numbers;
 }
@@ -42,20 +42,22 @@ function generateFurtherColumns($array, $rows, $generationCounter, &$alreadyFoun
 	// goal of this function is to extend the given grid, whenever "exploding stamps" are found
 	// array represents a 3-column grid with stamp codes
 
-	global $BONUS_STAMP_CODE;
+	global $BONUS_STAMP_CODE, $EXPLOSION_STAMP_CODE ;
 
     $regeneratedArrays = [];
     $alreadyFoundBonusInRegeneration = false;
 
     foreach ($array as $row) {
-        if (in_array(-1, $row)) {
-            $newNumbers = [];
+        if (in_array($EXPLOSION_STAMP_CODE , $row)) {
+            $explosionLessColumn = [];
             do {
-                $newNumbers = generateRandomNumbersForColumn($rows, $alreadyFoundBonus);
-            } while (in_array(-1, $newNumbers));
+				$tempBonusHint=$alreadyFoundBonus;
+                $explosionLessColumn = generateRandomNumbersForColumn($rows, $tempBonusHint);
+            } while (in_array($EXPLOSION_STAMP_CODE , $explosionLessColumn));
+			$alreadyFoundBonus = $alreadyFoundBonus | $tempBonusHint;
 
             $newRow = [$generationCounter, $row[1]];
-            foreach ($newNumbers as $number) {
+            foreach ($explosionLessColumn as $number) {
                 $newRow[] = $number;
             }
             $regeneratedArrays[] = $newRow;
@@ -80,10 +82,13 @@ function checkForBonuses($arrays) {
     }
 
     // Second pass: count valid bonuses
+	$already_rem = [];  // array for storing columns that have already been ignored due to an explosion, so we dont ignore the final column content!
+
     foreach ($arrays as $array) {
         $columnIndex = $array[1];
         // Skip columns with explosions
-        if (in_array($columnIndex, $columnsWithExplosion)) {
+        if (in_array($columnIndex, $columnsWithExplosion) and !in_array($columnIndex, $already_rem)) {
+			array_push($already_rem, $columnIndex);
             continue;
         }
         // Count bonuses in valid columns
