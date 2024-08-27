@@ -15,97 +15,91 @@ $ADMIN_MODE = false;  // set this constant to true if you need to by-pass credit
 $GAME_ID = "4"; // Game ID
 
 $paymentToken = null;
+$BONUS_STAMP_CODE = 0;
 
 
-function generateRandomNumbersForColumn($rows) {
+function generateRandomNumbersForColumn($rows, &$alreadyFoundBonus) {
     $numbers = [];
     for ($j = 0; $j < $rows; $j++) {
-        $numbers[] = draw_a_stamp();
+        do {
+            $stamp = draw_a_stamp();
+        } while ($alreadyFoundBonus && $stamp == $BONUS_STAMP_CODE);
+        
+        if ($stamp == $BONUS_STAMP_CODE) {
+            $alreadyFoundBonus = true; // Rule : There can be only one bonus per grid generated
+        }
+        $numbers[] = $stamp;
     }
     return $numbers;
 }
 
-function verifyAndRegenerate($array, $rows, $generationCounter, &$foundZero, &$additionalGenerationsRequired) {
+function verifyAndRegenerate($array, $rows, $generationCounter, &$alreadyFoundBonus, &$additionalGenerationsRequired) {
     $regeneratedArrays = [];
-    $foundZeroInRegeneration = false;
+    $alreadyFoundBonusInRegeneration = false;
 
     foreach ($array as $row) {
         if (in_array(-1, $row)) {
             $newNumbers = [];
             do {
-                $newNumbers = generateRandomNumbersForColumn($rows);
+                $newNumbers = generateRandomNumbersForColumn($rows, $alreadyFoundBonus);
             } while (in_array(-1, $newNumbers));
 
-            $newRow = [$generationCounter, $row[1]]; // Le numéro de génération et l'identifiant de colonne restent inchangés
+            $newRow = [$generationCounter, $row[1]];
             foreach ($newNumbers as $number) {
                 $newRow[] = $number;
-                if ($number === 0) {
-                    $foundZeroInRegeneration = true; // Détecter la présence d'un 0
-                    $foundZero = true;
+                if ($number === $BONUS_STAMP_CODE && !$alreadyFoundBonusInRegeneration && !$alreadyFoundBonus) {
+                    $alreadyFoundBonusInRegeneration = true;
+                    $alreadyFoundBonus = true;
                 }
             }
             $regeneratedArrays[] = $newRow;
         }
     }
 
-    // If zeros were found during regeneration, update the additional generations required.
-    if ($foundZeroInRegeneration) {
-        $additionalGenerationsRequired += 2; // For simplicity, add 2 more generations for each regeneration phase that finds zeros. Adjust as needed.
+    if ($alreadyFoundBonusInRegeneration) {
+        $additionalGenerationsRequired += 2;
     }
 
     return array_merge($array, $regeneratedArrays);
 }
 
-
 function generateRandomArray($rows, $columns, &$generations) {
     $allData = [];
-    $g = 0; // Initialize the generation counter
-    $additionalGenerationsRequired = 0; // Track additional generations required due to zeros found during regeneration
+    $g = 0;
+    $additionalGenerationsRequired = 0;
 
     while ($g < $generations + $additionalGenerationsRequired) {
         $array = [];
-        $foundZero = false; // Reset for each generation
-        $foundNegativeOne = false; // Flag to check for -1 in the array
-        $zerosFoundInGeneration = 0; // Track zeros found in the current generation
+        $alreadyFoundBonus = false;
+        $foundNegativeOne = false;
 
         for ($i = 0; $i < $columns; $i++) {
-            $numbers = generateRandomNumbersForColumn($rows);
+            $numbers = generateRandomNumbersForColumn($rows, $alreadyFoundBonus);
             $row = [$g, "C$i"];
-            $zerosInRow = 0; // Track zeros found in the current row 
-            // Count all the values of the array
-            $valueCounts = array_count_values($numbers);
-        
-            // Check if '6' is a key in the resulting array and get its count
-            $countOf0 = isset($valueCounts[0]) ? $valueCounts[0] : 0;
+            
             foreach ($numbers as $number) {
                 $row[] = $number;
-
-                if ($number === 0) {
-                    $foundZero = true; // Detect the presence of a 0
-                    $zerosInRow++; // Increment for each zero found in the row
+                if ($number === $BONUS_STAMP_CODE) {
+                    $alreadyFoundBonus = true;
                 }
-                if (in_array(0, $numbers) && in_array(-1, $numbers)) {
+                if ($number === -1) {
                     $foundNegativeOne = true;
                 }
-                
             }
-            $zerosFoundInGeneration += $countOf0; // Add the count of zeros in the row to the generation's total
             $array[] = $row;
         }
 
-        // Verify conditions and regenerate arrays if necessary
-        $array = verifyAndRegenerate($array, $rows, $g, $foundZero, $additionalGenerationsRequired);
+        $array = verifyAndRegenerate($array, $rows, $g, $alreadyFoundBonus, $additionalGenerationsRequired);
         $allData = array_merge($allData, $array);
-        // Correctly adjust generations based on zeros found
-        if ($foundZero && !$foundNegativeOne) {
-            $generations += 2 * $zerosFoundInGeneration; // For each zero found, add two more generations
-        } 
+        
+        if ($alreadyFoundBonus && !$foundNegativeOne) {
+            $generations += 2;
+        }
 
-        $g++; // Increment the generation counter after each complete cycle
+        $g++;
     }
     return $allData;
 }
-
 
 
 // function updateUserCredits($userId, $totalCreditsWon) {
