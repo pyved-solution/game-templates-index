@@ -1,0 +1,19 @@
+description algorithme envisagé en pseudo-code:
+
+
+pré-requis / ingrédients:
+-savoir sur quel wedge on se trouve à tout instant
+-fonction qui simule la rotation +fin de rotation (speed à zéro) sans pour autant créer l'animation à l'écran
+
+
+quand le user clique sur 'Spin':
+
+1 . récupérer le rang du "wedge" qui a été tiré au sort
+(nombre entre 0 et 5, ou entre 1 et 6 selon la convention qu'on a pris server-side)
+
+2. tirer au hasard un certain nombre de speed_values
+et pour chacune d'elle simuler où on s'arretera (sur quel wedge)
+
+3. on utilise la speed qui, en simulation, nous a fait nous arrêter sur Y
+
+4. on lance l'animation comme c'est fait habituellement
