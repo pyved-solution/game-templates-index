@@ -52,6 +52,7 @@ HttpServer = None
 
 
 # TODO rewrite the game loop/boilerplate
+print(pyv)
 class BlokumanGame(pyv.GameTpl):
 
     def get_video_mode(self):

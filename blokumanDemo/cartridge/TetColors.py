@@ -1,10 +1,10 @@
+from . import pimodules
 
-from . import glvars
+pyv = pimodules.pyved_engine
+enum = pyv.custom_struct.enum
 
-kengi = glvars.katasdk.pyved_engine
 
-
-TetColors = kengi.e_struct.enum(
+TetColors = enum(
     'Clear',
     'Gray',
     'Pink'

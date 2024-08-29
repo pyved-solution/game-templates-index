@@ -1,10 +1,8 @@
-from . import glvars
+from . import pimodules
 
-
-kengi = glvars.katasdk.pyved_engine
-
-
-Labels = kengi.e_struct.enum(
+pyv = pimodules.pyved_engine
+enum = pyv.custom_struct.enum
+Labels = enum(
     'PoidsTotal',
     'UtiliteTotale',
 

@@ -1,8 +1,8 @@
-from . import glvars
+from . import pimodules
 
-pyv = glvars.katasdk.pyved_engine
-
-GameStates = pyv.e_struct.enum(
+pyv = pimodules.pyved_engine
+enum = pyv.custom_struct.enum
+GameStates = enum(
     'TitleScreen',  # first in the list => initial gamestate
     'Credits',
     'Puzzle',
