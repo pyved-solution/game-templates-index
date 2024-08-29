@@ -1,12 +1,16 @@
 <?php
 include('dbconnection.php');
 
+$API_HOST ='https://services-beta.kata.games';
+$HOST2 = 'https://cms-beta.kata.games/content/plugins/facade';
+
 // Récupère l'ID de l'utilisateur par son nom d'utilisateur
 function getUserIdByJwt($jwt) {
+	global $API_HOST,$HOST2;
     // JWT token to be sent in the API call
 
     // API endpoint URL
-    $endpoint = "https://t-api-beta.kata.games/user/jwt?jwt=" . urlencode($jwt);
+    $endpoint = $HOST2."/user/jwt?jwt=" . urlencode($jwt);
 
     // Initialize cURL session
     $curl = curl_init();
@@ -43,6 +47,7 @@ function getUserIdByJwt($jwt) {
             return $user_id;
         } else {
             // Handle non-200 HTTP response
+			echo "when calling: $endpoint ...";
             echo "HTTP Error: $http_status_code";
             return null;
         }
@@ -68,15 +73,21 @@ function hasUsedSpin($userId) {
 // Update l'inventaire en credits (Faire un endpoint victory ou quelque chose du genre, qui ensuite ajoute les crédits)
 
 function updateSpinAndCreditsIfWon($userId, $hasWon, $hasWonTwice, $creditsToAdd,$game_id, $tokenCode) {
+	global $API_HOST;
     $conn = dbConnection();
     $today = date('Y-m-d');
     
     // Update the last_spin_date in the users_spin table
-    $stmt = $conn->prepare("INSERT INTO users_spin (user_id, last_spin_date) VALUES (:userId, :today) ON DUPLICATE KEY UPDATE last_spin_date = :today");
-    $stmt->execute(['userId' => $userId, 'today' => $today]);
+    
+	// tom: disabled code below,
+	//as we again wish to allow several plays, not only 1 per day
+	
+	//$stmt = $conn->prepare("INSERT INTO users_spin (user_id, last_spin_date) VALUES (:userId, :today) ON DUPLICATE KEY UPDATE last_spin_date = :today");
+    //$stmt->execute(['userId' => $userId, 'today' => $today]);
 
     if ($tokenCode && $hasWon) {
-        $url = "https://t-api-beta.kata.games/games/getPaid?user_id={$userId}&game_id={$game_id}&token={$tokenCode}&amount={$creditsToAdd}";
+		
+        $url = $API_HOST."/pvp/games/getPaid?user_id={$userId}&game_id={$game_id}&token={$tokenCode}&amount={$creditsToAdd}";
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -145,7 +156,10 @@ function generateSpin($userId, $game_id, $tokenCode) {
 
 // Helper function to call can_pay_game_fee endpoint
 function call_can_pay_game_fee($jwt, $game_price) {
-    $url = "https://t-api-beta.kata.games/games/canPayGameFee?jwt=".$jwt."&game_price=".$game_price; // Replace with your actual endpoint
+	global $API_HOST;
+	// Replace with your actual endpoint
+    $url = $API_HOST."/pvp/games/canPayGameFee?jwt=$jwt&game_price=$game_price"; 
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -157,7 +171,10 @@ function call_can_pay_game_fee($jwt, $game_price) {
 
 // Helper function to call pay_game_fee endpoint
 function call_pay_game_fee($jwt, $game_id, $game_price) {
-    $url = "https://t-api-beta.kata.games/games/payGameFee?jwt=".$jwt."&game_id=".$game_id."&game_price=".$game_price; // Replace with your actual endpoint
+	global $API_HOST;
+	// Replace with your actual endpoint
+	$url = $API_HOST."/pvp/games/payGameFee?jwt=$jwt&game_id=$game_id&game_price=$game_price"; 
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -170,7 +187,11 @@ function call_pay_game_fee($jwt, $game_id, $game_price) {
 
 // Modification de handleSpinRequest pour utiliser la nouvelle structure de réponse
 function handleSpinRequest() {
-    $input = json_decode(file_get_contents('php://input'), true);
+    
+	// why?
+	// $input = json_decode(file_get_contents('php://input'), true);
+	
+	$input=$_REQUEST;
     $jwt = $input['jwt'] ?? '';
     $game_id = 10;
 
@@ -232,6 +253,5 @@ function handleSpinRequest() {
     // echo json_encode($result);
 }
 
-
-handleSpinRequest();
-?>
+header('Content-Type: application/json; charset=utf-8');
+handleSpinRequest();  // prints out json content
