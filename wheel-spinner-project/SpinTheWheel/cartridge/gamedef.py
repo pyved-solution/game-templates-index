@@ -71,10 +71,12 @@ deceleration = 0.08  # Constant deceleration
 final_target_angle = 0
 tmp_disp = None  # label to disp final wedge color
 LABEL_POS = (320, 540)
+curr_spin_count = 0
+target_spin1, target_spin2 = None, None
 
 
 def gen_initial_speed():
-    return random.uniform(6.0, 21.667)  # the random spin speed, initially applied
+    return random.uniform(9.25, 15.667)  # the random spin speed, initially applied
 
 
 def draw_wheel(center_x, center_y, angle):
@@ -106,11 +108,13 @@ def get_wcolor_under_cursor(curr_angle):
     print('adjusted->', adjusted_angle)
 
     # Determine the wedge under the cursor
+    res = 0  # because numbers below 0.0 arent supported by the for loop below, the default wedge rank is the 0th
     for rank in range(0, 6):
         intv = angles_thresholds[rank]
         if intv[0] < adjusted_angle <= intv[1]:
-            return WEDGE_COLORS[rank]
-    return WEDGE_COLORS[0]  # because numbers below 0.0 arent supported by the for loop above
+            res = rank
+            break
+    return res, WEDGE_COLORS[res]
 
 
 def fetch_endpoint_gameserver() -> str:
@@ -133,26 +137,13 @@ def paint_game(scr):
     center_x, center_y = WIDTH // 2, HEIGHT // 2
     draw_wheel(center_x, center_y, current_angle)
 
-    # Spin the wheel
-    if spinning:
-        current_angle -= speed
-        speed -= deceleration
-        if speed < 0.0001:
-            spinning = False
-            speed = 0
-            wedge_color = get_wcolor_under_cursor(current_angle)
-            wedge_name = col_names[wedge_color]
-            # print(f"The wheel stopped at {wedge_name.capitalize()}!")
-            tmp_disp = ft_obj.render(wedge_name.capitalize(), True, wedge_color,
-                                     "#ffffff" if wedge_color != WHITE else "#000000")
-
     # Draw the cursor
     pygame.draw.polygon(screen, CURSOR_COL, [(center_x - 10, 50), (center_x + 10, 50), (center_x, 90)])
     if tmp_disp:
         screen.blit(tmp_disp, LABEL_POS)
 
 
-def test_my_luck() -> tuple:
+def test_luck_remote_call() -> tuple:
     """
     :return: a pair of integer values. The second one can be None
     """
@@ -163,12 +154,50 @@ def test_my_luck() -> tuple:
     try:  # stop if error, stop right now as it will be easier to debug
         json_obj = json.loads(netw_reply.text)
         a, b = json_obj["serverNumber1"], json_obj["serverNumber2"]
-        return a, b
+        print(json_obj['message'])
+        print()
+        return int(a)-1, int(b)-1
     except json.JSONDecodeError:
         print(' --Warning-- : cant decode the JSON reply, after game server script has been called!')
         return None, None
 
 
+def peek_future_match(selected_speed, goal_wedge):
+    """
+    le but de cette fonction est de simuler le lancement de roue mais sans jouer l'animation client-side,
+    la fct aide à selectionner 'par brute-force' la speed qui va bien pour tomber sur le wedge qu'on est censé voir
+    apparaitre post-spin
+
+    :param selected_speed: float
+    :param goal_wedge: int, le rang du triangle, dans l'intervalle 0..5
+    :return:
+    """
+    global current_angle, speed
+    cp_angle = current_angle
+    speed = selected_speed
+
+    # simulation per se
+    simu_done = False
+    while not simu_done:
+        cp_angle -= speed
+        speed -= deceleration
+        if speed < 0.0001:
+            simu_done = True
+            wedge_rank, wedge_color = get_wcolor_under_cursor(cp_angle)
+            wedge_name = col_names[wedge_color]
+
+            if goal_wedge == wedge_rank:
+                print('simu success-> speed ok found!', selected_speed)
+                print()
+                return True
+            # - big debug
+            # print('...simu avec arret:', wedge_name)
+    return False
+
+
+# --------------------------
+#  fonctions branchées sur pyved
+# --------------------------
 @pyv.declare_begin
 def init_game(vmst=None):
     global screen, gameserver_host, scr_size
@@ -187,7 +216,7 @@ def init_game(vmst=None):
 
 @pyv.declare_update
 def upd(time_info=None):
-    global labels, spinning, tmp_disp, speed
+    global labels, spinning, tmp_disp, speed, curr_spin_count, current_angle, target_spin1, target_spin2
 
     wanna_spin = False
     for ev in pygame.event.get():
@@ -206,21 +235,60 @@ def upd(time_info=None):
     # ---------------
     #  logic update
     # ---------------
-    if wanna_spin:
+    if wanna_spin:  # only the "start spin" part
         if not spinning:
-            # TODO use the precomputed server-side number
-            if False:
-                print('spinning!')
-                spin_result = test_my_luck()
-                print('rez:', spin_result)
+            if curr_spin_count == 0:  # init speed 1st spin
+                # we use the precomputed server-side number
+                target_spin1, target_spin2 = test_luck_remote_call()
+                print(target_spin1, target_spin2)
+                target_wcol = [ WEDGE_COLORS[target_spin1], WEDGE_COLORS[target_spin2]]
+                print('server gave:', col_names[target_wcol[0]], col_names[target_wcol[1]])
 
-            # Start the spinning
-            spinning = True
-            tmp_disp = None
-            # initial_angle = current_angle % (90*6)  # Save the starting angle
-            speed = gen_initial_speed()
-            # Random target angle (1-3 full spins)
-            # final_target_angle = initial_angle + random.uniform(360, 1080)
+                # so we need a speed print('rez:', spin_result)
+
+                # - selecting the adhoc speed
+                try_speed = gen_initial_speed()
+                while not peek_future_match(try_speed, target_spin1):
+                    try_speed = gen_initial_speed()
+
+                speed = try_speed
+                # Start the spinning
+                spinning = True
+                tmp_disp = None
+
+                # Random target angle (1-3 full spins)
+                # final_target_angle = initial_angle + random.uniform(360, 1080)
+
+                # TODO ensure that server side you cant win CR on the 2nd spin if the 1st spin was lost
+                if target_spin1 == 5:  # there is no sense to spin again if first color isnt white
+                    curr_spin_count += 1
+
+            elif curr_spin_count == 1:  # init speed 2nd spin
+
+                # - selecting the adhoc speed
+                try_speed = gen_initial_speed()
+                while not peek_future_match(try_speed, target_spin2):
+                    try_speed = gen_initial_speed()
+                speed = try_speed
+                # Start the spinning
+                spinning = True
+                tmp_disp = None
+                curr_spin_count = 0
+            else:
+                raise ValueError('warning curr_spin_count value non consistent')
+
+    # update the wheel position
+    if spinning:
+        current_angle -= speed
+        speed -= deceleration
+        if speed < 0.0001:
+            spinning = False
+            speed = 0
+            _, wedge_color = get_wcolor_under_cursor(current_angle)
+            wedge_name = col_names[wedge_color]
+            # print(f"The wheel stopped at {wedge_name.capitalize()}!")
+            tmp_disp = ft_obj.render(wedge_name.capitalize(), True, wedge_color,
+                                     "#ffffff" if wedge_color != WHITE else "#000000")
 
     # refresh screen
     screen.fill(BG_COL)
