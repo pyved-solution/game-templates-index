@@ -500,19 +500,12 @@ class CasinoState(pyv.BaseGameState):
         if glvars.forced_serial is None:
             print('-----> forced_serial est à None <-----')
 
-            expected_host = pimodules.network.get(
+            # the game host is provided by what can be read on "http://pyvm.kata.games/servers.json"
+            game_server_infos = pimodules.network.get(
                 'http://pyvm.kata.games', '/servers.json'
-            ).to_json()['LuckyStamps1']['url']
+            ).to_json()['LuckyStamps1']
 
-            if glvars.FORCED_GAME_HOST:
-                print('********* WARNING ************')
-                print()
-                print('not using the game server target, as specified in GameConfig serverside')
-                print(f" ===> NOT using {expected_host}")
-                target_game_host = glvars.FORCED_GAME_HOST
-                print(f"but using: {target_game_host}")
-            else:
-                target_game_host = expected_host
+            target_game_host = game_server_infos['url']
 
             # we have to use .text on the result bc we wish to pass a raw Serial to the model class
             netw_reply = pimodules.network.get('', target_game_host, data={'jwt': glvars.stored_jwt})
@@ -526,6 +519,7 @@ class CasinoState(pyv.BaseGameState):
         else:
             print(' ** ]]]]]]]]]]]]] mode: forced serial activ **')
             tirage_result = glvars.forced_serial
+
         self.m = LuckyStamModel(tirage_result)
         self.v = LuckyStamView(self.m)
         self.c = LuckyStamController(self.m)

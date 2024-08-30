@@ -8,10 +8,6 @@ GAME_PRICE = 5
 
 # netw
 stored_jwt = None
-GAME_CONFIG_SOURCE = "https://beta.kata.games/game-configs/LuckyStamps1.json"
-
-# FORCED_GAME_HOST = "https://games.gaudia-tech.com/lucky-stamps/testluck.php"  # handy for debug
-FORCED_GAME_HOST = None
 
 # ------------------
 # taille (px) attendue pour les <stamps> img = 149x175
