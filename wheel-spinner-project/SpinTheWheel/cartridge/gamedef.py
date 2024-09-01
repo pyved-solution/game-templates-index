@@ -70,7 +70,9 @@ speed = 0
 deceleration = 0.08  # Constant deceleration
 final_target_angle = 0
 tmp_disp = None  # label to disp final wedge color
-LABEL_POS = (320, 540)
+LABEL_POS = (320, 566)
+WEALTH_POS = (590, 566)
+
 curr_spin_count = 0
 target_spin1, target_spin2 = None, None
 
@@ -141,6 +143,8 @@ def paint_game(scr):
     pygame.draw.polygon(screen, CURSOR_COL, [(center_x - 10, 50), (center_x + 10, 50), (center_x, 90)])
     if tmp_disp:
         screen.blit(tmp_disp, LABEL_POS)
+    if wealth_label:
+        screen.blit(wealth_label, WEALTH_POS)
 
 
 def test_luck_remote_call() -> tuple:
@@ -194,24 +198,38 @@ def peek_future_match(selected_speed, goal_wedge):
             # print('...simu avec arret:', wedge_name)
     return False
 
+wealth = 0
+wealth_label = None
+
+
+def post_play_refresh_cr():
+    # called after each "play", to refresh the amount of CR
+    global wealth, wealth_label
+    infos = netw.get_user_infos(glvars.stored_pid)
+    wealth = infos['balance']
+    wealth_label = ft_obj.render('{} CR'.format(wealth), False, WHITE)
+
 
 # --------------------------
 #  fonctions branchées sur pyved
 # --------------------------
 @pyv.declare_begin
 def init_game(vmst=None):
-    global screen, gameserver_host, scr_size
+    global screen, gameserver_host, scr_size, wealth
 
     pyv.init(wcaption='Untitled pyved-based Game')
 
     glvars.stored_jwt = netw.get_jwt()
     glvars.stored_username = netw.get_username()
+    glvars.stored_pid = netw.get_user_id()
     screen = pyv.get_surface()
     scr_size = screen.get_size()
     print("jwt:", glvars.stored_jwt)
     print("username:", netw.get_username())
-
+    print('pid:', glvars.stored_pid)
     gameserver_host = fetch_endpoint_gameserver()
+
+    post_play_refresh_cr()
 
 
 @pyv.declare_update
@@ -274,6 +292,7 @@ def upd(time_info=None):
                 spinning = True
                 tmp_disp = None
                 curr_spin_count = 0
+
             else:
                 raise ValueError('warning curr_spin_count value non consistent')
 
@@ -289,6 +308,8 @@ def upd(time_info=None):
             # print(f"The wheel stopped at {wedge_name.capitalize()}!")
             tmp_disp = ft_obj.render(wedge_name.capitalize(), True, wedge_color,
                                      "#ffffff" if wedge_color != WHITE else "#000000")
+            if curr_spin_count == 0:
+                post_play_refresh_cr()
 
     # refresh screen
     screen.fill(BG_COL)
