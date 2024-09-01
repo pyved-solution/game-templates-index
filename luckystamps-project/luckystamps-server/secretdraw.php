@@ -3,15 +3,16 @@
 
 // WARNING: cannot use more than a single null value or the algorithm will fail
 $weights = [
-    -1 => 0.08,
-    0 => 0.01,
-    1 => 0.13,
+    
+    1 => 0.11,
     2 => 0.13,
     3 => 0.13,
     4 => 0.13,
-    5 => 0.13,
-    6 => 0.13,
-    7 => null  // The remaining chance
+    5 => 0.14,
+    6 => 0.14,
+    7 => 0.17,
+0 => 0.02,
+-1 => 0.03
 ];
 
 

@@ -500,9 +500,9 @@ class CasinoState(pyv.BaseGameState):
         if glvars.forced_serial is None:
             print('-----> forced_serial est à None <-----')
 
-            # the game host is provided by what can be read on "http://pyvm.kata.games/servers.json"
+            # the game host is provided by what can be read here "pyvm.kata.games/servers.json"
             game_server_infos = pimodules.network.get(
-                'http://pyvm.kata.games', '/servers.json'
+                'https://pyvm.kata.games', '/servers.json'  # note that it is HTTPS! All game are loaded via https in the pyvm
             ).to_json()['LuckyStamps1']
 
             target_game_host = game_server_infos['url']
