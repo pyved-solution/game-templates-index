@@ -72,6 +72,7 @@ final_target_angle = 0
 tmp_disp = None  # label to disp final wedge color
 LABEL_POS = (320, 566)
 WEALTH_POS = (590, 566)
+locked_game = True  # if youre not logged in, the game is locked
 
 curr_spin_count = 0
 target_spin1, target_spin2 = None, None
@@ -123,7 +124,7 @@ def fetch_endpoint_gameserver() -> str:
     # read the content from remote file "servers.json", and provide the ad-hoc URL
     # the game host is provided by what can be read on "http://pyvm.kata.games/servers.json"
     tmp = netw.get(
-        'http://pyvm.kata.games', '/servers.json'
+        'https://pyvm.kata.games', '/servers.json'
     ).to_json()
     print(tmp)
     game_server_infos = tmp[SLUG_CART]
@@ -210,12 +211,13 @@ def post_play_refresh_cr():
     wealth_label = ft_obj.render('{} CR'.format(wealth), False, WHITE)
 
 
+label_locked = None
 # --------------------------
 #  fonctions branchées sur pyved
 # --------------------------
 @pyv.declare_begin
 def init_game(vmst=None):
-    global screen, gameserver_host, scr_size, wealth
+    global screen, gameserver_host, scr_size, wealth, locked_game, label_locked
 
     pyv.init(wcaption='Untitled pyved-based Game')
 
@@ -228,8 +230,12 @@ def init_game(vmst=None):
     print("username:", netw.get_username())
     print('pid:', glvars.stored_pid)
     gameserver_host = fetch_endpoint_gameserver()
+    locked_game = (glvars.stored_jwt is None)
 
-    post_play_refresh_cr()
+    if not locked_game:
+        post_play_refresh_cr()
+    else:
+        label_locked = ft_obj.render('Please login with credentials, then re-launch game', False, WHITE)
 
 
 @pyv.declare_update
@@ -249,6 +255,8 @@ def upd(time_info=None):
         # manage mouse clicking
         elif ev.type == pygame.MOUSEBUTTONDOWN:
             wanna_spin = True
+    if locked_game:
+        wanna_spin = False
 
     # ---------------
     #  logic update
@@ -313,7 +321,15 @@ def upd(time_info=None):
 
     # refresh screen
     screen.fill(BG_COL)
-    paint_game(pyv.get_surface())
+    if not locked_game:
+        paint_game(pyv.get_surface())
+    else:
+        label_size = label_locked.get_size()
+        mid_pt = [
+            (scr_size[0] - label_size[0]) // 2,
+            (scr_size[1] - label_size[1]) // 2
+        ]
+        screen.blit(label_locked, mid_pt)
     pyv.flip()
 
 
