@@ -1,17 +1,16 @@
-import common
-from WalletModel import WalletModel
-
+from . import common
+from .WalletModel import WalletModel
+from . import pimodules
 
 MyEvTypes = common.MyEvTypes
 
-kengi = common.kengi
-CardDeck = kengi.tabletop.CardDeck
-find_best_ph = kengi.tabletop.find_best_ph
-
+pyv = pimodules.pyved_engine
+CardDeck = pyv.tabletop.CardDeck
+find_best_ph = pyv.tabletop.find_best_ph
 PokerStates = common.PokerStates
 
 
-class UthModel(kengi.Emitter):
+class UthModel(pyv.Emitter):
     """
     Uth: Ultimate Texas Holdem
     this is a model class, it handles "poker states" (mostly)

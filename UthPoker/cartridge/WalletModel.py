@@ -8,13 +8,15 @@ On double Play en cas de victoire (toujours), On double Ante,
 sauf si Ante a été "push" au préalable
 
 """
-import common
+from . import common
+from . import pimodules
 
-kengi = common.kengi
+
+pyv = pimodules.pyved_engine
 MyEvTypes = common.MyEvTypes
 
 
-class WalletModel(kengi.Emitter):
+class WalletModel(pyv.Emitter):
     """
     This class handles (in the model) everything that’s related to money.
 

@@ -1,22 +1,24 @@
-import common
-from uth_model import PokerStates
+from . import common
+from .uth_model import PokerStates
+from . import pimodules
 
+pyv = pimodules.pyved_engine
+pyv.bootstrap_e()
 
-kengi = common.kengi
-pygame = kengi.pygame
+pygame = pyv.pygame
 MyEvTypes = common.MyEvTypes
-Card = kengi.tabletop.StandardCard
-PokerHand = kengi.tabletop.PokerHand
-StandardCard = kengi.tabletop.StandardCard
-wContainer = kengi.gui.WidgetContainer
-Label = kengi.gui.Label
+Card = pyv.tabletop.StandardCard
+PokerHand = pyv.tabletop.PokerHand
+StandardCard = pyv.tabletop.StandardCard
+wContainer = pyv.gui.WidgetContainer
+Label = pyv.gui.Label
 
 # constants
 CST_VSPACING_BT = 4
 CST_HSPACING_BT = 10  # buttons that are actual player controls, at every pokerstate
 OVERLAY_POS = (85, 35)
 CHIP_SIZE_PX = (33, 33)
-BACKGROUND_IMG_PATH = 'user_assets/pokerbackground3.png'
+
 OFFSET_CASH = (-48, -24)
 BASE_X_CARDS_DR = 326
 Y_CARDS_DRAWN = 132
@@ -77,8 +79,8 @@ CHIP_SELECTOR_POS = (168, 295)
 STATUS_MSG_BASEPOS = (8, 258)
 
 
-class UthView(kengi.EvListener):
-    TEXTCOLOR = kengi.pal.punk['flashypink']
+class UthView(pyv.EvListener):
+    TEXTCOLOR = pyv.pal.punk['flashypink']
     BG_TEXTCOLOR = (92, 92, 100)
     ASK_SELECTION_MSG = 'SELECT ONE OPTION: '
 
@@ -98,7 +100,7 @@ class UthView(kengi.EvListener):
         for dzo in self._rect_dropzone_li:
             dzo.left -= 8
 
-        self.overlay_spr = pygame.image.load('user_assets/overlay0.png')
+        self.overlay_spr = pyv.vars.images['overlay0']
         self.overlay_spr.set_colorkey((255, 0, 255))
 
         self.bg = None
@@ -111,17 +113,25 @@ class UthView(kengi.EvListener):
         self._assets_rdy = False
         self._mod = model
 
-        self.pokergame_ft = kengi.gfx.JsonBasedCfont(
-            'user_assets/capello-ft'
-        )  # EmbeddedCfont() #kengi.pygame.font.Font(None, 20)
-        # if local ctx
-        self.pokergame_ft.forcing_transparency = True
+        # - old
+        # self.pokergame_ft = pyv.gfx.JsonBasedCfont(
+        #    'user_assets/capello-ft'
+        # )
+        # EmbeddedCfont() #pyv.pygame.font.Font(None, 20)
+
+        # works fine:
+        # self.pokergame_ft = pyv.vars.spritesheets['capello-ft']
+        # BUT cant be used for Label objects
+        self.pokergame_ft = pygame.font.Font(None, 18)
+
+        # good for capello ft?
+        # self.pokergame_ft.forcing_transparency = True
 
         self.info_msg0 = None
         self.info_msg1 = None  # will be used to tell the player what he/she has to do!
         self.info_messages = list()
 
-        self.scrsize = kengi.get_surface().get_size()
+        self.scrsize = pyv.get_surface().get_size()
         self.midpt = [self.scrsize[0] // 2, self.scrsize[1] // 2]
 
         self._chips_related_wcontainer = self._build_chips_related_gui()
@@ -144,9 +154,9 @@ class UthView(kengi.EvListener):
         self.generic_wcontainer = wContainer(
             (320, 244), (133, 250), wContainer.FLOW,
             [
-                kengi.gui.Button2(None, 'Bet x4', (0, 0), tevent=MyEvTypes.BetHighDecision),
-                kengi.gui.Button2(None, 'Bet x3', (0, 0), tevent=MyEvTypes.BetDecision),
-                kengi.gui.Button2(None, 'Check', (0, 0), tevent=MyEvTypes.CheckDecision)
+                pyv.gui.Button2(None, 'Bet x4', (0, 0), tevent=MyEvTypes.BetHighDecision),
+                pyv.gui.Button2(None, 'Bet x3', (0, 0), tevent=MyEvTypes.BetDecision),
+                pyv.gui.Button2(None, 'Check', (0, 0), tevent=MyEvTypes.CheckDecision)
             ],
             spacing=CST_HSPACING_BT,
             vspacing=CST_VSPACING_BT
@@ -176,18 +186,18 @@ class UthView(kengi.EvListener):
     def _build_chips_related_gui(self):  # TODO group with other obj so we have 1 panel dedicated to AnteSelection
         # - cycle right button
         def cb0():
-            kengi.get_ev_manager().post(MyEvTypes.CycleChipval, upwards=True)
+            pyv.get_ev_manager().post(MyEvTypes.CycleChipval, upwards=True)
 
-        cycle_r_button = kengi.gui.Button2(None, '>', (0, 0), callback=cb0)
+        cycle_r_button = pyv.gui.Button2(None, '>', (0, 0), callback=cb0)
 
         # - cycle left button
         def cb1():
-            kengi.get_ev_manager().post(MyEvTypes.CycleChipval, upwards=False)
+            pyv.get_ev_manager().post(MyEvTypes.CycleChipval, upwards=False)
 
-        cycle_l_button = kengi.gui.Button2(None, '<', (0, 0), callback=cb1)
+        cycle_l_button = pyv.gui.Button2(None, '<', (0, 0), callback=cb1)
 
         # disabled this, since Drag N Drop is working now
-        # stake_button = kengi.gui.Button2(None, ' __+__ ', (0, 0), tevent=MyEvTypes.StackChip)
+        # stake_button = pyv.gui.Button2(None, ' __+__ ', (0, 0), tevent=MyEvTypes.StackChip)
 
         chip_related_buttons = [
             cycle_l_button,
@@ -205,11 +215,11 @@ class UthView(kengi.EvListener):
     @staticmethod
     def _init_actions_related_gui():
         all_bt = [
-            kengi.gui.Button2(None, 'Bet_Same', (0, 11), tevent=MyEvTypes.BetIdem),  # bet same action is Bt #0
+            pyv.gui.Button2(None, 'Bet_Same', (0, 11), tevent=MyEvTypes.BetIdem),  # bet same action is Bt #0
 
-            kengi.gui.Button2(None, 'Deal', (330, 128), tevent=MyEvTypes.DealCards),
-            kengi.gui.Button2(None, 'Undo', (0, 0), tevent=MyEvTypes.BetUndo),
-            kengi.gui.Button2(None, 'Reset_Bet', (0, 0), tevent=MyEvTypes.BetReset),
+            pyv.gui.Button2(None, 'Deal', (330, 128), tevent=MyEvTypes.DealCards),
+            pyv.gui.Button2(None, 'Undo', (0, 0), tevent=MyEvTypes.BetUndo),
+            pyv.gui.Button2(None, 'Reset_Bet', (0, 0), tevent=MyEvTypes.BetReset),
         ]
 
         return wContainer(
@@ -246,6 +256,9 @@ class UthView(kengi.EvListener):
     def hide_generic_gui(self):
         self.generic_wcontainer.set_active(False)
 
+    def on_quit(self, ev):
+        pyv.vars.gameover = True
+
     def on_bet_reset(self, ev):
         self._mod.wallet.reset_bets(2)
 
@@ -254,13 +267,17 @@ class UthView(kengi.EvListener):
         self.adhoc_chip_spr = self.chip_spr[str(ev.value)]
 
     def _load_assets(self):
-        self.bg = kengi.pygame.image.load(BACKGROUND_IMG_PATH)
-        spr_sheet = kengi.gfx.JsonBasedSprSheet('user_assets/pxart-french-cards')
+        #self.bg = pyv.pygame.image.load(BACKGROUND_IMG_PATH)
+        #spr_sheet = pyv.gfx.JsonBasedSprSheet('user_assets/pxart-french-cards')
+        self.bg = pyv.vars.images['pokerbackground3']
+        spr_sheet = pyv.vars.spritesheets['pxart-french-cards']
+
         self._my_assets['card_back'] = spr_sheet['back-blue.png']
         for card_cod in StandardCard.all_card_codes():
             y = PokerHand.adhoc_mapping(card_cod[0]).lstrip('0') + card_cod[1].upper()  # convert card code to path
             self._my_assets[card_cod] = spr_sheet[f'{y}.png']
-        spr_sheet2 = kengi.gfx.JsonBasedSprSheet('user_assets/pokerchips')
+        # spr_sheet2 = pyv.gfx.JsonBasedSprSheet('user_assets/pokerchips')
+        spr_sheet2 = pyv.vars.spritesheets['pokerchips']
 
         for chip_val_info in ('2a', '2b', '5', '10', '20'):
             y = {
@@ -276,7 +293,7 @@ class UthView(kengi.EvListener):
             tempimg = pygame.transform.scale(spr_sheet2[y], CHIP_SIZE_PX)
             tempimg.set_colorkey((255, 0, 255))
 
-            spr = kengi.pygame.sprite.Sprite()
+            spr = pyv.pygame.sprite.Sprite()
             spr.image = tempimg
             spr.rect = spr.image.get_rect()
             spr.rect.center = PLAYER_CHIPS[chip_val_info]
@@ -287,7 +304,7 @@ class UthView(kengi.EvListener):
 
     def on_mousedown(self, ev):
         if self.adhoc_chip_spr.rect.collidepoint(
-                kengi.vscreen.proj_to_vscreen(ev.pos)
+                pyv.vscreen.proj_to_vscreen(ev.pos)
         ):
             self.dragged_chip_pos = list(self.adhoc_chip_spr.rect.center)
 
@@ -312,7 +329,7 @@ class UthView(kengi.EvListener):
 
     def on_mousemotion(self, ev):
         if self.dragged_chip_pos:
-            self.dragged_chip_pos[0], self.dragged_chip_pos[1] = kengi.vscreen.proj_to_vscreen(ev.pos)
+            self.dragged_chip_pos[0], self.dragged_chip_pos[1] = pyv.vscreen.proj_to_vscreen(ev.pos)
 
     def on_money_update(self, ev):
         if self._act_related_wcontainer.active:

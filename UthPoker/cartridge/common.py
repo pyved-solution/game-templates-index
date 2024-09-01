@@ -1,20 +1,5 @@
-import katagames_engine as kengi
-kengi.bootstrap_e()
-
-
-# class DynComponent:
-#     """relies either on bare Kengi or on the KataSDK+Kengi combo"""
-#     def provide_kengi(self):
-#         import katagames_engine as _kengi
-#         _kengi.bootstrap_e()
-#         return _kengi
-
-
-# class ExtComponent(DynComponent):
-#     def provide_kengi(self):
-#         import katagames_sdk as katasdk
-#         katasdk.bootstrap()
-#         return katasdk.kengi
+from . import pimodules
+pyv = pimodules.pyved_engine
 
 
 refgame, refmodel, refview = None, None, None
@@ -40,7 +25,7 @@ def chip_scrollup(x):
     refmodel.set_chipvalue(y)
 
 
-PokerStates = kengi.struct.enum(
+PokerStates = pyv.struct.enum(
     'AnteSelection',
     'PreFlop',
     'Flop',
@@ -48,7 +33,8 @@ PokerStates = kengi.struct.enum(
     'Outcome'
 )
 
-MyEvTypes = kengi.game_events_enum((
+
+MyEvTypes = pyv.game_events_enum((
     'StackChip',  # used to bet in an incremental way, contains: trips(True/False)
     'CycleChipval',  # contains: upwards(int: 1 or 0), to answer 'do we cycle 2->5->10->... or the other way around?'
 
