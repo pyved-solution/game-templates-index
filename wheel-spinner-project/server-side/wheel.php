@@ -1,8 +1,9 @@
 <?php
 include('dbconnection.php');
+include('low_level.php');
 
-$API_HOST ='https://services-beta.kata.games';
-$HOST2 = 'https://cms-beta.kata.games/content/plugins/facade';
+$API_HOST ='https://services.kata.games';
+$HOST2 = 'https://cms.kata.games/content/plugins/facade';
 
 // Récupère l'ID de l'utilisateur par son nom d'utilisateur
 function getUserIdByJwt($jwt) {
@@ -87,12 +88,9 @@ function updateSpinAndCreditsIfWon($userId, $hasWon, $hasWonTwice, $creditsToAdd
 
     if ($tokenCode && $hasWon) {
 		
-        $url = $API_HOST."/pvp/games/getPaid?user_id={$userId}&game_id={$game_id}&token={$tokenCode}&amount={$creditsToAdd}";
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $url = $API_HOST."/pvp/games/getPaid?user_id={$userId}&game_id={$game_id}&token={$tokenCode}&amount={$creditsToAdd}&description=luck_game";
+		$response = std_curl_call($url);
+
     } else {
         // Token code not available
         // Log the error or handle as needed
@@ -122,19 +120,22 @@ function generateSpin($userId, $game_id, $tokenCode) {
     $creditsToAdd = 0;
     $hasWon = false;
     $hasWonTwice = false;
+
+	// default msg and values
     $message = "Better luck next time!";
 
     // Vérifie les conditions de victoire
-    if ($userNumber1 === $serverNumber1) {
-        if ($userNumber2 === $serverNumber2) {
+	// 6 => means you've won!
+    if (6 == $serverNumber1) {
+		$hasWon = true;
+		$creditsToAdd = 10; // Utilisateur gagne 10 crédits
+		$hasWonTwice = false;
+
+        if (6 == $serverNumber2) {
             $creditsToAdd = 500; // Utilisateur gagne 500 crédits
-            $hasWon = true;
             $hasWonTwice = true;
             $message = "Congratulations, you won 500 credits!";
         } else {
-            $creditsToAdd = 10; // Utilisateur gagne 10 crédits
-            $hasWon = true;
-            $hasWonTwice = false;
             $message = "Close! You've won 10 credits.";
         }
     }
@@ -143,9 +144,9 @@ function generateSpin($userId, $game_id, $tokenCode) {
 
     return [
         'success' => true,
-        'userNumber1' => $userNumber1,
+        //'userNumber1' => $userNumber1,
         'serverNumber1' => $serverNumber1,
-        'userNumber2' => $userNumber2,
+        //'userNumber2' => $userNumber2,
         'serverNumber2' => $serverNumber2,
         'wonFirst' => $hasWon,
         'wonSecond' => $hasWonTwice,
