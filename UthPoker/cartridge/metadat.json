@@ -1,10 +1,1 @@
-{"vmlib_ver": "24_5a1", "dependencies": {"pyved_engine": "???"}, "description": "this is a placeholder so you can describe your game", "author": "Thomas E.",
-"assets": [
-	"overlay0.png",
-	"pokerbackground3.png",
-
-	"capello-ft.json",
-	"pxart-french-cards.json",
-	"pokerchips.json"
-],
-"sounds": [], "slug": "UthPoker", "title": "Untitled Game", "thumbnail512x384": "thumb_2.png", "thumbnail512x512": "thumb_1.png", "ktg_services": true, "instructions": "not provided", "uses_challenge": false, "has_game_server": false, "game_title": "UthPoker", "build_date": "Sun Sep  1 23:08:26 2024"}
+{"vmlib_ver": "24_9a1", "dependencies": {"pyved_engine": "???"}, "description": "this is a placeholder so you can describe your game", "author": "Thomas E.", "assets": ["overlay0.png", "pokerbackground3.png", "capello-ft.json", "pxart-french-cards.json", "pokerchips.json"], "sounds": [], "slug": "UthPoker", "title": "Untitled Game", "thumbnail512x384": "thumb_2.png", "thumbnail512x512": "thumb_1.png", "ktg_services": true, "instructions": "not provided", "uses_challenge": false, "has_game_server": false, "game_title": "UthPoker", "build_date": "Mon Sep  2 14:19:14 2024", "ncr_faucet":false}

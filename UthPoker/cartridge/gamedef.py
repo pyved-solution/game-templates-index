@@ -47,11 +47,13 @@ kpressed = set()
 ev_manager = None
 mod, view = None, None
 
-import pyved_engine as pyv
+# import pyved_engine as pyv
 @pyv.declare_begin
 def begin_uthpoker(vmst=None):
     global screen, ev_manager, mod, view
-    pyv.init(mode=None, wcaption='Uth Poker')
+    # as of pyved v29_9a1 the upscaling seems to be broken in webctx
+    # that is why we cant use x2 here. In the future this should be fixed
+    pyv.init(mode=1, wcaption='Uth Poker')
     screen = pyv.get_surface()
 
     ev_manager = pyv.get_ev_manager()
