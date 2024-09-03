@@ -77,7 +77,11 @@ def game_execution(metadata, game_definition_module):
         adhoc_folder = os.path.join('.', 'cartridge')
     else:
         raise FileNotFoundError("ERR: Asset dir for pre-loading assets cannot be found!")
-    pyv.preload_assets(metadata, prefix_asset_folder=adhoc_folder+os.sep)
+    pyv.preload_assets(
+        metadata,
+        prefix_asset_folder=adhoc_folder+os.sep+metadata['asset_base_folder']+os.sep,
+        prefix_sound_folder=adhoc_folder+os.sep+metadata['sound_base_folder']+os.sep,
+    )
     pyv.run_game()
 def bootgame(metadata):
     try:
