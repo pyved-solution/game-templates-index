@@ -1,5 +1,4 @@
-from . import pimodules
-pyv = pimodules.pyved_engine
+from .glvars import pyv
 
 
 refgame, refmodel, refview = None, None, None

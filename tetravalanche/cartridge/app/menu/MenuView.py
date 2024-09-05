@@ -1,14 +1,12 @@
 import random
 
 from ... import glvars
-from ... import pimodules
+from ...glvars import pyv
 from ...ev_types import MyEvTypes
 from ...glvars import ChoixMenu
 from ...labels import Labels
 from ...loctexts import tsl
 
-
-pyv = pimodules.pyved_engine
 
 BG_COLOR_NO_AUTH = glvars.colors['c_purple']
 BG_COLOR_IS_AUTH = pyv.pal.japan['peach']

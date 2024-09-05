@@ -1,8 +1,8 @@
 from . import common
 from .uth_model import PokerStates
-from . import pimodules
+from .glvars import pyv
 
-pyv = pimodules.pyved_engine
+
 pyv.bootstrap_e()
 
 pygame = pyv.pygame

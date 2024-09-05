@@ -1,10 +1,7 @@
 from collections import defaultdict
 import random
 
-from . import pimodules
-
-pyv = pimodules.pyved_engine
-
+from .glvars import pyv
 from .ev_types import MyEvTypes
 
 # from katagames_sdk.engine import CogObject

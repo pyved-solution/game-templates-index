@@ -1,10 +1,9 @@
 from . import common
 from .WalletModel import WalletModel
-from . import pimodules
+from .glvars import pyv
+
 
 MyEvTypes = common.MyEvTypes
-
-pyv = pimodules.pyved_engine
 CardDeck = pyv.tabletop.CardDeck
 find_best_ph = pyv.tabletop.find_best_ph
 PokerStates = common.PokerStates

@@ -1,11 +1,29 @@
-from . import pimodules
+# ------
+# engine-related code, do not modify!
+# --------
+
+registry = set()
+libname_to_alias_mapping = dict()
+
+def get_alias(origin_lib_name):
+    return libname_to_alias_mapping[origin_lib_name]
+
+def has_registered(origin_lib_name):
+    return origin_lib_name in libname_to_alias_mapping
+
+def register_lib(alias, libname, value):  # handy for dependency injection
+    global registry, libname_to_alias_mapping
+    libname_to_alias_mapping[libname] = alias
+    if alias in registry:
+        raise KeyError(f'Cannot register lib "{alias}" more than once!')
+    globals()[alias] = value
+    registry.add(alias)
 
 
-# aliases
-pyv = pimodules.pyved_engine
+# ------
+# custom code the gamedev added
+# --------
 
-
-# ----------------------
 #  CONSTANTS
 SCR_SIZE = (960, 720)
 DEV_MODE = False
@@ -32,26 +50,30 @@ server_debug = None
 
 ev_manager = None  # will be set once the game begins
 screen = None  # idem
-GameStates = pyv.custom_struct.enum(
-    'Menu',
-    'Login',
-    'Tetris',
-    'Credits',
-    'TaxPayment'
-)
-ChoixMenu = pyv.custom_struct.enum(
-    'DemoMode',
-    'StartChallenge',
-    'SeeInfos',
-    'QuitGame'
-)
-# ---------------
-# linked to katagames services
-# ---------------
+GameStates = None
+ChoixMenu = None
+
+def create_enums():
+    global ChoixMenu, GameStates
+    GameStates = pyv.custom_struct.enum(
+        'Menu',
+        'Login',
+        'Tetris',
+        'Credits',
+        'TaxPayment'
+    )
+    ChoixMenu = pyv.custom_struct.enum(
+        'DemoMode',
+        'StartChallenge',
+        'SeeInfos',
+        'QuitGame'
+    )
+ 
+
+# related to katagames services
 user_id = None
 username = None  # indique si on est log
 stored_session = None  # jwt
-
 cr_balance = None
 ready_to_compete = False  # will be True when at the same time user auth + can_pay_challenge has been called
 

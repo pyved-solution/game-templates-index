@@ -8,10 +8,9 @@ the same model & the same view obj ALL ALONG, when transitioning...
 from . import common
 from .uth_model import PokerStates
 from .uth_view import UthView
-from . import pimodules
+from .glvars import pyv
 
 
-pyv = pimodules.pyved_engine
 MyEvTypes = common.MyEvTypes
 
 

@@ -9,10 +9,9 @@ sauf si Ante a été "push" au préalable
 
 """
 from . import common
-from . import pimodules
+from .glvars import pyv
 
 
-pyv = pimodules.pyved_engine
 MyEvTypes = common.MyEvTypes
 
 
