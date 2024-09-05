@@ -24,10 +24,10 @@ from . import glvars
 # TODO: fix
 HttpServer = None
 
+# -------------------------
+# version ultra ancienne :
 
 # HttpServer = old_v_kengi.network.HttpServer  # katasdk.network.HttpServer in future versions
-
-
 # class BlokuGame(kengi.GameTpl):
 #
 #
@@ -45,34 +45,71 @@ HttpServer = None
 #
 #         important! Its needed to proc the 1st gstate 'do_init' method
 #         self._manager.post(kengi.EngineEvTypes.Gamestart)
-
-
 # blokuwrapper.glvars.gameref = game = BlokuGame()
 # katasdk.gkart_activation(game)
 
-
-# TODO rewrite the game loop/boilerplate
-print(pyv)
-class BlokumanGame(pyv.GameTpl):
-
-    def get_video_mode(self):
-        return 1
-
-    def list_game_events(self):
-        return BlokuEvents
-
-    def enter(self, vms=None):
+# ------------------------
+# version qui date de juin 2024, manque une refonte ici
+# class BlokumanGame(pyv.GameTpl):
+    # def get_video_mode(self):
+        # return 1
+    # def list_game_events(self):
+        # return BlokuEvents
+    # def enter(self, vms=None):
         # safer this way:
-        self.nxt_game = 'game_selector'
-        loctexts.init_repo(glvars.CHOSEN_LANG)
-        super().enter(vms)
-        pyv.declare_game_states(  # doit etre appelé après le setup_ev_manager !!!
-            GameStates,
-            {
-                GameStates.TitleScreen: TitleScreenState,
-                GameStates.Puzzle: PuzzleState
-            }
-        )
+        # self.nxt_game = 'game_selector'
+        # loctexts.init_repo(glvars.CHOSEN_LANG)
+        # super().enter(vms)
+        # pyv.declare_game_states(  # doit etre appelé après le setup_ev_manager !!!
+            # GameStates,
+            # {
+                # GameStates.TitleScreen: TitleScreenState,
+                # GameStates.Puzzle: PuzzleState
+            # }
+        # )
+# game = BlokumanGame()
 
 
-game = BlokumanGame()
+from . import glvars
+from . import loctexts
+from . import pimodules
+from .ev_types import MyEvTypes
+
+
+pyv = pimodules.pyved_engine
+pyv.bootstrap_e()
+
+
+@pyv.declare_begin
+def init_game(vmst=None):
+    loctexts.init_repo(glvars.CHOSEN_LANG)
+    pyv.init(wcaption='Tetravalanche')
+    glvars.screen = pyv.get_surface()
+
+    glvars.ev_manager = pyv.get_ev_manager()
+    glvars.ev_manager.setup(MyEvTypes)
+    glvars.init_fonts_n_colors()
+
+    # - init game states & boot up the game, now!
+    from .app.menu.state import MenuState
+    from .app.tetris.state import TetrisState
+    pyv.declare_game_states(
+        glvars.GameStates, {
+            glvars.GameStates.Menu: MenuState,
+            glvars.GameStates.Tetris: TetrisState,
+        }
+    )
+    glvars.ev_manager.post(pyv.EngineEvTypes.Gamestart)
+
+
+@pyv.declare_update
+def upd(time_info=None):
+    glvars.ev_manager.post(pyv.EngineEvTypes.Update, curr_t=time_info)
+    glvars.ev_manager.post(pyv.EngineEvTypes.Paint, screen=glvars.screen)
+    glvars.ev_manager.update()
+    pyv.flip()
+
+
+@pyv.declare_end
+def done(vmst=None):
+    pyv.close_game()
