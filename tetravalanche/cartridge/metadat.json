@@ -5,10 +5,13 @@
       "24_9a1",
       "pyv"
     ],
-	"network": [
-	  "0.2",
-	  "netw"
-	]
+    "network": [
+      "0_2",
+      "netw"
+    ],
+    "esper": [
+      "3_3"
+    ]
   },
   "description": "A game that is similar to like Tetris but, with a twist!",
   "author": "Thomas alias moonbak",
@@ -21,7 +24,7 @@
   "has_game_server": false,
   "ncr_faucet": true,
   "instructions": "not provided",
-  "build_date": "Thu Sep  5 10:10:23 2024",
+  "build_date": "Mon Sep  9 16:21:58 2024",
   "game_genre": [
     "Classics",
     "Arcade"
