@@ -1,8 +1,8 @@
-from . import pimodules
+# from . import pimodules
 from . import shared
 
+from .glvars import pyv
 
-pyv = pimodules.pyved_engine
 pyv.bootstrap_e()
 
 __all__ = [

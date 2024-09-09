@@ -1,0 +1,41 @@
+{
+  "vmlib_ver": "24_9a1",
+  "dependencies": {
+    "pyved_engine": [
+      "24_9a1",
+      "pyv"
+    ],
+    "esper": [
+      "3_3"
+    ]
+  },
+  "description": "this is a placeholder so you can describe your game",
+  "author": "Thomas E.",
+  "asset_list": [],
+  "asset_base_folder": ".",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "slug": "GoblinHorde",
+  "title": "Untitled Game",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Incremental"
+  ],
+  "game_title": "GoblinHorde",
+  "build_date": "Mon Sep  9 17:15:59 2024",
+  "source_files": [
+    "gamedef.py",
+    "glvars.py",
+    "pimodules.py",
+    "shared.py",
+    "systems.py",
+    "world.py",
+    "__init__.py"
+  ]
+}

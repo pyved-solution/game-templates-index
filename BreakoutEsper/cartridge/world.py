@@ -1,9 +1,10 @@
 import random
-from . import pimodules
+
+from .glvars import pyv
+
 from . import shared
 
 
-pyv = pimodules.pyved_engine
 pygame = pyv.pygame
 
 
