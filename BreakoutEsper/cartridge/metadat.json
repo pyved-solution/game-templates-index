@@ -6,7 +6,7 @@
       "pyv"
     ],
     "esper": [
-      "3_3"
+      "3_3", "ecs"
     ]
   },
   "description": "this is a placeholder so you can describe your game",
