@@ -1,10 +1,8 @@
-from . import shared
-from . import systems
-# from .world import blocks_create, player_create, ball_create
-from .glvars import pyv, ecs
-from .classes import *
-from . import glvars
 import random
+
+from . import glvars
+from .classes import *
+from .glvars import pyv, ecs
 
 
 pygame = pyv.pygame
@@ -31,63 +29,59 @@ def ball_create():
 
 
 def blocks_create():
-    bcy = 0
+    bcy = glvars.BLOCKS_STARTING_Y
     for column in range(5):
-        bcy = bcy + shared.BLOCK_H + shared.BLOCK_SPACING
-        bcx = -shared.BLOCK_W
-        for row in range(round(shared.LIMIT)):
-            bcx = bcx + shared.BLOCK_W + shared.BLOCK_SPACING
-            precursor_rect = (0 + bcx, 0 + bcy, shared.BLOCK_W, shared.BLOCK_H)
+        bcx = glvars.BLOCKS_STARTING_X
+        for row in range(round(glvars.blocks_limit)):
+            precursor_rect = (bcx, bcy, glvars.BLOCK_W, glvars.BLOCK_H)
             ecs.create_entity(
-                Body(*precursor_rect)
+                Body(*precursor_rect),
+                BlockSig()  # to tag entity as being a block
             )
+            bcx += glvars.BLOCK_W + glvars.BLOCK_SPACING
+        bcy += glvars.BLOCK_H + glvars.BLOCK_SPACING
 
 
 @pyv.declare_begin
 def init_game(vmst=None):
-    pyv.init()
-    glvars.screen = screen = pyv.get_surface()
-    glvars.scr_size = screen.get_size()
-
     pyv.init(wcaption='Pyv Breaker')
-    print('ecs?', ecs)
-    print(' +-------------------------+ ')
-    # pyv.define_archetype('player', ('body', 'speed', 'controls'))
-    # pyv.define_archetype('block', ('body', ))
-    # pyv.define_archetype('ball', ('body', 'speed_Y', 'speed_X'))
+    glvars.screen = s_obj = pyv.get_surface()
+    glvars.set_scr_size(s_obj.get_size())
 
-    # blocks_create()
+    ft = pyv.pygame.font.Font(None, glvars.classic_ftsize)
+    glvars.start_game_label = ft.render('Press space to start the game', True, 'white')
+
+    # add my entities
     player_create()
     ball_create()
     blocks_create()
 
-    # pyv.bulk_add_systems(systems)
-    # -----------------
-    # do all the ecs stuff
-    # ecs.switch_world('intro')
-    # print(ecs.list_worlds())
+    # add my processors
+    all_proc = (
+        EventProcessor(),
+        PhysicsProcessor(),
+        EndgameProcessor(),
+        GfxProcessor()
+    )
+    list(map(ecs.add_processor, all_proc))
 
-    # position??
-    for proc in (
-        EventProcessor(), PhysicsProcessor(), GfxProcessor()
-    ):
-        ecs.add_processor(proc)
+    #  mini docs for ecs.*
+    # ------------------
+    # .create_entity()
+    # .delete_entity(entity)
+    # .add_component(entity, component_instance)
+    # .remove_component(entity, ComponentType)
 
-    # ------------------
-    #  mini docs
-    # ------------------
-    # World.create_entity()
-    # World.delete_entity(entity)
-    # World.add_processor(processor_instance)
-    # World.remove_processor(ProcessorType)
-    # World.add_component(entity, component_instance)
-    # World.remove_component(entity, ComponentType)
-    # World.get_component(ComponentType)
-    # World.get_components(ComponentTypeA, ComponentTypeB, Etc)
-    # World.component_for_entity(entity, ComponentType)
-    # World.components_for_entity(entity)
-    # World.has_component(entity, ComponentType)
-    # World.process()
+    # .try_component(entity, ComponentType)
+    # .get_component(ComponentType)
+    # .get_components(ComponentTypeA, ComponentTypeB, Etc)
+    # .component_for_entity(entity, ComponentType)
+    # .components_for_entity(entity)
+    # .has_component(entity, ComponentType)
+
+    # .add_processor(processor_instance)
+    # .remove_processor(ProcessorType)
+    # .process()
 
 
 @pyv.declare_update
@@ -98,13 +92,7 @@ def upd(time_info=None):
         dt = 0
     glvars.prev_time_info = time_info
 
-    ev_li = pygame.event.get()
-    for ev in ev_li:
-        if ev.type == pygame.QUIT:
-            pyv.vars.gameover = True
     ecs.process(dt)
-
-    # already done??
     pyv.flip()
 
 

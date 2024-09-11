@@ -28,14 +28,10 @@
   "game_genre": [
     "Incremental"
   ],
-  "build_date": "Mon Sep  9 18:30:34 2024",
+  "build_date": "Wed Sep 11 12:59:39 2024",
   "source_files": [
     "classes.py",
     "gamedef.py",
-    "glvars.py",
-    "pimodules.py",
-    "shared.py",
-    "systems.py",
-    "__init__.py"
+    "glvars.py"
   ]
 }

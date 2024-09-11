@@ -27,19 +27,44 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 # ------
 # custom code the gamedev added
 # --------
-screen = None
-scr_size = None
-prev_time_info = None
+def interpolate_color(x, y) -> tuple:
+    return 150, ((x-BLOCKS_STARTING_X) * 0.27) % 256, ((y-BLOCKS_STARTING_Y) * 1.22) % 256
 
-player_entity = None
-ball_entity = None
 
+def set_scr_size(val):
+    global scr_size, blocks_limit
+    scr_size = val
+    blocks_limit = scr_size[0] / (BLOCK_W + BLOCK_SPACING)
+
+
+# - CONSTANTS
 # physics
-PL_WIDTH, PL_HEIGHT = 110, 25
-PLAYER_SPEED = 220
+PL_WIDTH, PL_HEIGHT = 128, 18
+PLAYER_SPEED = 266
 
 # ball-related
 BALL_INIT_POS = 480, 277
 BALL_SIZE = 22
 MAX_XSPEED_BALL = 225.0
 YSPEED_BALL = 288.0
+
+# (Size of break-out blocks)
+BLOCK_W = 74
+BLOCK_H = 35
+BLOCK_SPACING = 5
+BLOCKS_STARTING_X = 7
+BLOCKS_STARTING_Y = 58
+
+# - VARS
+screen = None
+scr_size = None
+
+classic_ftsize = 38
+start_game_label = None
+end_game_label = None
+
+prev_time_info = None
+player_entity = None
+ball_entity = None
+
+blocks_limit = None
