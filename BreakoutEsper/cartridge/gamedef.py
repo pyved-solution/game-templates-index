@@ -105,7 +105,7 @@ def upd(time_info=None):
     ecs.process(dt)
 
     # already done??
-    # pyv.flip()
+    pyv.flip()
 
 
 @pyv.declare_end

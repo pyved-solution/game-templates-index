@@ -6,7 +6,8 @@
       "pyv"
     ],
     "esper": [
-      "3_3", "ecs"
+      "3_3",
+      "ecs"
     ]
   },
   "description": "this is a placeholder so you can describe your game",
@@ -15,7 +16,7 @@
   "asset_base_folder": ".",
   "sound_base_folder": ".",
   "sound_list": [],
-  "slug": "GoblinHorde",
+  "slug": "BreakoutEsper",
   "title": "Untitled Game",
   "thumbnail512x384": "thumb_2.png",
   "thumbnail512x512": "thumb_1.png",
@@ -27,15 +28,14 @@
   "game_genre": [
     "Incremental"
   ],
-  "game_title": "GoblinHorde",
-  "build_date": "Mon Sep  9 17:15:59 2024",
+  "build_date": "Mon Sep  9 18:30:34 2024",
   "source_files": [
+    "classes.py",
     "gamedef.py",
     "glvars.py",
     "pimodules.py",
     "shared.py",
     "systems.py",
-    "world.py",
     "__init__.py"
   ]
 }
