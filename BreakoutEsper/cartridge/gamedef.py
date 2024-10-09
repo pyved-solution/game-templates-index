@@ -5,9 +5,6 @@ from .classes import *
 from .glvars import pyv, ecs
 
 
-pygame = pyv.pygame
-
-
 def player_create():
     player = ecs.create_entity(
         Speed(0.0), Controls(), Body(glvars.scr_size[0]//2, 635, glvars.PL_WIDTH, glvars.PL_HEIGHT)
@@ -47,8 +44,7 @@ def init_game(vmst=None):
     pyv.init(wcaption='Pyv Breaker')
     glvars.screen = s_obj = pyv.get_surface()
     glvars.set_scr_size(s_obj.get_size())
-
-    ft = pyv.pygame.font.Font(None, glvars.classic_ftsize)
+    ft = pyv.new_font_obj(None, glvars.classic_ftsize)
     glvars.start_game_label = ft.render('Press space to start the game', True, 'white')
 
     # add my entities
@@ -86,14 +82,13 @@ def init_game(vmst=None):
 
 @pyv.declare_update
 def upd(time_info=None):
-    if glvars.prev_time_info:
-        dt = (time_info - glvars.prev_time_info)
+    if glvars.prev_time_info is None:
+        glvars.prev_time_info = time_info
     else:
-        dt = 0
-    glvars.prev_time_info = time_info
-
-    ecs.process(dt)
-    pyv.flip()
+        dt = (time_info - glvars.prev_time_info)
+        glvars.prev_time_info = time_info
+        ecs.process(dt)
+        pyv.flip()
 
 
 @pyv.declare_end

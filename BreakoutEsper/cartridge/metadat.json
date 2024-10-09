@@ -2,7 +2,7 @@
   "vmlib_ver": "24_9a1",
   "dependencies": {
     "pyved_engine": [
-      "24_9a1",
+      "24_9a3",
       "pyv"
     ],
     "esper": [

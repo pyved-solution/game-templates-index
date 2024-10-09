@@ -6,7 +6,6 @@ from . import glvars
 
 
 pyv.bootstrap_e()
-pygame = pyv.pygame
 
 
 class Speed:
@@ -31,7 +30,7 @@ class BlockSig:
 class Body:
     def __init__(self, x, y, w, h):
         self._x, self._y, self.w, self.h = x, y, w, h
-        self._cached_rect = pygame.Rect(self.x, self.y, self.w, self.h)
+        self._cached_rect = pyv.new_rect_obj(self.x, self.y, self.w, self.h)
 
     @property
     def y(self):
@@ -40,7 +39,7 @@ class Body:
     @y.setter
     def y(self, val):
         self._y = val
-        self._cached_rect = pygame.Rect(self._x, self._y, self.w, self.h)
+        self._cached_rect = pyv.new_rect_obj(self._x, self._y, self.w, self.h)
 
     @property
     def x(self):
@@ -49,7 +48,7 @@ class Body:
     @x.setter
     def x(self, val):
         self._x = val
-        self._cached_rect = pygame.Rect(self._x, self._y, self.w, self.h)
+        self._cached_rect = pyv.new_rect_obj(self._x, self._y, self.w, self.h)
 
     def to_rect(self):
         return self._cached_rect
@@ -61,14 +60,15 @@ class Body:
 
 class EventProcessor(ecs.Processor):
     def process(self, *args, **kwargs) -> None:
+        evsys = pyv.legacy_evs
 
-        for ev in pygame.event.get():
-            if ev.type == pygame.QUIT:
+        for ev in evsys.get():
+            if ev.type == evsys.QUIT:
                 pyv.vars.gameover = True
-            elif ev.type == pygame.KEYDOWN:
-                if ev.key == pygame.K_ESCAPE:
+            elif ev.type == evsys.KEYDOWN:
+                if ev.key == evsys.K_ESCAPE:
                     pyv.vars.gameover = True
-                elif ev.key == pygame.K_SPACE:
+                elif ev.key == evsys.K_SPACE:
                     ball_sp = ecs.try_component(glvars.ball_entity, Speed)
                     if glvars.start_game_label:
                         glvars.start_game_label = None
@@ -76,11 +76,11 @@ class EventProcessor(ecs.Processor):
                         print('ball accelerates')
                         ball_sp.vy *= 1.08  # boost ball speed when pressing space
 
-        all_pkeys = pygame.key.get_pressed()
+        all_pkeys = evsys.pressed_keys()
         sp_compo = ecs.try_component(glvars.player_entity, Speed)
-        if all_pkeys[pygame.K_LEFT]:
+        if all_pkeys[evsys.K_LEFT]:
             sp_compo.vx = -1 * glvars.PLAYER_SPEED
-        elif all_pkeys[pygame.K_RIGHT]:
+        elif all_pkeys[evsys.K_RIGHT]:
             sp_compo.vx = glvars.PLAYER_SPEED
         else:
             sp_compo.vx = 0.0
@@ -93,11 +93,11 @@ class EndgameProcessor(ecs.Processor):
 
         # player has destroyed all blocks
         if len(li_pairs) == 0:  # no more blocks left
-            ft = pyv.pygame.font.Font(None, glvars.classic_ftsize)
+            ft = pyv.new_font_obj(None, glvars.classic_ftsize)
             glvars.end_game_label = ft.render('VICTORY!', True, 'white')
 
         elif bpy > glvars.scr_size[1]:  # player has lost the ball
-            ft = pyv.pygame.font.Font(None, glvars.classic_ftsize)
+            ft = pyv.new_font_obj(None, glvars.classic_ftsize)
             glvars.end_game_label = ft.render('GAME OVER', True, 'white')
 
 
@@ -183,7 +183,7 @@ class GfxProcessor(ecs.Processor):
         # draw player and ball
         for ent, body in ecs.get_component(Body):
             if ent == glvars.player_entity:  # draw player
-                pygame.draw.rect(self._scr, 'white', body.to_rect())
+                pyv.draw_rect(self._scr, 'white', body.to_rect())
             elif ent == glvars.ball_entity:  # draw ball
                 pyv.draw_rect(self._scr, 'blue', ecs.try_component(ent, Body).to_rect())
             else:  # blocks
