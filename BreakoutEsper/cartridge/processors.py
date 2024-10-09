@@ -1,74 +1,27 @@
-"""
-the file contains all classes used to implement the ECS pattern
-"""
 from .glvars import pyv, ecs
+from .components import *
 from . import glvars
 
 
-pyv.bootstrap_e()
+__all__ = [
+	'EventProc',
+	'EndgameProc',
+	'PhysicsProc',
+	'GraphicsProc'
+]
 
 
-class Speed:
-    def __init__(self, vx=0.0, vy=0.0):
-        self.vx = vx
-        self.vy = vy
-
-
-class Controls:
-    def __init__(self):
-        self.right = self.left = False
-
-
-class BlockSig:
-    free_b_id = 0
-
-    def __init__(self):
-        self.bid = self.__class__.free_b_id
-        self.__class__.free_b_id += 1
-
-
-class Body:
-    def __init__(self, x, y, w, h):
-        self._x, self._y, self.w, self.h = x, y, w, h
-        self._cached_rect = pyv.new_rect_obj(self.x, self.y, self.w, self.h)
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, val):
-        self._y = val
-        self._cached_rect = pyv.new_rect_obj(self._x, self._y, self.w, self.h)
-
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, val):
-        self._x = val
-        self._cached_rect = pyv.new_rect_obj(self._x, self._y, self.w, self.h)
-
-    def to_rect(self):
-        return self._cached_rect
-
-    def commit(self):
-        # use the cached rect (has been modified) to update other values
-        self._x, self.y = self._cached_rect.topleft
-
-
-class EventProcessor(ecs.Processor):
+class EventProc(ecs.Processor):
     def process(self, *args, **kwargs) -> None:
-        evsys = pyv.legacy_evs
+        ev_manager = pyv.legacy_evs
 
-        for ev in evsys.get():
-            if ev.type == evsys.QUIT:
+        for ev in ev_manager.get():
+            if ev.type == ev_manager.QUIT:
                 pyv.vars.gameover = True
-            elif ev.type == evsys.KEYDOWN:
-                if ev.key == evsys.K_ESCAPE:
+            elif ev.type == ev_manager.KEYDOWN:
+                if ev.key == ev_manager.K_ESCAPE:
                     pyv.vars.gameover = True
-                elif ev.key == evsys.K_SPACE:
+                elif ev.key == ev_manager.K_SPACE:
                     ball_sp = ecs.try_component(glvars.ball_entity, Speed)
                     if glvars.start_game_label:
                         glvars.start_game_label = None
@@ -76,17 +29,17 @@ class EventProcessor(ecs.Processor):
                         print('ball accelerates')
                         ball_sp.vy *= 1.08  # boost ball speed when pressing space
 
-        all_pkeys = evsys.pressed_keys()
+        all_pkeys = ev_manager.pressed_keys()
         sp_compo = ecs.try_component(glvars.player_entity, Speed)
-        if all_pkeys[evsys.K_LEFT]:
+        if all_pkeys[ev_manager.K_LEFT]:
             sp_compo.vx = -1 * glvars.PLAYER_SPEED
-        elif all_pkeys[evsys.K_RIGHT]:
+        elif all_pkeys[ev_manager.K_RIGHT]:
             sp_compo.vx = glvars.PLAYER_SPEED
         else:
             sp_compo.vx = 0.0
 
 
-class EndgameProcessor(ecs.Processor):
+class EndgameProc(ecs.Processor):
     def process(self, *args, **kwargs):
         li_pairs = ecs.get_component(BlockSig)
         bpy = ecs.try_component(glvars.ball_entity, Body).to_rect().top
@@ -101,7 +54,7 @@ class EndgameProcessor(ecs.Processor):
             glvars.end_game_label = ft.render('GAME OVER', True, 'white')
 
 
-class PhysicsProcessor(ecs.Processor):
+class PhysicsProc(ecs.Processor):
     def process(self, *args, **kwargs):
         # blocks all movement if the game is over/ hasnt started yet
         if glvars.start_game_label:
@@ -172,7 +125,7 @@ class PhysicsProcessor(ecs.Processor):
             ecs.delete_entity(z_entity)
 
 
-class GfxProcessor(ecs.Processor):
+class GraphicsProc(ecs.Processor):
     def __init__(self):
         self._scr = pyv.get_surface()
 

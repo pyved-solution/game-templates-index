@@ -1,8 +1,27 @@
 import random
-
-from . import glvars
-from .classes import *
+from .components import *
+from . import processors
 from .glvars import pyv, ecs
+
+"""
+>>mini docs for esper/ecs<<
+
+.create_entity()
+.delete_entity(entity)
+.add_component(entity, component_instance)
+.remove_component(entity, ComponentType)
+
+.try_component(entity, ComponentType)
+.get_component(ComponentType)
+.get_components(ComponentTypeA, ComponentTypeB, Etc)
+.component_for_entity(entity, ComponentType)
+.components_for_entity(entity)
+.has_component(entity, ComponentType)
+
+.add_processor(processor_instance)
+.remove_processor(ProcessorType)
+.process()
+"""
 
 
 def player_create():
@@ -39,45 +58,28 @@ def blocks_create():
         bcy += glvars.BLOCK_H + glvars.BLOCK_SPACING
 
 
+def auto_add_processors(module_name):
+    processor_objects = [
+        getattr(module_name, cls)() for cls in module_name.__all__
+    ]
+    for processor in processor_objects:
+        ecs.add_processor(processor)
+
+
+# ...The three canonical gamedef functions
+# -------------------------------
 @pyv.declare_begin
 def init_game(vmst=None):
     pyv.init(wcaption='Pyv Breaker')
     glvars.screen = s_obj = pyv.get_surface()
     glvars.set_scr_size(s_obj.get_size())
-    ft = pyv.new_font_obj(None, glvars.classic_ftsize)
-    glvars.start_game_label = ft.render('Press space to start the game', True, 'white')
-
-    # add my entities
+    my_font = pyv.new_font_obj(None, glvars.classic_ftsize)
+    glvars.start_game_label = my_font.render('Press space to start the game', True, 'white')
+    # build all entities, then add all processors
     player_create()
     ball_create()
     blocks_create()
-
-    # add my processors
-    all_proc = (
-        EventProcessor(),
-        PhysicsProcessor(),
-        EndgameProcessor(),
-        GfxProcessor()
-    )
-    list(map(ecs.add_processor, all_proc))
-
-    #  mini docs for ecs.*
-    # ------------------
-    # .create_entity()
-    # .delete_entity(entity)
-    # .add_component(entity, component_instance)
-    # .remove_component(entity, ComponentType)
-
-    # .try_component(entity, ComponentType)
-    # .get_component(ComponentType)
-    # .get_components(ComponentTypeA, ComponentTypeB, Etc)
-    # .component_for_entity(entity, ComponentType)
-    # .components_for_entity(entity)
-    # .has_component(entity, ComponentType)
-
-    # .add_processor(processor_instance)
-    # .remove_processor(ProcessorType)
-    # .process()
+    auto_add_processors(processors)
 
 
 @pyv.declare_update
