@@ -1,0 +1,38 @@
+{
+  "vmlib_ver": "24_9a1",
+  "dependencies": {
+    "pyved_engine": [
+      "24_9a3",
+      "pyv"
+    ],
+    "esper": [
+      "3_3",
+      "ecs"
+    ]
+  },
+  "description": "this is a placeholder so you can describe your game",
+  "author": "Thomas E.",
+  "asset_list": [],
+  "asset_base_folder": ".",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "slug": "basicBreakoutEsper",
+  "title": "Tech demo for pyved (breakout+esper)",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Incremental"
+  ],
+  "build_date": "Wed Sep 11 12:59:39 2024",
+  "source_files": [
+    "components.py",
+	"processors.py",
+    "gamedef.py",
+    "glvars.py"
+  ]
+}

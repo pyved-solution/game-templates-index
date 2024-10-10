@@ -15,14 +15,14 @@ without you having any further betting options)
 you can either: Fold / Bet 1x the ante. You cannot check anymore since the river is out.
 """
 from . import common
-from . import pimodules
+from .glvars import pyv,netw,ecs
 from .game_logic import AnteSelectionState, PreFlopState, FlopState, TurnRiverState, OutcomeState
 from .uth_model import UthModel
 from .uth_view import UthView
 
+print( '----------- superman ----------')
+print(pyv, netw, ecs)
 
-# aliases
-pyv = pimodules.pyved_engine
 pyv.bootstrap_e()
 
 MyEvTypes = common.MyEvTypes

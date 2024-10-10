@@ -1,64 +1,74 @@
 {
-    "vmlib_ver": "24_9a1",
-    "dependencies": {
-        "pyved_engine": "???"
-    },
-    "description": "A game that is similar to like Tetris but, with a twist!",
-    "author": "Thomas alias moonbak",
-    "slug": "tetravalanche",
-    "title": "TetrAvalanche[v1]",
-    "thumbnail512x384": "thumb_2.png",
-    "thumbnail512x512": "thumb_1.png",
-    "ktg_services": true,
-    "uses_challenge": true,
-    "has_game_server": false,
-    "ncr_faucet": true,
-    "instructions": "not provided",
-    "build_date": "Tue Sep  3 16:57:33 2024",
-    "game_genre": [
-        "Classics",
-        "Arcade"
+  "vmlib_ver": "24_9a1",
+  "dependencies": {
+    "pyved_engine": [
+      "24_9a1",
+      "pyv"
     ],
-    "asset_base_folder": "game-assets",
-    "asset_list": [
-        "img_bt_rouge.png",
-        "mining_btc.png",
-        "monogram.ttf"
+    "network": [
+      "0_2",
+      "netw"
     ],
-    "sound_base_folder": "sound",
-    "sound_list": [
-        "chiptronic.ogg",
-        "coinhigh.wav",
-        "coinlow.wav",
-        "crumble.wav",
-        "explo_basique.wav"
-    ],
-    "data_files": [
-        "vide.csv"
-    ],
-    "source_files": [
-        "gamedef.py",
-        "pimodules.py",
-		"__init__.py",
-        "ev_types.py",
-        "fonts_n_colors.py",
-        "glvars.py",
-        "gui.py",
-        "labels.py",
-        "loctexts.py",
-        "modele_tetris.py",
-        "app/credits/__init__.py",
-        "app/credits/state.py",
-        "app/login/__init__.py",
-        "app/login/state.py",
-        "app/menu/__init__.py",
-        "app/menu/MenuView.py",
-        "app/menu/state.py",
-        "app/tax_payment/__init__.py",
-        "app/tax_payment/state.py",
-        "app/tetris/__init__.py",
-        "app/tetris/state.py",
-        "app/tetris/TetrisCtrl.py",
-        "app/tetris/TetrisView.py"
+    "esper": [
+      "3_3"
     ]
+  },
+  "description": "A game that is similar to like Tetris but, with a twist!",
+  "author": "Thomas alias moonbak",
+  "slug": "tetravalanche",
+  "title": "TetrAvalanche[v1]",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": true,
+  "uses_challenge": true,
+  "has_game_server": false,
+  "ncr_faucet": true,
+  "instructions": "not provided",
+  "build_date": "Mon Sep  9 16:21:58 2024",
+  "game_genre": [
+    "Classics",
+    "Arcade"
+  ],
+  "asset_base_folder": "game-assets",
+  "asset_list": [
+    "img_bt_rouge.png",
+    "mining_btc.png",
+    "monogram.ttf"
+  ],
+  "sound_base_folder": "sound",
+  "sound_list": [
+    "chiptronic.ogg",
+    "coinhigh.wav",
+    "coinlow.wav",
+    "crumble.wav",
+    "explo_basique.wav"
+  ],
+  "data_files": [
+    "vide.csv"
+  ],
+  "source_files": [
+    "ev_types.py",
+    "fonts_n_colors.py",
+    "gamedef.py",
+    "glvars.py",
+    "gui.py",
+    "labels.py",
+    "loctexts.py",
+    "modele_tetris.py",
+    "__init__.py",
+    "app/__init__.py",
+    "app/credits/state.py",
+    "app/credits/__init__.py",
+    "app/login/state.py",
+    "app/login/__init__.py",
+    "app/menu/MenuView.py",
+    "app/menu/state.py",
+    "app/menu/__init__.py",
+    "app/tax_payment/state.py",
+    "app/tax_payment/__init__.py",
+    "app/tetris/state.py",
+    "app/tetris/TetrisCtrl.py",
+    "app/tetris/TetrisView.py",
+    "app/tetris/__init__.py"
+  ]
 }

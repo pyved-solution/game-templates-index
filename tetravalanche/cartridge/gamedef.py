@@ -1,15 +1,18 @@
 from . import glvars
 from . import loctexts
-from . import pimodules
 from .ev_types import MyEvTypes
 
 
-pyv = pimodules.pyved_engine
+pyv = glvars.pyv
+# mandatory line here, do not move or remove it
 pyv.bootstrap_e()
 
 
 @pyv.declare_begin
 def init_game(vmst=None):
+    glvars.create_enums()
+
+    pyv.bootstrap_e()
     loctexts.init_repo(glvars.CHOSEN_LANG)
     pyv.init(wcaption='Tetravalanche')
     glvars.screen = pyv.get_surface()

@@ -2,11 +2,10 @@ import json
 
 from .MenuView import MenuView
 from ... import glvars
-from ... import pimodules
+from ...glvars import pyv, netw
 from ...ev_types import MyEvTypes
 
 
-pyv = pimodules.pyved_engine
 pygame = pyv.pygame
 
 
@@ -262,9 +261,6 @@ class MenuCtrl(pyv.EvListener):
             self.ref_view.refresh_graphic_state()
         if self.ref_mod.is_logged():
             print('Current rank of user:', netw.get_rank(glvars.user_id, glvars.GAME_ID))
-
-
-netw = pimodules.network
 
 
 class MenuState(pyv.BaseGameState):

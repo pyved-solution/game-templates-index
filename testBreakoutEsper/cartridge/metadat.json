@@ -1,0 +1,26 @@
+{
+    "vmlib_ver": "24_9a1",
+    "plugins": {
+        "esper": ["3.3", "esper"]
+    },
+    "description": "this is a placeholder so you can describe your game",
+    "author": "Unknown",
+    "asset_list": [],
+    "asset_base_folder": ".",
+    "sound_base_folder": ".",
+    "sound_list": [],
+    "slug": "testBreakoutEsper",
+    "title": "Untitled Game",
+    "thumbnail512x384": "thumb_2.png",
+    "thumbnail512x512": "thumb_1.png",
+    "ktg_services": false,
+    "instructions": "not provided",
+    "uses_challenge": false,
+    "has_game_server": false,
+    "ncr_faucet": false,
+    "game_genre": [
+        "Experimental"
+    ],
+    "game_title": "testBreakoutEsper",
+    "build_date": "Wed Sep  4 18:06:09 2024"
+}

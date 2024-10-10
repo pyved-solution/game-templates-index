@@ -1,6 +1,6 @@
-from . import pimodules
+from .glvars import pyv
 
-pyv = pimodules.pyved_engine
+
 enum = pyv.custom_struct.enum
 
 

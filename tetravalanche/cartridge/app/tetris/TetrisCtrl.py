@@ -1,7 +1,6 @@
-from ... import pimodules
-
-pyv = pimodules.pyved_engine
 from ... import glvars
+pyv = glvars.pyv
+
 from ...ev_types import MyEvTypes
 # from katagames_sdk.api import HttpServer
 # from katagames_sdk.capsule.event import FIRST_CUSTO_TYPE  # TODO fix this dependancy! shouldnt be here

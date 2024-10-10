@@ -1,8 +1,6 @@
-from ... import pimodules
-
-pyv = pimodules.pyved_engine
-
 from ... import glvars
+pyv = glvars.pyv
+
 from ...ev_types import MyEvTypes
 from ...modele_tetris import TetColor
 
