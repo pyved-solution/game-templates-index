@@ -16,8 +16,8 @@
   "asset_base_folder": ".",
   "sound_base_folder": ".",
   "sound_list": [],
-  "slug": "BreakoutEsper",
-  "title": "Untitled Game",
+  "slug": "basicBreakoutEsper",
+  "title": "Tech demo for pyved (breakout+esper)",
   "thumbnail512x384": "thumb_2.png",
   "thumbnail512x512": "thumb_1.png",
   "ktg_services": false,
@@ -30,7 +30,8 @@
   ],
   "build_date": "Wed Sep 11 12:59:39 2024",
   "source_files": [
-    "classes.py",
+    "components.py",
+	"processors.py",
     "gamedef.py",
     "glvars.py"
   ]
