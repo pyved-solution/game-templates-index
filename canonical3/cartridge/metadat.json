@@ -1,0 +1,63 @@
+{
+    "vmlib_ver": "24_10a1",
+    "dependencies": {
+        "pyved_engine": [
+            "24_10a1",
+            "pyv"
+        ]
+    },
+    "description": "this is a placeholder so you can describe your game",
+    "author": "moonbak",
+    "asset_base_folder": ".",
+    "sound_base_folder": ".",
+    "asset_list": [
+        "black_bishop.png",
+        "black_king.png",
+        "black_knight.png",
+        "black_pawn.png",
+        "black_queen.png",
+        "black_rook.png",
+        "white_bishop.png",
+        "white_king.png",
+        "white_knight.png",
+        "white_pawn.png",
+        "white_queen.png",
+        "white_rook.png",
+        "white_square.png",
+        "brown_square.png",
+        "cyan_square.png"
+    ],
+    "sound_list": [],
+    "slug": "canonical3",
+    "title": "chessBundle",
+    "instructions": "not provided",
+    "build_date": "Mon Oct 28 10:16:21 2024",
+    "thumbnail512x384": "thumb_2.png",
+    "thumbnail512x512": "thumb_1.png",
+    "ktg_services": false,
+    "uses_challenge": false,
+    "has_game_server": false,
+    "ncr_faucet": false,
+    "game_genre": [
+        "Classics"
+    ],
+    "game_title": "Chess",
+    "source_files": [
+        "ai_players.py",
+        "chdefs.py",
+        "ChessGameParams.py",
+        "ChessGUI_text.py",
+        "chessintro.py",
+        "chessmatch.py",
+        "ChessmatchMod.py",
+        "chess_rules.py",
+        "gamedef.py",
+        "main_gui_view.py",
+        "misc.py",
+        "model.py",
+        "PythonChessAIStats.py",
+        "run_chess.py",
+        "ScrollingTextBox.py",
+        "__init__.py"
+    ]
+}

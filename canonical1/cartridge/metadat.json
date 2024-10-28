@@ -1,0 +1,37 @@
+{
+    "vmlib_ver": "24_10a1",
+    "dependencies": {
+        "pyved_engine": [
+            "24_9a3",
+            "pyv"
+        ]
+    },
+    "description": "this is a placeholder so you can describe your game",
+    "author": "moonbak",
+    "asset_list": [
+    ],
+    "asset_base_folder": "my_folder",
+    "sound_base_folder": ".",
+    "sound_list": [],
+    "slug": "canonical1",
+    "title": "Breakout",
+    "thumbnail512x384": "thumb_2.png",
+    "thumbnail512x512": "thumb_1.png",
+    "ktg_services": false,
+    "instructions": "not provided",
+    "uses_challenge": false,
+    "has_game_server": false,
+    "ncr_faucet": false,
+    "game_genre": [
+        "Experimental",
+        "Arcade"
+    ],
+    "build_date": "Tue Oct 22 20:11:29 2024",
+    "source_files": [
+        "gamedef.py",
+        "glvars.py",
+        "systems.py",
+        "world.py",
+        "__init__.py"
+    ]
+}

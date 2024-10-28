@@ -1,0 +1,37 @@
+{
+    "vmlib_ver": "24_10a1",
+    "dependencies": {
+        "pyved_engine": [
+            "24_10a1",
+            "pyv"
+        ]
+    },
+    "description": "this is an example of platformer",
+    "author": "moonbak",
+    "asset_list": [
+        "my_map.ncsv"
+    ],
+    "asset_base_folder": ".",
+    "sound_base_folder": ".",
+    "sound_list": [],
+    "slug": "canonical2",
+    "title": "Platformer",
+    "build_date": "Mon Oct 28 10:15:48 2024",
+    "thumbnail512x384": "thumb_2.png",
+    "thumbnail512x512": "thumb_1.png",
+    "ktg_services": false,
+    "instructions": "not provided",
+    "uses_challenge": false,
+    "has_game_server": false,
+    "ncr_faucet": false,
+    "game_genre": [
+        "Platformer"
+    ],
+    "source_files": [
+        "classes.py",
+        "gamedef.py",
+        "glvars.py",
+        "systems.py",
+        "World.py"
+    ]
+}
