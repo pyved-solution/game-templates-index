@@ -45,19 +45,19 @@
     "source_files": [
         "ai_players.py",
         "chdefs.py",
+		"chess_rules.py",
         "ChessGameParams.py",
         "ChessGUI_text.py",
         "chessintro.py",
         "chessmatch.py",
         "ChessmatchMod.py",
-        "chess_rules.py",
         "gamedef.py",
+		"glvars.py",
         "main_gui_view.py",
         "misc.py",
         "model.py",
         "PythonChessAIStats.py",
         "run_chess.py",
-        "ScrollingTextBox.py",
-        "__init__.py"
+        "ScrollingTextBox.py"
     ]
 }
