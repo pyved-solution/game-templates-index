@@ -2,39 +2,36 @@
     "vmlib_ver": "24_10a1",
     "dependencies": {
         "pyved_engine": [
-            "24_10a1",
+            "24_9a3",
             "pyv"
         ]
     },
-    "description": "a basic demo for a roguelike game",
+    "description": "this is a placeholder so you can describe your game",
     "author": "moonbak",
-    "asset_base_folder": ".",
-    "sound_base_folder": ".",
     "asset_list": [
-        "smallninja_sprites.json",
-        "tileset.png",
-        "monster.png",
-        "avatar1.png"
     ],
+    "asset_base_folder": "my_folder",
+    "sound_base_folder": ".",
     "sound_list": [],
-    "slug": "canonical4",
-    "title": "Roguelike Template",
-    "build_date": "Mon Oct 28 10:17:26 2024",
+    "slug": "Breakout",
+    "title": "Breakout",
     "thumbnail512x384": "thumb_2.png",
     "thumbnail512x512": "thumb_1.png",
     "ktg_services": false,
-    "instructions": "no instructions provided",
+    "instructions": "not provided",
     "uses_challenge": false,
     "has_game_server": false,
     "ncr_faucet": false,
     "game_genre": [
-        "Roguelike"
+        "Experimental",
+        "Arcade"
     ],
-    "game_title": "Roguelike",
+    "build_date": "Tue Oct 22 20:11:29 2024",
     "source_files": [
         "gamedef.py",
         "glvars.py",
-        "mvc_parts.py",
+        "systems.py",
+        "world.py",
         "__init__.py"
     ]
 }

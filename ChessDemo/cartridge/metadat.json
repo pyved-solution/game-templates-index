@@ -28,8 +28,8 @@
         "cyan_square.png"
     ],
     "sound_list": [],
-    "slug": "canonical3",
-    "title": "chessBundle",
+    "slug": "ChessDemo",
+    "title": "ChessDemo",
     "instructions": "not provided",
     "build_date": "Mon Oct 28 10:16:21 2024",
     "thumbnail512x384": "thumb_2.png",

@@ -6,16 +6,17 @@
             "pyv"
         ]
     },
-    "description": "this is a placeholder so you can describe your game",
+    "description": "this is an example of platformer",
     "author": "moonbak",
     "asset_list": [
-        "lion.png"
+        "my_map.ncsv"
     ],
-    "asset_base_folder": "my_folder",
+    "asset_base_folder": ".",
     "sound_base_folder": ".",
     "sound_list": [],
-    "slug": "canonical0",
-    "title": "Empty",
+    "slug": "Platformer",
+    "title": "Platformer",
+    "build_date": "Mon Oct 28 10:15:48 2024",
     "thumbnail512x384": "thumb_2.png",
     "thumbnail512x512": "thumb_1.png",
     "ktg_services": false,
@@ -24,12 +25,13 @@
     "has_game_server": false,
     "ncr_faucet": false,
     "game_genre": [
-        "Experimental"
+        "Platformer"
     ],
-    "build_date": "Mon Oct 28 10:15:16 2024",
     "source_files": [
+        "classes.py",
         "gamedef.py",
         "glvars.py",
-        "__init__.py"
+        "systems.py",
+        "World.py"
     ]
 }
