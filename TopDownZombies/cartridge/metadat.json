@@ -1,0 +1,65 @@
+{
+  "vmlib_ver": "24_10a3",
+  "dependencies": {
+    "pyved_engine": [
+      "24_10a3",
+      "pyv"
+    ]
+  },
+  "description": "this is a placeholder so you can describe your game",
+  "author": "thomas",
+  "asset_list": [
+    "(zombie)bonus.png",
+    "(zombie)bullet.png",
+    "(zombie)cell_tower.png",
+    "(zombie)comms_icon.png",
+    "(zombie)health_icon.png",
+    "(zombie)hitman_gun.png",
+    "(zombie)landmine.png",
+    "(zombie)light_350_med.png",
+    "(zombie)mine_icon.png",
+    "(zombie)pistol.png",
+    "(zombie)pistol_ammo.png",
+    "(zombie)shotgun.png",
+    "(zombie)shotgun_ammo.png",
+    "(zombie)uzi.png",
+    "(zombie)uzi_ammo.png",
+    "(zombies)explosion.png",
+    "(zombies)tile_179.png",
+    "(zombies)whitePuff15.png",
+    "(zombies)whitePuff16.png",
+    "(zombies)whitePuff17.png",
+    "(zombies)whitePuff18.png",
+    "zombie1_hold.png",
+    "zombie2_hold.png"
+  ],
+  "asset_base_folder": "assets",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "data_files": [
+    "level1.tmj"
+  ],
+  "slug": "TopDownZombies",
+  "title": "TopDownZombies",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Arcade",
+    "Experimental"
+  ],
+  "build_date": "Tue Oct 29 18:37:07 2024",
+  "source_files": [
+    "classes.py",
+    "constants.py",
+    "gamedef.py",
+    "glvars.py",
+    "sprites.py",
+    "zombies.py",
+    "__init__.py"
+  ]
+}
