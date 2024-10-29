@@ -1,9 +1,9 @@
 """
 game actors actor
 """
-from pygame.math import Vector2 as Vector2d
-
-from shared import deg, pyv, pygame, random, math
+from .glvars import deg, pyv
+import math
+import random
 
 
 __all__ = [
@@ -11,12 +11,13 @@ __all__ = [
     'new_rockfield'
 ]
 
+pygame = pyv.pygame
+Vector2d = pyv.Vector2d
 
 SHIP_DASH_RANGE = 55
 SHIP_DELTA_ANGLE = 0.04
 SHIP_SPEED_CAP = 192
 SHIP_RAD = 5
-SHIP_COLOR = (119, 255, 0)
 
 
 def new_ship(pos_xy):
@@ -24,7 +25,7 @@ def new_ship(pos_xy):
         "pos": Vector2d(*pos_xy),
         "angle": 0,
         "speed": Vector2d(),
-        "scr_size": pyv.screen.get_size()
+        "scr_size": pyv.vars.screen.get_size()
     }
 
     # -------- callable functions
@@ -84,8 +85,8 @@ def new_ship(pos_xy):
         ensure_ok_pos(this)
 
     def on_update(this, ev):
-        this.pos.x += ev.info_t * this.speed.x
-        this.pos.y += ev.info_t * this.speed.y
+        this.pos.x += ev.dt * this.speed.x
+        this.pos.y += ev.dt * this.speed.y
         ensure_ok_pos(this)
 
     def on_draw(this, ev):
@@ -110,19 +111,17 @@ def new_ship(pos_xy):
             pt.x = round(pt.x)
             pt.y = round(pt.y)
         pt_li.reverse()
-        pygame.draw.polygon(pyv.screen, SHIP_COLOR, pt_li, 2)
-
+        pygame.draw.polygon(ev.screen, pyv.pal.punk.brightgreen, pt_li, 2)
     return pyv.new_actor(locals())
 
 
-LINE_COLOR = 'antiquewhite2'
 LINE_THICKNESS = 2
 
 
 def new_rockfield(quantity):
     actor_type, data = 'rockfield', {
         'content': [],
-        'scr_size': pyv.screen.get_size()
+        'scr_size': pyv.vars.screen.get_size()
     }
     for _ in range(quantity):
         rand_pos = [random.randint(0, data['scr_size'][0] - 1), random.randint(0, data['scr_size'][1] - 1)]
@@ -150,19 +149,18 @@ def new_rockfield(quantity):
         return resx, resy
 
     # --- behavior
-    def on_draw(this, ev):  # TODO use ev.screen
+    def on_draw(this, ev):
         for rockinfo in this.content:
-            pos = (int(rockinfo[0][0]), int(rockinfo[0][1]))
+            pos = int(rockinfo[0][0]), int(rockinfo[0][1])
             size = rockinfo[1]
-            pygame.draw.circle(pyv.screen, LINE_COLOR, pos, size, LINE_THICKNESS)
+            pyv.draw_circle(ev.screen, pyv.pal.c64.lightgray, pos, size, LINE_THICKNESS)
 
     def on_update(this, ev):
         for k in range(len(this.content)):
             speed_vec = this.content[k][2]
-            this.content[k][0][0] += ev.info_t * speed_vec.x
-            this.content[k][0][1] += ev.info_t * speed_vec.y
+            this.content[k][0][0] += ev.dt * speed_vec.x
+            this.content[k][0][1] += ev.dt * speed_vec.y
             this.content[k][0][0], this.content[k][0][1] = adjust_for_torus(
                 this.content[k][0][0], this.content[k][0][1], this.scr_size
             )
-
     return pyv.new_actor(locals())
