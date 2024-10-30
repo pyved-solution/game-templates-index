@@ -31,8 +31,7 @@ class DummyDisp(pyv.EvListener):
         ev.screen.fill(self.col)
 
 
-@pyv.declare_begin
-def rogue_begin(vms=None):
+def init(vms=None):
     pyv.init(wcaption='roguelike template')
     # bind obj to glvars
     glvars.avatar_sprite_sheet = pyv.vars.spritesheets['smallninja_sprites']
@@ -48,12 +47,10 @@ def rogue_begin(vms=None):
     v.turn_on()
 
     NinjamazeCtrl(m).turn_on()
-
     print_help()  # so the player knows how to "play"
 
 
-@pyv.declare_update
-def rogue_update(info_t=None):
+def update(info_t=None):
     gvars = MiniStorage.instance()
     gvars.ev_manager.post(EngineEvTypes.Update, curr_t=info_t)
     gvars.ev_manager.post(EngineEvTypes.Paint, screen=gvars.screen)
@@ -61,7 +58,6 @@ def rogue_update(info_t=None):
     pyv.flip()
 
 
-@pyv.declare_end
-def rogue_quit(vms=None):
+def close(vms=None):
     pyv.close_game()
     print('bye!')

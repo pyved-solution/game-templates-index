@@ -13,6 +13,7 @@
     "asset_base_folder": "my_folder",
     "sound_base_folder": ".",
     "sound_list": [],
+	"data_files": [],
     "slug": "Breakout",
     "title": "Breakout",
     "thumbnail512x384": "thumb_2.png",

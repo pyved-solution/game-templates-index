@@ -8,15 +8,13 @@ r4 = pyg.Rect(32, 32, 128, 128)
 kpressed = set()
 
 
-@pyv.declare_begin
-def init_game(vmst=None):
+def init(vmst=None):
     global screen
     pyv.init(wcaption='Untitled pyved-based Game')
     screen = pyv.get_surface()
 
 
-@pyv.declare_update
-def upd(time_info=None):
+def update(time_info=None):
     for ev in pyg.event.get():
         if ev.type == pyg.QUIT:
             pyv.vars.gameover = True
@@ -32,7 +30,6 @@ def upd(time_info=None):
     pyv.flip()
 
 
-@pyv.declare_end
-def done(vmst=None):
+def close(vmst=None):
     pyv.close_game()
     print('gameover!')

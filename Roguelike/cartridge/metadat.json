@@ -17,6 +17,7 @@
         "avatar1.png"
     ],
     "sound_list": [],
+	"data_files": [],
     "slug": "Roguelike",
     "title": "Roguelike",
     "build_date": "Mon Oct 28 10:17:26 2024",

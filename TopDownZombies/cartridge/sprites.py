@@ -6,7 +6,7 @@ from . import glvars
 kengi = glvars.pyv
 pg = kengi.pygame
 vec = pg.math.Vector2
-EngineEvTypes = kengi.events.EngineEvTypes
+EngineEvTypes = kengi.EngineEvTypes
 tilemap = kengi.tmx.get_ztilemap_module()
 collide_hit_rect = tilemap.collide_hit_rect
 
@@ -279,7 +279,7 @@ def collided_with_wall(sprite, group, dir):
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y, stats=None):
-        self.msg_emitter = kengi.events.Emitter()  # CogObj()
+        self.msg_emitter = kengi.Emitter()  # CogObj()
 
         self._layer = PLAYER_LAYER
         self.groups = game.all_sprites

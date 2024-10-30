@@ -24,8 +24,7 @@ def print_mini_tutorial():
     print('-' * 32)
 
 
-@pyv.declare_begin
-def game_init(gms):
+def init(gms):
     pyv.init(pyv.LOW_RES_MODE)  # 0, forced_size=(960 // 2, 720 // 2), maxfps=60)
 
     from .actors import new_rockfield, new_ship
@@ -37,8 +36,7 @@ def game_init(gms):
     print_mini_tutorial()
 
 
-@pyv.declare_update
-def game_update(info_t):
+def update(info_t):
     global last_t
 
     # - ev management
@@ -77,7 +75,6 @@ def game_update(info_t):
     pyv.flip()
 
 
-@pyv.declare_end
-def game_exit(gms):
+def close(gms):
     pyv.close_game()
     print('asteroids demo ->over')

@@ -6,8 +6,7 @@ pyv = glvars.pyv
 pygame = pyv.pygame
 
 
-@pyv.declare_begin
-def init_game(vmst=None):
+def init(vmst=None):
     pyv.init()
     screen = pyv.get_surface() 
     # glvars.screen = screen
@@ -23,8 +22,7 @@ def init_game(vmst=None):
     pyv.bulk_add_systems(systems)
 
 
-@pyv.declare_update
-def upd(time_info=None):
+def update(time_info=None):
     if glvars.prev_time_info:
         dt = (time_info - glvars.prev_time_info)
     else:
@@ -35,7 +33,6 @@ def upd(time_info=None):
     pyv.flip()
 
 
-@pyv.declare_end
-def done(vmst=None):
+def close(vmst=None):
     pyv.close_game()
     print('gameover!')

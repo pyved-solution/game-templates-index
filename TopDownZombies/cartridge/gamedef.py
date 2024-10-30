@@ -1,47 +1,34 @@
-# from . import glvars
-# from . import systems
-# from .world import blocks_create, player_create, ball_create
 from random import random, choice
+from .glvars import pyv
 from . import glvars
 from .constants import *
 from .classes import GameflowCtrl, GameWorld
 from .actors import *
-
-pyv = kengi = glvars.pyv
-
 from .sprites import Explosion, Obstacle, Player, Tower, BonusItem, Runner, Mob, Item
 
 # TODO if you wanna fix bugs, the most important is :
 #  - to fix the sound: use a sound controller + use several channels in local ctx
 #  - find why icons are blinking and remove this effect
-# --- constants
 
-
-# ----------- global vars
 g = None
 saved_t = None
-# kengi = katasdk.kengi
-
-pg = kengi.pygame
+pg = pyv.pygame
 vec = pg.math.Vector2
 WARP_BACK_SIG = [2, 'niobepolis']
 glclock = None
 basefont = None  # will store a (pygame)font object
 
 
-
-
-@pyv.declare_begin
-def game_enter(vmst=None):
+def init(vmst=None):
     global g, glclock, basefont
-    kengi.init(1)
-    kengi.get_ev_manager().setup()
+    pyv.init(1)
+    pyv.get_ev_manager().setup()
 
     basefont = pg.font.Font(None, 29)
-    glclock = kengi.pygame.time.Clock()
+    glclock = pyv.pygame.time.Clock()
 
     g = GameWorld()
-    g.screen = kengi.get_surface()
+    g.screen = pyv.get_surface()
 
     ctrl = GameflowCtrl(g)
 
@@ -59,10 +46,8 @@ def game_enter(vmst=None):
     print(tmp)
 
 
-@pyv.declare_update
-def game_update(timeinfo=None):
+def update(timeinfo=None):
     global saved_t
-
     # related to ctrls
     # for weird reasons arrow keys are handled differentrly than other keys in events
     # self.UP_KEY, \
@@ -108,50 +93,10 @@ def game_update(timeinfo=None):
         (250, 13, 55),
         (0, 0, 0)
     )
-    scr = kengi.vars.screen
+    scr = pyv.vars.screen
     scr.blit(label, (scr.get_size()[0] - 96, 16))
-    kengi.flip()
+    pyv.flip()
 
 
-@pyv.declare_end
-def game_exit(vmstate=None):
-    kengi.quit()
-
-
-# pyv = glvars.pyv
-# pygame = pyv.pygame
-#
-#
-# @pyv.declare_begin
-# def init_game(vmst=None):
-#     pyv.init()
-#     screen = pyv.get_surface()
-#     # glvars.screen = screen
-#     pyv.init(wcaption='Pyv Breaker')
-#
-#     pyv.define_archetype('player', ('body', 'speed', 'controls'))
-#     pyv.define_archetype('block', ('body', ))
-#     pyv.define_archetype('ball', ('body', 'speed_Y', 'speed_X'))
-#
-#     blocks_create()
-#     player_create()
-#     ball_create()
-#     pyv.bulk_add_systems(systems)
-#
-#
-# @pyv.declare_update
-# def upd(time_info=None):
-#     if glvars.prev_time_info:
-#         dt = (time_info - glvars.prev_time_info)
-#     else:
-#         dt = 0
-#     glvars.prev_time_info = time_info
-#
-#     pyv.systems_proc(dt)
-#     pyv.flip()
-#
-#
-# @pyv.declare_end
-# def done(vmst=None):
-#     pyv.close_game()
-#     print('gameover!')
+def close(vmstate=None):
+    pyv.close_game()

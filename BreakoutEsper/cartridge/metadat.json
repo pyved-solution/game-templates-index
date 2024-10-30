@@ -16,6 +16,7 @@
   "asset_base_folder": ".",
   "sound_base_folder": ".",
   "sound_list": [],
+  "data_files": [],
   "slug": "BreakoutEsper",
   "title": "Untitled Game",
   "thumbnail512x384": "thumb_2.png",

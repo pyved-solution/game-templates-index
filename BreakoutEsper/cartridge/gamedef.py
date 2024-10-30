@@ -34,10 +34,8 @@ def auto_add_processors(module_name):
         ecs.add_processor(processor)
 
 
-# ...The three canonical gamedef functions
-# -------------------------------
-@pyv.declare_begin
-def init_game(vmst=None):
+# canonical gamedef functions
+def init(vmst=None):
     pyv.init(wcaption='Pyv Breaker')
     glvars.screen = s_obj = pyv.get_surface()
     glvars.set_scr_size(s_obj.get_size())
@@ -53,8 +51,7 @@ def init_game(vmst=None):
     auto_add_processors(processors_menu)
 
 
-@pyv.declare_update
-def upd(time_info=None):
+def update(time_info=None):
     if glvars.prev_time_info is None:
         glvars.prev_time_info = time_info
     else:
@@ -64,7 +61,6 @@ def upd(time_info=None):
         pyv.flip()
 
 
-@pyv.declare_end
-def done(vmst=None):
+def close(vmst=None):
     pyv.close_game()
     print('gameover!')
