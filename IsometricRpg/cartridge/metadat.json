@@ -1,0 +1,53 @@
+{
+  "vmlib_ver": "24_10a3",
+  "dependencies": {
+    "pyved_engine": [
+      "24_10a3",
+      "pyv"
+    ]
+  },
+  "description": "Basically a tech demo, showing we can create isometric games using pyved-engine",
+  "author": "Joseph-H and moonbak",
+  "asset_base_folder": "assets",
+  "asset_list": [
+    "floor-tile.png",
+    "half-floor-tile.png",
+    "mysterious_stranger.png",
+    "npc.png",
+    "sys_defbackground.png",
+    "sys_defborder.png",
+    "sys_icon.png"
+  ],
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "data_files": [
+    "DejaVuSansCondensed-Bold.ttf",
+    "conversation.json",
+    "test_map.json",
+    "sync-tileset.json"
+  ],
+  "slug": "IsometricRpg",
+  "title": "IsometricRpg",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "RPG",
+    "Isometric"
+  ],
+  "build_date": "Wed Oct 30 12:42:57 2024",
+  "source_files": [
+    "classes.py",
+    "custom_events.py",
+    "gamedef.py",
+    "glvars.py",
+    "__init__.py",
+    "demolib/animobs.py",
+    "demolib/dialogue.py",
+    "demolib/rpgmenu.py"
+  ]
+}
