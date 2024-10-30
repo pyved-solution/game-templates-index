@@ -25,7 +25,9 @@
     "DejaVuSansCondensed-Bold.ttf",
     "conversation.json",
     "test_map.json",
-    "sync-tileset.json"
+	"test_map2.tmj",
+    "sync-tileset.json",
+	"sync-tileset.tsx"
   ],
   "slug": "IsometricRpg",
   "title": "IsometricRpg",
@@ -46,7 +48,6 @@
     "custom_events.py",
     "gamedef.py",
     "glvars.py",
-    "__init__.py",
     "demolib/animobs.py",
     "demolib/dialogue.py",
     "demolib/rpgmenu.py"
