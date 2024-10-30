@@ -16,7 +16,8 @@
     "npc.png",
     "sys_defbackground.png",
     "sys_defborder.png",
-    "sys_icon.png"
+    "sys_icon.png",
+    "spritesheet.png"
   ],
   "sound_base_folder": ".",
   "sound_list": [],

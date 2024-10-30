@@ -30,10 +30,10 @@ evm = None
 def _load_maps():
     global maps, tilemap_width, tilemap_height
     maps.append(
-        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map.tmx')
+        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map.json')
     )
     maps.append(
-        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map2.tmx')
+        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map2.tmj')
     )
     tilemap_width, tilemap_height = maps[0].width, maps[0].height
 
