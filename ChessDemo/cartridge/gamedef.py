@@ -28,8 +28,7 @@ class SharedStorage:
         self.screen = pyv.get_surface()
 
 
-@pyv.declare_begin
-def beginchess(vmst=None):
+def init(vmst=None):
     pyv.init()
     glvars = SharedStorage.instance()
 
@@ -51,8 +50,7 @@ def beginchess(vmst=None):
     glvars.ev_manager.post(pyv.EngineEvTypes.Gamestart)
 
 
-@pyv.declare_update
-def updatechess(info_t):
+def update(info_t):
     glvars = SharedStorage.instance()
 
     glvars.ev_manager.post(pyv.EngineEvTypes.Update, curr_t=info_t)
@@ -62,6 +60,5 @@ def updatechess(info_t):
     pyv.flip()
 
 
-@pyv.declare_end
-def endchess(vmst=None):
+def close(vmst=None):
     pyv.close_game()

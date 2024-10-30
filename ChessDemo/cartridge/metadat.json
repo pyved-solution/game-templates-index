@@ -28,6 +28,7 @@
         "cyan_square.png"
     ],
     "sound_list": [],
+	"data_files": [],
     "slug": "ChessDemo",
     "title": "ChessDemo",
     "instructions": "not provided",
