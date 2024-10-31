@@ -30,11 +30,11 @@ evm = None
 def _load_maps():
     global maps, tilemap_width, tilemap_height
     maps.append(
-        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map.json')
+        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map.tmj')
     )
-    maps.append(
-        pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map2.tmj')
-    )
+    # maps.append(
+    #    pyv.isometric.model.IsometricMap.load(['cartridge'], 'test_map2.tmx')
+    # )
     tilemap_width, tilemap_height = maps[0].width, maps[0].height
 
 
@@ -43,11 +43,12 @@ def _add_map_entities(gviewer):
     classes.my_npc = NPC(15, 15)
 
     # too many hacks, no?
-    tm, tm2 = maps[0], maps[1]
+    tm = maps[0]
     list(tm.objectgroups.values())[0].contents.append(classes.my_pc)
-    list(tm2.objectgroups.values())[0].contents.append(classes.my_pc)
     list(tm.objectgroups.values())[0].contents.append(classes.my_npc)
-    list(tm2.objectgroups.values())[0].contents.append(classes.my_npc)
+    # tm2 = maps[1]
+    # list(tm2.objectgroups.values())[0].contents.append(classes.my_pc)
+    # list(tm2.objectgroups.values())[0].contents.append(classes.my_npc)
     gviewer.set_focused_object(classes.my_pc)
     # force: center on avatar op.
     # mypc.x += 0.5

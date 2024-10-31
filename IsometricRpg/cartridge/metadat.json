@@ -14,20 +14,22 @@
     "half-floor-tile.png",
     "mysterious_stranger.png",
     "npc.png",
+	"spritesheet.png",
     "sys_defbackground.png",
     "sys_defborder.png",
-    "sys_icon.png",
-    "spritesheet.png"
+    "sys_icon.png"
   ],
   "sound_base_folder": ".",
   "sound_list": [],
   "data_files": [
     "DejaVuSansCondensed-Bold.ttf",
     "conversation.json",
-    "test_map.json",
-	"test_map2.tmj",
     "sync-tileset.json",
-	"sync-tileset.tsx"
+	"test_map.json",
+    "sync-tileset.tsx",
+	"test_map.tmj",
+	"test_map.tmx",
+	"test_map2.tmx"
   ],
   "slug": "IsometricRpg",
   "title": "IsometricRpg",
@@ -42,7 +44,7 @@
     "RPG",
     "Isometric"
   ],
-  "build_date": "Wed Oct 30 12:42:57 2024",
+  "build_date": "Thu Oct 31 14:42:38 2024",
   "source_files": [
     "classes.py",
     "custom_events.py",
@@ -50,6 +52,7 @@
     "glvars.py",
     "demolib/animobs.py",
     "demolib/dialogue.py",
-    "demolib/rpgmenu.py"
+    "demolib/rpgmenu.py",
+	"demolib/__init__.py"
   ]
 }
