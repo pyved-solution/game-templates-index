@@ -9,12 +9,14 @@
   "description": "this is a placeholder so you can describe your game",
   "author": "thomas",
   "asset_list": [
+    "thumb_1.png",
+    "thumb_2.png"
   ],
   "asset_base_folder": ".",
   "sound_base_folder": ".",
   "sound_list": [],
   "data_files": [],
-  "slug": "AsteroidsActor",
+  "slug": "Asteroids",
   "title": "AsteroidsActor",
   "thumbnail512x384": "thumb_2.png",
   "thumbnail512x512": "thumb_1.png",
@@ -26,8 +28,9 @@
   "game_genre": [
     "Experimental"
   ],
-  "build_date": "Tue Oct 29 20:11:50 2024",
+  "build_date": "Thu Oct 31 14:32:09 2024",
   "source_files": [
+    "actors.py",
     "gamedef.py",
     "glvars.py"
   ]

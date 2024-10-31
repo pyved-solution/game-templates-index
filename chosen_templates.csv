@@ -2,7 +2,8 @@ Game Template Identifier,Template Name(=slug)
 1,Empty
 2,SnakeBasic
 3,Breakout
-4,Platformer
-5,Roguelike
-6,ChessDemo
-7,IsometricRpg
+4,Asteroids
+5,Platformer
+6,Roguelike
+7,ChessDemo
+8,IsometricRpg

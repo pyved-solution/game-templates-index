@@ -21,7 +21,7 @@ SHIP_RAD = 5
 
 
 def new_ship(pos_xy):
-    actor_type, data = 'ship', {
+    data = {
         "pos": Vector2d(*pos_xy),
         "angle": 0,
         "speed": Vector2d(),
@@ -112,14 +112,14 @@ def new_ship(pos_xy):
             pt.y = round(pt.y)
         pt_li.reverse()
         pygame.draw.polygon(ev.screen, pyv.pal.punk.brightgreen, pt_li, 2)
-    return pyv.new_actor(locals())
+    return pyv.new_actor('ship', locals())
 
 
 LINE_THICKNESS = 2
 
 
 def new_rockfield(quantity):
-    actor_type, data = 'rockfield', {
+    data = {
         'content': [],
         'scr_size': pyv.vars.screen.get_size()
     }
@@ -163,4 +163,4 @@ def new_rockfield(quantity):
             this.content[k][0][0], this.content[k][0][1] = adjust_for_torus(
                 this.content[k][0][0], this.content[k][0][1], this.scr_size
             )
-    return pyv.new_actor(locals())
+    return pyv.new_actor('rockfield', locals())
