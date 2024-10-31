@@ -1,0 +1,30 @@
+{
+  "portrait": "portrait_woman_L",
+  "states": [
+    {
+      "label": "s1",
+      "msg": "Hello, I see my friend sent you my way. What brings you here?",
+      "initial": true,
+      "transitions": [
+        {
+          "trigger": "Just exploring the area.",
+          "next_state": "s2"
+        },
+        {
+          "trigger": "Looking for wisdom.",
+          "next_state": "s3"
+        }
+      ]
+    },
+    {
+      "label": "s2",
+      "msg": "It's a good place for that. Enjoy your journey, wanderer.",
+      "terminal": true
+    },
+    {
+      "label": "s3",
+      "msg": "Wisdom is earned, not given. But perhaps I can share a piece of advice: stay curious.",
+      "terminal": true
+    }
+  ]
+}

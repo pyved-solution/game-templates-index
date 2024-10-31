@@ -1,0 +1,54 @@
+{
+  "portrait": "portrait_man_L",
+  "states": [
+    {
+      "label": "s1",
+      "msg": "Greetings, stranger. You look like you have travelled a great distance to get here.",
+      "initial": true,
+      "transitions": [
+        {
+          "trigger": "I'm looking for guidance.",
+          "next_state": "s2"
+        },
+        {
+          "trigger": "Hi there. Who are you?",
+          "next_state": "s3"
+        }
+      ]
+    },
+    {
+      "label": "s2",
+      "msg": "I don't have all the answers. Go talk to my friend over there.",
+      "transitions": [
+        {
+          "trigger": "Thank you, I'll go find them.",
+          "next_state": "encounter_Y"
+        }
+      ]
+    },
+    {
+      "label": "s3",
+      "msg": "I am a mysterious stranger... I could be anyone, or anything, you want me to be. The only limit is your imagination.",
+      "transitions": [
+        {
+          "trigger": "Sounds like you are the beginnings of a generic NPC class, designed to be flexible yet powerful.",
+          "next_state": "s4"
+        },
+        {
+          "trigger": "Can you be a dog?",
+          "next_state": "s5"
+        }
+      ]
+    },
+    {
+      "label": "s4",
+      "msg": "Actually I'm just a generic isometric map object right now. But yeah, that is pretty flexible and powerful.",
+      "terminal": true
+    },
+    {
+      "label": "s5",
+      "msg": "I could be a dog, a character, a computer terminal. Anything you need for the game.",
+      "terminal": true
+    }
+  ]
+}

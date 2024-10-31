@@ -1,0 +1,40 @@
+{
+  "vmlib_ver": "24_10a3",
+  "dependencies": {
+    "pyved_engine": [
+      "24_10a3",
+      "pyv"
+    ]
+  },
+  "description": "this is a placeholder so you can describe your game",
+  "author": "thomas",
+  "asset_list": [
+    "mysterious_stranger.png",
+    "portrait_man_L.png",
+    "portrait_woman_L.png",
+	"sys_defbackground.png",
+	"sys_defborder.png"
+  ],
+  "asset_base_folder": "assets",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "data_files": ["encounter_1.json", "encounter_Y.json"],
+  "slug": "VisualNovel",
+  "title": "VisualNovel",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Classics"
+  ],
+  "build_date": "Thu Oct 31 17:39:27 2024",
+  "source_files": [
+    "gamedef.py",
+    "glvars.py",
+    "__init__.py"
+  ]
+}
