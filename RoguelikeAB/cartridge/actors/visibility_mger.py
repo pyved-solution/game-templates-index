@@ -15,7 +15,8 @@ def new_visibility_mger(ref_maze):
         'map': pyv.struct.BoolMatrix((glvars.MAP_W, glvars.MAP_H))
     }
 
-    # - util
+    # -----------
+    #  utils
     def test(this, cell):  # test if one can see the given cell
         if glvars.GODMODE:
             return True
@@ -39,6 +40,8 @@ def new_visibility_mger(ref_maze):
         for cell in li_visible:
             this.map.set_val(cell[0], cell[1], True)
 
+    # -----------
+    #  behavior
     def on_maze_generated(this, ev):
         this.map.set_all(False)
         # copy references

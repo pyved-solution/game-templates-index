@@ -8,10 +8,9 @@ from ..glvars import pyv
 Pathfinder = pyv.terrain.DijkstraPathfinder
 
 
-# -------------- monster -----------------
 def new_monster(gpos, mtype):
-    # we will manage all mobs at the same time...
-    # anciennement pr chaque monstre:
+    # anciennement pr chaque monstre on vait:
+
     # 'position': position,
     # 'damages': shared.MONSTER_DMG,
     # 'health_point': shared.MONSTER_HP,

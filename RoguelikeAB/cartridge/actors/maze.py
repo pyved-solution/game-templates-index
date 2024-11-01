@@ -45,12 +45,12 @@ def new_maze():
             'active': False
         })
 
-    def list_walkable_cells():  # static
-        walkable_cells = list()
-        for i in range(glvars.MAP_W):
-            for j in range(glvars.MAP_H):
-                walkable_cells.append((i, j))
-        return walkable_cells
+    # def list_walkable_cells():  # static
+    #     walkable_cells = list()
+    #     for i in range(glvars.MAP_W):
+    #         for j in range(glvars.MAP_H):
+    #             walkable_cells.append((i, j))
+    #     return walkable_cells
 
     def terrain_gen(this):
         # reset old map, if some data existed
@@ -75,42 +75,12 @@ def new_maze():
         this.content = pyv.rogue.RandomMaze(glvars.MAP_W, glvars.MAP_H, min_room_size=3, max_room_size=5)
         # print(shared.game_state['rm'].blocking_map)
 
-        # IMPORTANT: adding mobs comes before computing the visibility
-
-        # >>> extra entities : mobs:
-        if len(this.li_mobs):
-            # flush list of mobs
-            for e in this.li_mobs:
-                pyv.del_actor(e)
-            del this.li_mobs[:]
-            # glvars.ref_monsters = new_monster_pack()
-
-        # flush list of mobs
-        # mobpack_data = pyv.actor_state(glvars.ref_monsters)
-        # del mobpack_data.table[:]
-
-        # shared.game_state["enemies_pos2type"].clear()
-        # for monster in monsters:
-        #     pyv.delete_entity(monster)
-        for _ in range(5):
-            tmp = this.content.pick_walkable_cell()
-            # do i need to call .add_monster instead?
-            # pyv.actor_exec(glvars.ref_monsters, 'add_monster', pos_key, 1)
-            # print('nouv monster-->', tmp)
-            this.li_mobs.append(new_monster(tmp, 1))
-
-        #  extra entity : pots
-        for e in this.li_pots:
-            pyv.del_actor(e)
-        del this.li_pots[:]
-        ppos = this.content.pick_walkable_cell()
-        this.li_pots.append(new_potion(ppos))
-
-        # - reset the visibility
-        this.walkable_cells = []
+        # IMPORTANT:
+        # adding exit & player & mobs comes before computing the visibility
+        # >>> player
         pos_pl_spawn = this.content.pick_walkable_cell()
+        # --- spawn player
         # TODO tp the player ??
-
         # pyv.find_by_archetype('player')[0]['position'] =
         # world.update_vision_and_mobs(
         #     pyv.find_by_archetype('player')[0]['position'][0],
@@ -121,7 +91,8 @@ def new_maze():
         glvars.ref_player = this.ref_player
         # update_vision(this)
 
-        # >>> extra entity: the level exit
+        # >>> extra entity:
+        # the level exit
         forbidden_loc = [
             pos_pl_spawn,
             # what about monsters??
@@ -133,6 +104,30 @@ def new_maze():
                 this.exit_entity = new_exit_entity(exit_test_pos)
                 print('exit created @', this.exit_pos)
                 break
+
+        # >>> extra entities :
+        #  mobs:
+        # first, flush the list of mobs
+        for e in this.li_mobs:
+            pyv.del_actor(e)
+        del this.li_mobs[:]
+        # shared.game_state["enemies_pos2type"].clear()
+        for _ in range(5):
+            tmp = this.content.pick_walkable_cell()
+            # do i need to call .add_monster instead?
+            # pyv.actor_exec(glvars.ref_monsters, 'add_monster', pos_key, 1)
+            # print('nouv monster-->', tmp)
+            this.li_mobs.append(new_monster(tmp, 1))
+
+        #  extra entity : POTS!
+        for e in this.li_pots:
+            pyv.del_actor(e)
+        del this.li_pots[:]
+        for _ in range(glvars.NB_POTS_PER_MAP):
+            ppos = this.content.pick_walkable_cell()
+            this.li_pots.append(new_potion(ppos))
+
+        # ???
         # while True:
         #     resultat = random.randint(0, 1)
         #     potionPos = shared.random_maze.pick_walkable_cell()
@@ -145,15 +140,13 @@ def new_maze():
         #             potion.effect = 'Poison'
         #         break
 
-        # where can i walk?
+        # where can i walk:
         del glvars.walkable_cells[:]
         for i in range(glvars.MAP_W):
             for j in range(glvars.MAP_H):
-                # ignoring walls
-                cell_content = get_cell_terrain(this, i, j)
-                if cell_content:
+                # all but not walls
+                if get_cell_terrain(this, i, j) is not None:
                     glvars.walkable_cells.append((i, j))
-
         pyv.post_ev(
             'maze_generated',
             li_mobs=this.li_mobs, li_pots=this.li_pots, exit_entity=this.exit_entity, ref_player=this.ref_player

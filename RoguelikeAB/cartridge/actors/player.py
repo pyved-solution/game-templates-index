@@ -24,14 +24,19 @@ def new_player(new_position):
     # -----------
     #  utils
     def change_hp(this, value):
-        this.hitpoints += value
+        old_hp = this.hitpoints
         delta_str = str(value)
-        print(f' player hitpoints changed, it is now:{this.hitpoints} ({delta_str})')
+        this.hitpoints += value
+        print(f' Player HEALTH {old_hp} ->{this.hitpoints} (hp change: {delta_str})')
+
+        if this.hitpoints > glvars.HITPOINTS_CAP:
+            this.hitpoints = glvars.HITPOINTS_CAP
+            print('max hp reached, new value:', glvars.HITPOINTS_CAP)
+        elif this.hitpoints <= 0:
+            pyv.post_ev('player_death')
+            print(' xOxOx ...player died... xOxOx ')
         # sync with glvars
         glvars.avatar_hp = this.hitpoints
-        if this.hitpoints <= 0:
-            print(' <>player dies')
-            pyv.post_ev('player_death')
 
     # -----------
     #  behavior

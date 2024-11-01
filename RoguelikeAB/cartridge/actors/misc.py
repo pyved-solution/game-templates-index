@@ -11,6 +11,8 @@ from ..glvars import pyv
 def new_gui():
 	data = {'active': False, 'msg': None}
 
+	# -----------
+	#  behavior
 	def on_player_death(this, ev):
 		glvars.game_paused = True
 		this.active = True
@@ -21,7 +23,8 @@ def new_gui():
 	def on_draw(this, ev):
 		if this.active:
 			m_w, m_h = this.msg.get_size()
-			tx, ty = (glvars.SCR_WIDTH - m_w)//2, (glvars.SCR_HEIGHT - m_h)//2
+			scr_w, scr_h = ev.screen.get_size()
+			tx, ty = (scr_w - m_w)//2, (scr_h - m_h)//2
 			ev.screen.blit(this.msg, (tx, ty))
 
 	def on_game_restart(this, ev):  # means the game resumes
@@ -31,16 +34,12 @@ def new_gui():
 
 
 def new_potion(gpos):
-	# anciennement
-	# potion = pyv.new_from_archetype('potion')
-	# pyv.init_entity(potion, {
-	# 	'position': None,
-	# 	'effect': random.choice((-30, +50))
-	# })
 	data = {
 		'pos': tuple(gpos), 'effect': random.choice((-30, +50))
 	}
 
+	# -----------
+	#  behavior
 	def on_draw(this, ev):
 		item_position = this.pos
 		if not pyv.trigger('test', glvars.ref_visibility_mger, item_position):
@@ -63,13 +62,8 @@ def new_potion(gpos):
 
 # --------------- exit ----------------------
 def new_exit_entity(pos):
-	# anciennement pr monstre:
-	# 'position': position,
-	# 'damages': shared.MONSTER_DMG,
-	# 'health_point': shared.MONSTER_HP,
-	# 'active': False  # the mob will become active, once the player sees it
 	data = {
-		'x': pos[0], 'y': pos[1]
+		'x': pos[0], 'y': pos[1]  # TODO use .pos like elsewhere ->unification
 	}
 
 	# - behavior

@@ -35,13 +35,15 @@
     "Roguelike", "Experimental" 
   ],
   "source_files": [
+    "actors/__init__.py",
     "actors/maze.py",
     "actors/player.py",
+    "actors/monsters.py",
     "actors/misc.py",
+    "actors/visibility_mger.py",
+
     "gamedef.py",
     "glvars.py",
-    "shared.py",
-    "systems.py",
-    "world.py"
+    "shared.py"
   ]
 }
