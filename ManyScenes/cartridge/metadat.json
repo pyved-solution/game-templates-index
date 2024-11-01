@@ -1,0 +1,36 @@
+{
+  "vmlib_ver": "24_10a3",
+  "dependencies": {
+    "pyved_engine": [
+      "24_10a3",
+      "pyv"
+    ]
+  },
+  "description": "this is a placeholder so you can describe your game",
+  "author": "thomas",
+  "asset_list": [
+    "lion.png"
+  ],
+  "asset_base_folder": "my_folder",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "data_files": [],
+  "slug": "ManyScenes",
+  "title": "ManyScenes",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Experimental"
+  ],
+  "build_date": "Fri Nov  1 11:14:36 2024",
+  "source_files": [
+    "gamedef.py",
+    "glvars.py",
+    "__init__.py"
+  ]
+}
