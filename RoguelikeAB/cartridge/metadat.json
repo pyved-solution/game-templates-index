@@ -1,0 +1,47 @@
+{
+  "vmlib_ver": "24_10a1",
+  "dependencies": {
+    "pyved_engine": [
+      "24_10a1",
+      "pyv"
+    ]
+  },
+  "description": "Basic template for a roguelike/dungeon-crawling game",
+  "author": "moonbak aka thomas",
+
+  "asset_base_folder": "assets",
+  "asset_list": [
+    "smallninja_sprites.json",
+    "tileset.png",
+    "monster.png",
+    "avatar1.png"
+  ],
+
+  "sound_base_folder": ".",
+  "sound_list": [],
+
+  "data_files": ["assets-License.txt"],
+  "slug": "Roguelike",
+  "title": "My Roguelike",
+  "build_date": "Fri Nov  1 12:41:13 2024",
+  "thumbnail512x512": "thumbnailSQ.png",
+  "thumbnail512x384": "thumbnailR.png",
+  "ktg_services": false,
+  "instructions": "no instructions provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Roguelike", "Experimental" 
+  ],
+  "source_files": [
+    "actors/maze.py",
+    "actors/player.py",
+    "actors/misc.py",
+    "gamedef.py",
+    "glvars.py",
+    "shared.py",
+    "systems.py",
+    "world.py"
+  ]
+}
