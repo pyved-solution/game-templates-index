@@ -1,9 +1,9 @@
 from .glvars import pyv
 pyv.bootstrap_e()
 
-from . import dialogue
+from .story import ConversationView
 from . import glvars
-from .classes2 import Automaton
+from .story import Automaton
 
 
 # - gl variables
@@ -57,13 +57,10 @@ class PathCtrl(pyv.EvListener):
         # ou inversement, que la ConversationView puisse s'adapter à une interface type AUtomaton
 
         # myconvo = dialogue.Offer.from_json(pyv.vars.data['legacy_conv'])  # using data pre-loaded thu pyv
-        automaton = Automaton(pyv.vars.data)
-        automaton.load_from_json(pyv.vars.data['encounter_1'])
-        print(automaton)
-
-        conv_viewer = dialogue.ConversationView(
-            automaton
-        )
+        conv_viewer = ConversationView(Automaton(
+            ('encounter_1', pyv.vars.data['encounter_1']),
+            ('encounter_Y', pyv.vars.data['encounter_Y']),
+        ))
         conv_viewer.turn_on()
 
     def on_conv_finish(self, ev):
