@@ -444,10 +444,12 @@ class Player(pg.sprite.Sprite):
 
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, debug=False):
         self._layer = MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.print_debug_infos = debug
+
         self.game = game
         self.image = game.mob_img.copy()  # prevent bugs. E.g. duplicate health bars
         self.rect = self.image.get_rect()  # fixed bug by using mob_hit_rect.copy() where mobs disappear
@@ -526,30 +528,32 @@ class Mob(pg.sprite.Sprite):
                 if self.game.zombie_moan_sounds:  # have sound
                     if random() < 0.002:
                         choice(self.game.zombie_moan_sounds).play()
-                print('--------chasing zombie update----------')
-                print('dt= ', self.game.dt)
-                print('pos= ', self.pos)
-                interm =(self.game.player.pos - self.pos)
-                print('interm: ',  interm)
+
+                if self.print_debug_infos:
+                    print('--------(dans methode "Mob.update()" -->is_chasing zombie----------')
+                    print('dt= ', self.game.dt)
+                    print('pos= ', self.pos)
+                interm = self.game.player.pos - self.pos
+                if self.print_debug_infos:
+                    print('interm: ',  interm)
                 self.rot = interm.angle_to(vec(1, 0))
-                print('rot= ',  self.rot)
+                if self.print_debug_infos:
+                    print('rot= ',  self.rot)
                 self.rect = self.image.get_rect()
                 self.rect.center = self.pos
-
                 self.acc = vec(1, 0).rotate(-self.rot)
 
                 # temp disabled to see if bug comes from here
                 # self.avoid_mobs()
-                print('(-)acc= ', self.acc)
+                if self.print_debug_infos:
+                    print('(-)acc= ', self.acc)
                 self.acc.scale_to_length(self.speed)
-
                 self.acc += self.vel * -1.3  # friction to slow down movement
-                print('(+)acc= ', self.acc)
+                if self.print_debug_infos:
+                    print('(+)acc= ', self.acc)
                 self.vel += self.acc * self.game.dt
 
-                print('vel= ', self.vel)
-
-                # Using equation of motion
+                # Use an equation of motion
                 self.pos += self.vel * self.game.dt + (0.5 * self.acc * (self.game.dt ** 2))
                 self.hit_rect.centerx = self.pos.x
                 collided_with_wall(self, self.game.walls, 'x')

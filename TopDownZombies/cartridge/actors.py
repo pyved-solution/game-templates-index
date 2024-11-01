@@ -20,7 +20,7 @@ SHIP_COLOR = (119, 255, 0)
 
 
 def new_player(pos_xy):
-    actor_type, data = 'ship', {
+    data = {
         "pos": Vector2d(*pos_xy),
         "angle": 0,
         "speed": Vector2d(),
@@ -52,4 +52,4 @@ def new_player(pos_xy):
     def on_brake(this, ev):
         pass
 
-    return pyv.new_actor(locals())
+    return pyv.new_actor('playe', locals())

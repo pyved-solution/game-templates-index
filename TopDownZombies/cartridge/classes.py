@@ -37,7 +37,8 @@ class IngameText(pg.sprite.Sprite):
 
 
 class GameWorld:
-    # todo separation M.V.C.
+    # todo adapter architecture...
+    #  soit vers MVC, soit vers actor-based
 
     def __init__(self):
         self.playing = True  # true when player selects 'new game' or 'continue'
@@ -60,8 +61,7 @@ class GameWorld:
         self.soundfx_lvl = .6
         self.music_lvl = .8
         self.clock = pg.time.Clock()
-        self.draw_debug = True
-
+        self.draw_debug = False  # afficher les collision rect ou non
         self.paused = False
 
         # fonts
