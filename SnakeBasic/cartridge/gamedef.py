@@ -93,3 +93,4 @@ def update(time_info=None):
 
 def close(vmst=None):
     pyv.close_game()
+    print('snake basic:over')

@@ -24,3 +24,5 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 # custom code the gamedev added
 # --------
 conversation_ongoing = False
+FINAL_BG_COLOR = 'black'
+CONV_BG_COLOR = '#0e0e2e'  # code couleur hexadécimal

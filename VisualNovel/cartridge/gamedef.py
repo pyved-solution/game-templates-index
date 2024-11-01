@@ -11,7 +11,9 @@ def init(vmst=None):
     global amt_viewer_id
     pyv.init(pyv.LOW_RES_MODE)
     new_game_controller()
-    amt_viewer_id = pyv.story.new_automaton_viewer('encounter_1', 'encounter_Y')
+    amt_viewer_id = pyv.story.new_automaton_viewer(
+        'encounter_1', 'encounter_Y'
+    )
 
 
 def update(time_info=None):
@@ -37,7 +39,6 @@ def update(time_info=None):
 
 
 def close(vmst=None):
-    print(dir(pyv))
     pyv.del_actor(amt_viewer_id)
     pyv.close_game()
     print('visual novel:over')

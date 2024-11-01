@@ -18,7 +18,10 @@
   "asset_base_folder": "assets",
   "sound_base_folder": ".",
   "sound_list": [],
-  "data_files": ["encounter_1.json", "encounter_Y.json"],
+  "data_files": [
+    "encounter_1.json",
+    "encounter_Y.json"
+  ],
   "slug": "VisualNovel",
   "title": "VisualNovel",
   "thumbnail512x384": "thumb_2.png",
@@ -34,7 +37,6 @@
   "build_date": "Thu Oct 31 17:39:27 2024",
   "source_files": [
     "gamedef.py",
-    "glvars.py",
-    "__init__.py"
+    "glvars.py"
   ]
 }
