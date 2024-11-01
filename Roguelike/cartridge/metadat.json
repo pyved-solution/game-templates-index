@@ -37,7 +37,6 @@
   ],
   "game_title": "Roguelike",
   "source_files": [
-    "actors.py",
     "gamedef.py",
     "glvars.py",
     "shared.py",
