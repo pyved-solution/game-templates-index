@@ -6,17 +6,49 @@ from ..glvars import pyv
 from .. import glvars
 
 
-def new_player():
-    data = {
-        'x': 15, 'y': 15
-    }
+def new_player(new_position):
+    # ---- anciennement ----
+    # 'position': None,
+    # 'controls': {'left': False, 'right': False, 'up': False, 'down': False},
+    # 'damages': shared.PLAYER_DMG,
+    # 'health_point': shared.PLAYER_HP,
+    # 'enter_new_map': True
 
-    # - utils
-    def player_push(this, directio):
+    data = {
+        'pos': new_position,
+        'hitpoints': glvars.avatar_hp,
+        'future_pos': None
+    }
+    pyv.post_ev('player_spawn', pos=new_position)
+
+    # -----------
+    #  utils
+    def change_hp(this, value):
+        this.hitpoints += value
+        delta_str = str(value)
+        print(f' player hitpoints changed, it is now:{this.hitpoints} ({delta_str})')
+        # sync with glvars
+        glvars.avatar_hp = this.hitpoints
+        if this.hitpoints <= 0:
+            print(' <>player dies')
+            pyv.post_ev('player_death')
+
+    # -----------
+    #  behavior
+    def on_spawn(this, ev):
+        this.pos = ev.pos
+        pyv.post_ev('avatar_movement', pos=this.pos)
+
+    def on_player_input(this, ev):
+        # TODO collision contre murs pas tout à fait, ok. Sur la 1er level ca va, les autres ca bug
+        if ev.dir not in ('right', 'down', 'left', 'up'):
+            return
+        directio = ev.dir
+
         # player = pyv.find_by_archetype('player')[0]
         # monsters = pyv.find_by_archetype('monster')  # TODO kick mobs? missing feat.
         # print(glvars.walkable_cells)
-        future_pos = [this.x, this.y]
+        future_pos = list(this.pos)
         deltas = {
             'right': (+1, 0),  # right
             'up': (0, -1),  # up
@@ -25,30 +57,12 @@ def new_player():
         }
         future_pos[0] += deltas[directio][0]  # why this sign?
         future_pos[1] += deltas[directio][1]
-        if tuple(future_pos) not in glvars.walkable_cells:  # bad name?
-            # TODO kick event
-            pass
+        x = tuple(future_pos)
+        if x not in glvars.walkable_cells:
+            print('hitting a wall, takes time tho')
         else:
-            # commit new pos =>Update player vision
-            this.x, this.y = future_pos
-            pyv.post_ev('avatar_moves', pos=(this.x, this.y))
-
-
-    # world.update_vision_and_mobs(player.position[0], player.position[1])
-    # - behavior
-    def on_spawn(this, ev):
-        this.x, this.y = ev.pos
-        pyv.post_ev('avatar_moves', pos=(this.x, this.y))
-
-
-    def on_req_move_avatar(this, ev):
-        print('reception', ev.__dict__)
-        # TODO collision detection
-        if ev.dir not in ('right', 'down', 'left', 'up'):
-            return
-        print('attemptin to move...')
-        player_push(this, ev.dir)
-
+            this.pos = x
+        pyv.post_ev('player_movement', pos=this.pos)
 
     def on_draw(this, ev):
         scr = ev.screen
@@ -57,16 +71,19 @@ def new_player():
         # ----------
         #  draw player/enemies
         # ----------
-        av_i, av_j = this.x, this.y
+        if this.pos is None:
+            print('xx warning->pos is None')
+            return
+        av_i, av_j = this.pos
         exit_i, exit_j = 23, 20
         # exit_ent = pyv.find_by_archetype('exit')[0]
         # potion = pyv.find_by_archetype('potion')[0]
         # tuile = shared.TILESET.image_by_rank(912)
 
         # ->draw exit
-        if pyv.actor_state(glvars.maze_id).visibility_map.get_val(exit_i, exit_j):
-            scr.blit(glvars.tileset.image_by_rank(1092),
-                     (exit_i * glvars.CELL_SIDE, exit_j * glvars.CELL_SIDE, 32, 32))
+        #if pyv.actor_state(glvars.ref_maze).visibility_map.get_val(exit_i, exit_j):
+        #    scr.blit(glvars.tileset.image_by_rank(1092),
+        #             (exit_i * glvars.CELL_SIDE, exit_j * glvars.CELL_SIDE, 32, 32))
 
         # ->draw potions
         # if shared.game_state['visibility_m'].get_val(*potion.position):

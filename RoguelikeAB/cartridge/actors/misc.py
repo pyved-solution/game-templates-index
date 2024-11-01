@@ -1,49 +1,92 @@
 """
 we actors for the Roguelike here,
-except from "maze" and "player" that have their own file
+except from "maze" and "player", "monsters" that have their own file
 """
-from ..glvars import pyv
+import random
+
 from .. import glvars
+from ..glvars import pyv
 
 
-def new_potion():
-	data = {}
+def new_gui():
+	data = {'active': False, 'msg': None}
+
+	def on_player_death(this, ev):
+		glvars.game_paused = True
+		this.active = True
+		ft = pyv.new_font_obj(None, 80)  # large txt
+		score = glvars.level_count
+		this.msg = ft.render(glvars.ENDGAME_MSG.format(score), False, 'white', 'black')
+
+	def on_draw(this, ev):
+		if this.active:
+			m_w, m_h = this.msg.get_size()
+			tx, ty = (glvars.SCR_WIDTH - m_w)//2, (glvars.SCR_HEIGHT - m_h)//2
+			ev.screen.blit(this.msg, (tx, ty))
+
+	def on_game_restart(this, ev):  # means the game resumes
+		this.active = False
+
+	return pyv.new_actor('gui', locals())
+
+
+def new_potion(gpos):
+	# anciennement
+	# potion = pyv.new_from_archetype('potion')
+	# pyv.init_entity(potion, {
+	# 	'position': None,
+	# 	'effect': random.choice((-30, +50))
+	# })
+	data = {
+		'pos': tuple(gpos), 'effect': random.choice((-30, +50))
+	}
+
+	def on_draw(this, ev):
+		item_position = this.pos
+		if not pyv.trigger('test', glvars.ref_visibility_mger, item_position):
+			return  # avoid drawing invisble things
+		adhoc_img = glvars.tileset.image_by_rank(810) \
+			if this.effect < 0 else glvars.tileset.image_by_rank(811)
+		scr_x, scr_y = item_position[0] * glvars.CELL_SIDE, item_position[1] * glvars.CELL_SIDE
+		ev.screen.blit(adhoc_img, (scr_x, scr_y, 32, 32))
+
+	def on_player_movement(this, ev):
+		if ev.pos[0] == this.pos[0] and ev.pos[1] == this.pos[1]:
+			pyv.trigger('change_hp', glvars.ref_player, this.effect)
+			# trick: an actor can destroy itself
+			auto_id = pyv.id_actor(this)
+			pyv.del_actor(auto_id)
+			pyv.post_ev('item_destroyed', id=auto_id)
 
 	return pyv.new_actor('potion', locals())
 
 
-# -------------- rogue_entity(can be: exit, potion, mob...) -------------------
-def new_rogue_entity(pos, is_mob):
+# --------------- exit ----------------------
+def new_exit_entity(pos):
+	# anciennement pr monstre:
+	# 'position': position,
+	# 'damages': shared.MONSTER_DMG,
+	# 'health_point': shared.MONSTER_HP,
+	# 'active': False  # the mob will become active, once the player sees it
 	data = {
-		'x': pos[0], 'y': pos[1],
-		'is_mob': is_mob
+		'x': pos[0], 'y': pos[1]
 	}
 
 	# - behavior
-	def on_player_moves(this, ev):
-		if not this.is_mob:
-			return
-		i, j = this.ref_player.old_pos
-		player = pyv.find_by_archetype('player')[0]
-		curr_pos = player.position
-
-		if (i is None) or curr_pos[0] != i or curr_pos[1] != j:
-			# position has changed!
-			saved_player_pos[0], saved_player_pos[1] = curr_pos
-			blockmap = pyv.actor_state(maze_id).blocking_map
-			allmobs = pyv.find_by_archetype('monster')
-			for mob_ent in allmobs:
-				if not mob_ent.active:
-					pass
-				else:
-					pathfinding_result = pyv.terrain.DijkstraPathfinder.find_path(
-						blockmap, mob_ent.position, player.position
-					)
-					if len(pathfinding_result) > 1:  # if player moved first, he may already be on the same pos as the monster
-						new_pos = pathfinding_result[1]  # index 1 --> 1 step forward!
-						mob_ent.position[0], mob_ent.position[1] = new_pos  # TODO a proper "kick the player" feat.
+	def on_player_movement(this, ev):
+		new_avx, new_avy = ev.pos  # test new position vs map exit
+		if new_avx == this.x:
+			if new_avy == this.y:
+				glvars.level_count += 1
+				print('you now enter level:', glvars.level_count)
+				pyv.post_ev('req_refresh_maze')
 
 	def on_draw(this, ev):
-		pyv.draw_circle(ev.screen, 'red', (glvars.CELL_SIDE*this.x, glvars.CELL_SIDE*this.y), 8)
+		if not pyv.trigger('test', glvars.ref_visibility_mger, (this.x, this.y)):
+			return  # avoid drawing invisble things
+		ev.screen.blit(
+			glvars.tileset.image_by_rank(1092),
+			(this.x * glvars.CELL_SIDE, this.y * glvars.CELL_SIDE, 32, 32)
+		)
 
-	return pyv.new_actor('rogue_entity', locals())
+	return pyv.new_actor('exit_entity', locals())

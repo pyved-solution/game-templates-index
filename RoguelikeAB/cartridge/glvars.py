@@ -23,17 +23,30 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 # ------
 # custom code the gamedev added
 # --------
-maze_id = None
+ref_maze = None
+ref_visibility_mger = None
+ref_player = None
+
+# ref_monsters = None
+# ref_player = None
+
+game_paused = False
 avatar_sprite_sheet = None
 level_count = 1
 walkable_cells = []  # list of walkable cells is fully dynamic, we prefer to store it as a gl var
 tileset = None
 avatar_img = None
 monster_img = None
-fov_computer = None  # va stocker un item de pyv, celui-ci est un calculateur de visibilité
+avatar_hp = 100
 
+MAP_W, MAP_H = 24, 24  # CELLS.
+# these dimensions match map size that is,
+# the size of: actor_state(maze_actor).content
+
+GODMODE = False  # if set to True, ignore fog and see all
 CELL_SIDE = 32  # px
 GRID_REZ = (CELL_SIDE, CELL_SIDE)
+ENDGAME_MSG = 'GAME OVER; Max level= {}'
 
 WALL_COLOR = (8, 8, 24)
 HIDDEN_CELL_COLOR = (24, 24, 24)
