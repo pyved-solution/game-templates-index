@@ -30,6 +30,7 @@
   "build_date": "Thu Oct 31 11:53:20 2024",
   "source_files": [
     "gamedef.py",
-    "glvars.py"
+    "glvars.py",
+    "actors.py"
   ]
 }
