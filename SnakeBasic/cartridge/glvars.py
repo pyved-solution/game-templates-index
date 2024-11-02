@@ -32,5 +32,5 @@ CELL_SIZE_PX = 30  # in pixels
 DELAY_INTER_MV = 0.15  # sec, the lower the value, the fastest the pace of the game
 NB_COLUMNS = 25
 NB_ROWS = 19
-INIT_DIRECTION = 1
+INIT_DIRECTION = 'down'
 INIT_SNAKE_MODEL = ((7, 2), (7, 3), (7, 4))
