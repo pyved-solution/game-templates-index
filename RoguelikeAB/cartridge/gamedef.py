@@ -29,7 +29,7 @@ def init(vmst=None):
     pyv.init(wcaption='Roguelike actor-based')
     _prepare_images()
     # pyv.set_debug_flag()
-    pyv.setup_evsys6(
+    pyv.declare_evs(
         'spawn',  # it's like a teleport
         'player_input',
         # 'player_kicks',
@@ -82,7 +82,7 @@ def update(curr_t=None):
     pyv.post_ev('update', info_t=curr_t)
     pyv.post_ev('draw', screen=pyv.vars.screen)
 
-    pyv.process_events()
+    pyv.process_evq()
     pyv.flip()
 
 

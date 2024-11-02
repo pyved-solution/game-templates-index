@@ -46,10 +46,10 @@ def new_player(pos_xy):
 
     # --------
     # behavior
-    def on_thrust(this, ev):
-        pass
+    # def on_thrust(this, ev):
+    #     pass
+    #
+    # def on_brake(this, ev):
+    #     pass
 
-    def on_brake(this, ev):
-        pass
-
-    return pyv.new_actor('playe', locals())
+    return pyv.new_actor('playen', locals())

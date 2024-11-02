@@ -6,6 +6,7 @@ Current revision: year 2024, 10-19
 My goal is to showcase how the custom py-based engine operates in a straightforward manner
 """
 import random
+
 from .glvars import pyv
 
 
@@ -26,6 +27,9 @@ def print_mini_tutorial():
 
 def init(gms):
     pyv.init(pyv.LOW_RES_MODE)  # 0, forced_size=(960 // 2, 720 // 2), maxfps=60)
+    pyv.declare_evs(
+        'thrust', 'ship_rotate', 'brake', 'dash'
+    )
 
     from .actors import new_rockfield, new_ship
     new_rockfield(7)
@@ -59,19 +63,19 @@ def update(info_t):
     elif keys[pyg.K_DOWN]:
         pyv.post_ev("brake")
 
-    # using ev sys 6
+    # use ev sys 6. Also, we prefer to pass:
+    #  dt(delta time) instead of info_t in the update event. We can
     if last_t:
         dt = info_t - last_t
     else:
         dt = 0
     last_t = info_t
     pyv.post_ev("update", dt=dt)
-    pyv.process_events()
-
-    # refresh screen then logic
+    # refresh logic, then screen
     pyv.vars.screen.fill(pyv.pal.punk.nightblue)
     pyv.post_ev("draw", screen=pyv.vars.screen)
-    pyv.process_events()
+    pyv.process_evq()
+
     pyv.flip()
 
 

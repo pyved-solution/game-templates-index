@@ -22,7 +22,9 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 
 # ------
 # custom code the gamedev added
-# --------
+# -------
+av_jungle = None
 world_dim = [None, None]
 
 JUNG_WORLD_ID = 'jungle'
+BG_COL = '#3a1010'

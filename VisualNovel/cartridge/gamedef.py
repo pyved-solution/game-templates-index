@@ -14,6 +14,8 @@ def init(vmst=None):
     amt_viewer_id = pyv.story.new_automaton_viewer(
         'encounter_1', 'encounter_Y'
     )
+    # insta-begin the conversation!
+    pyv.post_ev('conv_begins')
 
 
 def update(time_info=None):
@@ -24,6 +26,8 @@ def update(time_info=None):
         elif ev.type == pyv.evsys0.KEYDOWN:
             if ev.key == pyv.evsys0.K_ESCAPE:
                 pyv.vars.gameover = True
+            # elif ev.key == pyv.evsys0.K_RETURN:
+            #    pyv.post_ev('conv_begins')
         elif ev.type == pyv.evsys0.MOUSEMOTION:
             pyv.post_ev('mousemotion', pos=ev.pos, rel=ev.rel)
         elif ev.type == pyv.evsys0.MOUSEBUTTONDOWN:
@@ -34,7 +38,7 @@ def update(time_info=None):
     # -evsys6
     pyv.post_ev('update', info_t=time_info)
     pyv.post_ev('draw', screen=pyv.vars.screen)
-    pyv.process_events()
+    pyv.process_evq()
     pyv.flip()
 
 

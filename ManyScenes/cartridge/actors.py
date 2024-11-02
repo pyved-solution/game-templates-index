@@ -18,7 +18,7 @@ def new_avatar(bx, by):
     #  callable functions
     # ---------------------------
     def reset_pos(this):
-        print('coucou je suis GREEN')
+        this.x, this.y = 300, 300
 
     # ---------------------------
     #  behavior
@@ -34,14 +34,14 @@ def new_avatar(bx, by):
             this.y += this.delta_px
 
     def on_update(this, ev):
-        if pyv.get_curr_world() == 'default':
+        if pyv.get_world() == 'default':
             if this.x > glvars.world_dim[0] - 33:
                 this.x = glvars.world_dim[0] - 50
-                pyv.switch_world(glvars.JUNG_WORLD_ID)
-        elif pyv.get_curr_world() == glvars.JUNG_WORLD_ID:
+                pyv.set_world(glvars.JUNG_WORLD_ID)
+        elif pyv.get_world() == glvars.JUNG_WORLD_ID:
             if this.x < 33:
                 this.x = 50
-                pyv.switch_world('default')
+                pyv.set_world('default')
 
     def on_draw(this, ev):
         pyv.draw_circle(ev.screen, this.color, (this.x, this.y), this.mobile_size)
@@ -67,8 +67,7 @@ def new_npc():
 
     # - utilitary
     def say_something(this, txt_message):
-        print('say sth:', txt_message)
-        print(pyv.time())
+        print('NPC says something!', txt_message)
         if this.small_ft is None:
             this.small_ft = pyv.new_font_obj(None, 18)
         this.msg = this.small_ft.render(txt_message, False, 'gray')

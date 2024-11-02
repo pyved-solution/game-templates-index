@@ -9,7 +9,6 @@
   "description": "this is a placeholder so you can describe your game",
   "author": "thomas",
   "asset_list": [
-    "lion.png"
   ],
   "asset_base_folder": "my_folder",
   "sound_base_folder": ".",
@@ -30,7 +29,6 @@
   "build_date": "Fri Nov  1 11:14:36 2024",
   "source_files": [
     "gamedef.py",
-    "glvars.py",
-    "__init__.py"
+    "glvars.py"
   ]
 }

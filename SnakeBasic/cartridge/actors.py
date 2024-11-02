@@ -26,7 +26,7 @@ apple_id = None
 
 def new_apple():
     candidate_pos = None
-    while candidate_pos is None or candidate_pos in pyv.actor_state(snake_id).content:
+    while candidate_pos is None or candidate_pos in pyv.peek(snake_id).content:
         candidate_pos = (
             randint(0, glvars.NB_COLUMNS - 1),
             randint(0, glvars.NB_ROWS - 1)
@@ -39,7 +39,7 @@ def new_apple():
     def on_draw(this, ev):
         if glvars.gameover_msg is None:
             csize = glvars.CELL_SIZE_PX
-            apple_infos = pyv.actor_state(apple_id)
+            apple_infos = pyv.peek(apple_id)
             pyv.draw_rect(
                 ev.screen, pyv.pal.japan.red,
                 pyv.new_rect_obj(apple_infos.x * csize, apple_infos.y * csize, csize, csize)
@@ -73,12 +73,40 @@ def new_snake():
             return 3
         if head[1] >= glvars.NB_ROWS or head[1] < 0:
             return 3
-        apple = pyv.actor_state(apple_id)
+        apple = pyv.peek(apple_id)
         if head == (apple.x, apple.y):
             return 1
         return 0
 
     # - behavior
+    def on_player_moves(this, ev):
+        this.direction = ev.dir  # new direction
+
+    def on_world_tick(this, ev):
+        global apple_id
+        dir_to_offset = {
+            'right': (1, 0),
+            'down': (0, 1),
+            'left': (-1, 0),
+            'up': (0, -1)
+        }
+        increm_x, increm_y = dir_to_offset[this.direction]
+        s_body = this.content
+        head_loc = s_body[-1]
+        new_head_location = (
+            head_loc[0] + increm_x,
+            head_loc[1] + increm_y
+        )
+        s_body.append(new_head_location)
+        coll = collision_check(this)
+        if coll >= 2:
+            glvars.game_running = 2
+        elif coll == 1:
+            pyv.del_actor(apple_id)
+            apple_id = new_apple()
+        elif coll == 0:
+            s_body.pop(0)
+
     def on_draw(this, ev):
         if glvars.gameover_msg is None:
             s_body = this.content
@@ -88,24 +116,5 @@ def new_snake():
                     ev.screen, pyv.pal.japan.peach,
                     pyv.new_rect_obj(s_body[i][0] * csize, s_body[i][1] * csize, csize, csize)
                 )
-
-    def on_world_tick(this, ev):
-        global apple_id
-        dx, dy = {
-            0: (1, 0),
-            1: (0, 1),
-            2: (-1, 0),
-            3: (0, -1)
-        }[this.direction]
-        s_body = this.content
-        s_body.append((s_body[-1][0] + dx, s_body[-1][1] + dy))
-        coll = collision_check(this)
-        if coll >= 2:
-            glvars.game_running = 2
-        elif coll == 1:
-            pyv.del_actor(apple_id)
-            apple_id = new_apple()
-        elif coll == 0:
-            s_body.pop(0)
 
     return pyv.new_actor('snake', locals())
