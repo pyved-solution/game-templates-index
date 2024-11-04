@@ -7,7 +7,7 @@
     ]
   },
   "description": "this is a placeholder so you can describe your game",
-  "author": "thomas",
+  "author": "unknown author",
   "asset_list": [
     "(zombie)bonus.png",
     "(zombie)bullet.png",
@@ -31,13 +31,14 @@
     "(zombies)whitePuff17.png",
     "(zombies)whitePuff18.png",
     "zombie1_hold.png",
-    "zombie2_hold.png"
+    "zombie2_hold.png",
+    "spritesheet_tiles.png"
   ],
-  "asset_base_folder": "assets",
+  "asset_base_folder": ".",
   "sound_base_folder": ".",
   "sound_list": [],
   "data_files": [
-    "level1.tmj"
+    "level1.tmj","spritsheet_tiles.xml"
   ],
   "slug": "TopDownZombies",
   "title": "TopDownZombies",
