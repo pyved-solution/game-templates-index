@@ -3,7 +3,6 @@ from .glvars import pyv
 from . import glvars
 from .constants import *
 from .classes import GameflowCtrl, GameWorld
-from .actors import *
 from .sprites import Explosion, Obstacle, Player, Tower, BonusItem, Runner, Mob, Item
 
 # TODO if you wanna fix bugs, the most important is :
@@ -41,9 +40,11 @@ def init(vmst=None):
     print('[c] change weapon')
     print('[x] land mine')
     print('[space] shoot')
-
-    tmp = new_player((8,9))
-    print(tmp)
+    
+    # this will be used later (some day) when we convert the raw game to a pattern-compliant game
+    # (such as the: AB patterN?)
+    #tmp = new_player((8,9))
+    #print(tmp)
 
 
 def update(timeinfo=None):
