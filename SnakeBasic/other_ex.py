@@ -1,6 +1,9 @@
-# 85 lignes de code
+# WARNING: this is not using pyved-engine! And is not part of the
+# game template. We keep this file only as a mean to compare and to outline
+# key differences between a library such as PYGAME and the approach used
+# by the game engine PYVED-ENGINE
+# ~ 85 lines of code
 from random import randint
-
 import pygame as pg
 
 
@@ -44,6 +47,7 @@ def check_collisions():
 clock = pg.time.Clock()
 f = pg.font.SysFont('console', 24, True)
 
+# game loop
 while True:
     clock.tick(8)
     for e in pg.event.get():
