@@ -38,7 +38,7 @@
   "sound_base_folder": ".",
   "sound_list": [],
   "data_files": [
-    "level1.tmj","spritsheet_tiles.xml"
+    "level1.tmj","spritesheet_tiles.xml"
   ],
   "slug": "TopDownZombies",
   "title": "TopDownZombies",
