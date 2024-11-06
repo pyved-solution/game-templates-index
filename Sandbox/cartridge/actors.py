@@ -100,7 +100,7 @@ def new_entities_viewer():
         if this.what_to_display is None:
             pass  # nothing to display...
         elif this.what_to_display == 'text':
-            scr.blit(this.my_text)
+            scr.blit(this.my_text, TEXT_POS)
         elif this.what_to_display == 'lion':
             scr.blit(pyv.vars.images['lion'], this.my_rect)
         elif this.what_to_display == 'square':
