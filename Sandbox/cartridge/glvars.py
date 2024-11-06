@@ -21,5 +21,10 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 
 
 # ------
-# custom code the gamedev added
+# put here, all the custom code added by the gamedev
 # --------
+font_obj = None
+screen_center = None
+
+# use capitals to represent constants
+INIT_BG_COLOR = '#070720'  # very dark blue
