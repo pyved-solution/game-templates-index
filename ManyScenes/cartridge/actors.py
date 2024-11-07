@@ -34,14 +34,14 @@ def new_avatar(bx, by):
             this.y += this.delta_px
 
     def on_update(this, ev):
-        if pyv.get_world() == 'default':
-            if this.x > glvars.world_dim[0] - 33:
-                this.x = glvars.world_dim[0] - 50
-                pyv.set_world(glvars.JUNG_WORLD_ID)
-        elif pyv.get_world() == glvars.JUNG_WORLD_ID:
+        if pyv.get_scene() == pyv.DEFAULT_SCENE:
+            if this.x > glvars.scene_dim[0] - 33:
+                this.x = glvars.scene_dim[0] - 50
+                pyv.set_scene(glvars.JUNG_SCENE_ID)
+        elif pyv.get_scene() == glvars.JUNG_SCENE_ID:
             if this.x < 33:
                 this.x = 50
-                pyv.set_world('default')
+                pyv.set_scene(pyv.DEFAULT_SCENE)
 
     def on_draw(this, ev):
         pyv.draw_circle(ev.screen, this.color, (this.x, this.y), this.mobile_size)
@@ -57,7 +57,7 @@ NPC_MSG_DURATION = 2.0  # sec
 def new_npc():
     data = {
         # demo of how components can be used (2/2)
-        "x": -96 + (glvars.world_dim[0] // 2), "y": 400,
+        "x": -96 + (glvars.scene_dim[0] // 2), "y": 400,
         "color": "pink",
         "mobile_size": 20,
         "speak_end_date": None,
@@ -69,7 +69,7 @@ def new_npc():
     def say_something(this, txt_message):
         print('NPC says something!', txt_message)
         if this.small_ft is None:
-            this.small_ft = pyv.new_font_obj(None, 18)
+            this.small_ft = pyv.new_font_obj(None, glvars.TEXT_SIZE)
         this.msg = this.small_ft.render(txt_message, False, 'gray')
         this.speak_end_date = pyv.time() + NPC_MSG_DURATION
 
