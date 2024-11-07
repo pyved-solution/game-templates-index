@@ -9,14 +9,15 @@
     "description": "this is a placeholder so you can describe your game",
     "author": "moonbak",
     "asset_list": [
-        "lion.png"
+        "lion.png",
+		"pokerchips.json"
     ],
     "asset_base_folder": "my_folder",
-    "sound_base_folder": ".",
-    "sound_list": [],
+    "sound_base_folder": "sounds",
+    "sound_list": ["sfx_drop.wav", "woosh.wav"],
 	"data_files": [],
-    "slug": "Empty",
-    "title": "Empty",
+    "slug": "Sandbox",
+    "title": "Sandbox",
     "thumbnail512x384": "thumb_2.png",
     "thumbnail512x512": "thumb_1.png",
     "ktg_services": false,
@@ -31,6 +32,6 @@
     "source_files": [
         "gamedef.py",
         "glvars.py",
-        "__init__.py"
+        "actors.py"
     ]
 }

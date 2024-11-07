@@ -6,6 +6,9 @@ launcher script tied to the "pyved-engine game bundle" format.
 The following code helps in booting up a wrapped game cartridge
 (->PyvGAMCART format) | To know more, please visit:
 https://github.com/pyved-solution | Contact author: thomas.iw@kata.games
+
+To check the implementation of the game you need to open "cartridge/gamedef.py"
+as it is the only entry point for any pyved-engine based game.
 """
 import importlib.util
 import json

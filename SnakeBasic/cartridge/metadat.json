@@ -6,10 +6,9 @@
       "pyv"
     ]
   },
-  "description": "this is a placeholder so you can describe your game",
+  "description": "the classic: game of snake",
   "author": "thomas",
   "asset_list": [
-    "lion.png"
   ],
   "asset_base_folder": "assets",
   "sound_base_folder": ".",
