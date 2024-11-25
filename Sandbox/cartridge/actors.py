@@ -21,9 +21,26 @@ from . import glvars
 # ------------------------------------
 #  we declare actors here!
 # ------------------------------------
+def new_color_viewer():
+    data = {
+        'curr_color_name': 'medium_gray',
+        'square_position': (325, 400, 80, 80)
+    }
+
+    # - behavior
+    def on_color_change(this, ev):
+        this.curr_color_name = pyv.pal.yu.next_colorname(this.curr_color_name)
+        print(' color?', this.curr_color_name)
+
+    def on_draw(this, ev):
+        pyv.draw_rect(ev.screen, pyv.pal.yu[this.curr_color_name], this.square_position)
+
+    return pyv.new_actor('color_viewer', locals())
+
+
 def new_solid_background():
     data = {
-        'color': glvars.INIT_BG_COLOR
+        'color': pyv.pal.yu.medium_gray
     }
 
     def on_draw(this, ev):

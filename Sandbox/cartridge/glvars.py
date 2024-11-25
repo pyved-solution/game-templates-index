@@ -26,5 +26,5 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 font_obj = None
 screen_center = None
 
-# use capitals to represent constants
-INIT_BG_COLOR = '#070720'  # very dark blue
+# represent game constants, by using capitals
+MY_CONST = 0

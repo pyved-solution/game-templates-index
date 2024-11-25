@@ -12,7 +12,7 @@ def init(vmst=None):
     pyv.init(wcaption='Untitled, empty, and pyved-based demo')
     # declare your custom events here
     pyv.declare_evs(
-        'new_nb_pressed_keys', 'timer_start', 'timer_stop'
+        'new_nb_pressed_keys', 'timer_start', 'timer_stop', 'color_change'
     )
     print('-' * 32)
     print('press one or two key (any key) to see something cool')
@@ -25,6 +25,7 @@ def init(vmst=None):
     )
     new_movable_rect(glvars.screen_center)
     new_entities_viewer()
+    new_color_viewer()
 
     print('----- try to press 1, 2 or 3 keys at the same time! ---------')
     print('you can also drag and drop the purple square, for fun. This will play a sound')
@@ -55,11 +56,13 @@ def update(time_info=None):
             else:
                 pyv.post_ev('timer_stop')
                 timer_active = False
+        elif ev.type == pyv.evsys0.KEYDOWN and ev.key == pyv.evsys0.K_SPACE:
+            pyv.post_ev('color_change')
         # other not important keys...
         elif ev.type == pyv.evsys0.KEYDOWN:
             pressed_keys.add(ev.key)
         elif ev.type == pyv.evsys0.KEYUP:
-            if ev.key != pyv.evsys0.K_RETURN:
+            if ev.key not in (pyv.evsys0.K_RETURN, pyv.evsys0.K_SPACE):
                 pressed_keys.remove(ev.key)
 
     # <>

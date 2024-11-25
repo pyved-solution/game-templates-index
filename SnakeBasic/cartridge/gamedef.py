@@ -74,7 +74,7 @@ def update(time_info=None):
     # <> LOGIC
     if glvars.game_running == 2:
         if glvars.gameover_msg is None:
-            glvars.gameover_msg = glvars.font_obj.render(glvars.END_MSG, False, 'blue')
+            glvars.gameover_msg = glvars.font_obj.render(glvars.END_MSG, False, pyv.pal.yu.white)
     elif glvars.game_running == 1:
         if last_t is None:
             last_t = time_info

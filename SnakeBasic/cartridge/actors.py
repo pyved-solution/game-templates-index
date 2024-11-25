@@ -11,7 +11,7 @@ __all__ = [
 
 def new_background():
     data = {
-        'color': pyv.pal.punk.nightblue
+        'color': pyv.pal.yu.dark_green
     }
 
     def on_draw(this, ev):
@@ -41,7 +41,7 @@ def new_apple():
             csize = glvars.CELL_SIZE_PX
             apple_infos = pyv.peek(apple_id)
             pyv.draw_rect(
-                ev.screen, pyv.pal.japan.red,
+                ev.screen, pyv.pal.yu.crimson,
                 pyv.new_rect_obj(apple_infos.x * csize, apple_infos.y * csize, csize, csize)
             )
 
@@ -113,7 +113,7 @@ def new_snake():
             csize = glvars.CELL_SIZE_PX
             for i in range(len(s_body)):
                 pyv.draw_rect(
-                    ev.screen, pyv.pal.japan.peach,
+                    ev.screen, pyv.pal.yu.leaf_green,
                     pyv.new_rect_obj(s_body[i][0] * csize, s_body[i][1] * csize, csize, csize)
                 )
 
