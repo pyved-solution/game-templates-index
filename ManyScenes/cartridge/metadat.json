@@ -30,6 +30,8 @@
   "source_files": [
     "gamedef.py",
     "glvars.py",
-    "actors.py"
+    "scenes/__init__.py",
+    "scenes/default.py",
+    "scenes/jungle.py"
   ]
 }

@@ -28,4 +28,5 @@ scene_dim = [None, None]
 
 TEXT_SIZE = 25
 JUNG_SCENE_ID = 'jungle'
+SPACE_SCENE_ID = 'space'
 BG_COL = '#3a1010'

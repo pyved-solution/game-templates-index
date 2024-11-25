@@ -1,5 +1,33 @@
-from .glvars import pyv
-from . import glvars
+from ..glvars import pyv
+from .. import glvars
+
+
+# utilitary functions to ease scene initialization
+
+
+def setup(map_w, map_h):
+    global ref_npc
+    # start with this, bc background has to be displayed first
+    new_background()
+
+    # then,
+    new_avatar(map_w // 2, map_h // 2)
+    ref_npc = new_npc()
+
+
+# ---------- bg ------------------
+HINT_TEXT = 'Use arrow keys | Go right...'
+FT_SIZE = 60
+
+
+def new_background():
+    data = {
+        'hint_msg': pyv.new_font_obj(None, FT_SIZE).render(HINT_TEXT, False, 'yellow')
+    }
+    def on_draw(this, ev):
+        ev.screen.fill(glvars.BG_COL)
+        ev.screen.blit(this.hint_msg, (256, 32))
+    return pyv.new_actor('bg_default_scene', locals())
 
 
 # ---------- avatar --------------
@@ -23,6 +51,14 @@ def new_avatar(bx, by):
     # ---------------------------
     #  behavior
     # ---------------------------
+    def on_player_action(this, ev):
+        if pyv.get_scene() == glvars.JUNG_SCENE_ID:
+            if not (this.x == 300 and this.y == 300):
+                reset_pos(this)  # move the avatar to a cool location
+            else:
+                # change scene
+                pyv.set_scene(glvars.SPACE_SCENE_ID)
+
     def on_move_avatar(this, ev):
         if ev.dir == "right":
             this.x += this.delta_px  # max(this.pos[1] - 5, 0)
@@ -34,6 +70,9 @@ def new_avatar(bx, by):
             this.y += this.delta_px
 
     def on_update(this, ev):
+        # --- this is one way to implement the logic of the game ---
+        # if the game has a great number of scene, and the behavior varies greatly, then
+        # it would be best to re-define a scene-specific avatar actor
         if pyv.get_scene() == pyv.DEFAULT_SCENE:
             if this.x > glvars.scene_dim[0] - 33:
                 this.x = glvars.scene_dim[0] - 50
