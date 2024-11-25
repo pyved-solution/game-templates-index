@@ -32,6 +32,7 @@
     "glvars.py",
     "scenes/__init__.py",
     "scenes/default.py",
-    "scenes/jungle.py"
+    "scenes/jungle.py",
+	"scenes/space.py"
   ]
 }
