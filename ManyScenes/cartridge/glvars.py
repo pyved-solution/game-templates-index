@@ -26,7 +26,9 @@ def register_lib(alias, libname, value):  # handy for dependency injection
 av_jungle = None
 scene_dim = [None, None]
 
-TEXT_SIZE = 25
+WINDOW_LABEL = "Just a test: one avatar, plus three scenes!"
+TEXT_SIZE = 22
 JUNG_SCENE_ID = 'jungle'
 SPACE_SCENE_ID = 'space'
 BG_COL = '#3a1010'
+TUTO_TEXT = 'Controls are:\n Arrow keys | SPACE key | ENTER key, Move right to leave the first scene'

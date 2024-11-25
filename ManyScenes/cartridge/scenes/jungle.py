@@ -18,5 +18,11 @@ def new_bg_painter():
 
     def on_draw(this, ev):
         ev.screen.fill(this.bg_color)
+        # after filling the screen with black, imagine i wish to show another image... How to do this?
+        # again, it is a simple "blit" to screen operation:
+        coordinates = (355, 240)
+        ev.screen.blit(
+            pyv.vars.images['dummy0'], coordinates
+        )
 
     return pyv.new_actor('bg_scene_jungle', locals())

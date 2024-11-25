@@ -16,13 +16,9 @@ def setup(map_w, map_h):
 
 
 # ---------- bg ------------------
-HINT_TEXT = 'Use arrow keys | Go right...'
-FT_SIZE = 60
-
-
 def new_background():
     data = {
-        'hint_msg': pyv.new_font_obj(None, FT_SIZE).render(HINT_TEXT, False, 'yellow')
+        'hint_msg': pyv.new_font_obj(None, glvars.TEXT_SIZE).render(glvars.TUTO_TEXT, False, 'yellow')
     }
     def on_draw(this, ev):
         ev.screen.fill(glvars.BG_COL)
@@ -114,11 +110,19 @@ def new_npc():
 
     # - behavior
     def on_draw(this, ev):
-        pyv.draw_circle(ev.screen, this.color, (this.x, this.y), this.mobile_size)
+        # you can keep this line, if you prefer to have a geometrical representation (minimalist) of
+        # the NPC
+        # pyv.draw_circle(ev.screen, this.color, (this.x, this.y), this.mobile_size)
+
+        # ...or instead you can use an image:
+        img_dim = pyv.vars.images['dummy1'].get_size()
+        ev.screen.blit(pyv.vars.images['dummy1'], (this.x, this.y))
+
+        # let's display the message if the NPC is talking:
         if this.msg:
-            offsety = -50
-            ahx = this.x - this.msg.get_width() // 2
-            ahy = this.y + offsety
+            offsety = -25
+            ahx = this.x + int(img_dim[0]-this.msg.get_width() / 2)
+            ahy = this.y + (img_dim[1]//2) + offsety
             ev.screen.blit(this.msg, (ahx, ahy))
 
     def on_update(this, ev):

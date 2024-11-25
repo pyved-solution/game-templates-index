@@ -9,8 +9,10 @@
   "description": "this is a placeholder so you can describe your game",
   "author": "thomas",
   "asset_list": [
+    "dummy0.png",
+    "dummy1.png"
   ],
-  "asset_base_folder": "my_folder",
+  "asset_base_folder": "assets",
   "sound_base_folder": ".",
   "sound_list": [],
   "data_files": [],

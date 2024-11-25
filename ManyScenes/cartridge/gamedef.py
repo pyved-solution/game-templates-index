@@ -2,14 +2,13 @@ from .glvars import pyv
 from . import glvars
 from . import scenes
 
-
 pyv.bootstrap_e()
 
 
 def init(gms):
     global hint_msg
 
-    pyv.init(wcaption="Test:One avatar, two rooms")
+    pyv.init(wcaption=glvars.WINDOW_LABEL)
     pyv.declare_evs(
         'move_avatar', 'player_action'
     )
@@ -34,12 +33,14 @@ def init(gms):
     # and now,
     # we have to go back to the default scene #1, because this is where the game begins
     pyv.set_scene(pyv.DEFAULT_SCENE)
-    print('-'*32)
-    print('CONTROLS are:\n Arrow keys | SPACE in the 1st scene | ENTER in the 2nd scene')
+    print('-' * 32)
+    print(glvars.TUTO_TEXT)
 
 
 def update(tnow=None):  # will be called BEFORE event dispatching...
-    # Event handling, and check keyboard inputs
+    # ------------
+    # Event handling + check keyboard inputs
+    # ------------
     for ev in pyv.evsys0.get():
         if ev.type == pyv.evsys0.QUIT:
             pyv.vars.gameover = True
@@ -47,10 +48,16 @@ def update(tnow=None):  # will be called BEFORE event dispatching...
             if ev.key == pyv.evsys0.K_ESCAPE:
                 pyv.vars.gameover = True
             elif ev.key == pyv.evsys0.K_RETURN:
-                pyv.post_ev('player_action')
+                if pyv.get_scene() == pyv.DEFAULT_SCENE:
+                    my_msg = 'In the next scene press Enter twice to enter a special world'
+                    pyv.trigger('say_something', scenes.default.ref_npc, my_msg)
+                else:
+                    pyv.post_ev('player_action')
             elif ev.key == pyv.evsys0.K_SPACE:
-                if pyv.get_scene() != glvars.JUNG_SCENE_ID:
-                    pyv.trigger('say_something', scenes.default.ref_npc, 'Hello, scenes are:'+str(pyv.ls_scenes()) )
+                if pyv.get_scene() == pyv.DEFAULT_SCENE:
+                    my_msg = 'Hello, scenes are:' + str(pyv.ls_scenes())
+                    pyv.trigger('say_something', scenes.default.ref_npc, my_msg)
+
     keys = pyv.evsys0.pressed_keys()
     if keys[pyv.evsys0.K_LEFT]:
         pyv.post_ev("move_avatar", dir="left")
