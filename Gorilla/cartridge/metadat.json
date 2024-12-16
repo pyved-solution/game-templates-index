@@ -1,0 +1,34 @@
+{
+  "vmlib_ver": "24_11a1",
+  "dependencies": {
+    "pyved_engine": [
+      "24_11a1",
+      "pyv"
+    ]
+  },
+  "description": "the classic: game of snake",
+  "author": "Thomas and Al.Sweigart",
+  "asset_list": [],
+  "asset_base_folder": "assets",
+  "sound_base_folder": ".",
+  "sound_list": [],
+  "data_files": [],
+  "slug": "Gorilla",
+  "title": "Gorilla",
+  "thumbnail512x384": "thumb_2.png",
+  "thumbnail512x512": "thumb_1.png",
+  "ktg_services": false,
+  "instructions": "not provided",
+  "uses_challenge": false,
+  "has_game_server": false,
+  "ncr_faucet": false,
+  "game_genre": [
+    "Classics"
+  ],
+  "build_date": "Mon Dec 16 11:16:03 2024",
+  "source_files": [
+    "gamedef.py",
+    "glvars.py",
+    "actors.py"
+  ]
+}
