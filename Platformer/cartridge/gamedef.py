@@ -12,8 +12,7 @@ pygame = pyv.pygame
 ts_prev_frame = None
 
 
-@pyv.declare_begin
-def troid_init(vms=None):
+def init(vms=None):
     pyv.init()
     screen = pyv.get_surface()
     glvars.screen = screen
@@ -35,13 +34,11 @@ def troid_init(vms=None):
     pyv.bulk_add_systems(systems)
 
 
-@pyv.declare_update
-def troid_update(timeinfo):
+def update(timeinfo):
     glvars.t_now=timeinfo
     pyv.systems_proc(pyv.all_entities(), None)
     pyv.flip()
 
 
-@pyv.declare_end
-def troid_exit(vms=None):
+def close(vms=None):
     pyv.quit()

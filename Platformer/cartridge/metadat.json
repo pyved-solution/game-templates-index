@@ -2,18 +2,20 @@
     "vmlib_ver": "24_10a1",
     "dependencies": {
         "pyved_engine": [
-            "24_10a1",
+            "25_1a1",
             "pyv"
         ]
     },
     "description": "this is an example of platformer",
     "author": "moonbak",
     "asset_list": [
-        "my_map.ncsv"
     ],
     "asset_base_folder": ".",
     "sound_base_folder": ".",
     "sound_list": [],
+	"data_files": [
+		"my_map.ncsv"
+	],
     "slug": "Platformer",
     "title": "Platformer",
     "build_date": "Mon Oct 28 10:15:48 2024",
