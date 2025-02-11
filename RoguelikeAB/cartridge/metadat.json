@@ -8,7 +8,7 @@
    },
    "description":"Basic template for a roguelike/dungeon-crawling game",
    "author":"moonbak aka thomas",
-   "asset_base_folder":"assets",
+   "asset_base_folder":".",
    "asset_list":[
       "smallninja_sprites.json",
       "tileset.png",
