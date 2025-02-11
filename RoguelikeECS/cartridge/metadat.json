@@ -2,29 +2,25 @@
   "vmlib_ver": "24_10a1",
   "dependencies": {
     "pyved_engine": [
-      "24_10a1",
+      "25_1a1",
       "pyv"
     ]
   },
   "description": "a basic demo for a roguelike game",
   "author": "moonbak",
   "asset_base_folder": ".",
-  
   "asset_list": [
-    "smallninja_sprites.json",
-    "tileset.png",
+    "avatar1.png",
     "monster.png",
-    "avatar1.png"
+    "smallninja_sprites.json",
+    "tileset.png"
   ],
-
   "sound_base_folder": ".",
   "sound_list": [],
-
   "data_files": [],
-
-  "slug": "Roguelike",
-  "title": "Roguelike",
-  "build_date": "Fri Nov  1 12:41:13 2024",
+  "slug": "RoguelikeECS",
+  "title": "RoguelikeECS",
+  "build_date": "Tue Feb 11 23:45:18 2025",
   "thumbnail512x384": "thumb_2.png",
   "thumbnail512x512": "thumb_1.png",
   "ktg_services": false,

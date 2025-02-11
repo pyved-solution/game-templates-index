@@ -7,7 +7,7 @@ from . import world
 pyv = glvars.pyv
 
 def init(vmst=None):
-    pyv.init(wcaption='Roguelike actor-based')
+    pyv.init(wcaption='Roguelike with ECS pattern')
     screen = pyv.get_surface()
     shared.screen = screen
     pyv.define_archetype('player', (
