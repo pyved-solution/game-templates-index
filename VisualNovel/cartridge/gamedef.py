@@ -11,9 +11,9 @@ def init(vmst=None):
     global amt_viewer_id
     pyv.init(pyv.LOW_RES_MODE)
     new_game_controller()
-    amt_viewer_id = pyv.story.new_automaton_viewer(
+    amt_viewer_id = pyv.story.new_automaton_viewer((
         'encounter_1', 'encounter_Y'
-    )
+    ))
     # insta-begin the conversation!
     pyv.post_ev('conv_begins')
 
