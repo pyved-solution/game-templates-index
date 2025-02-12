@@ -2,15 +2,13 @@
   "vmlib_ver": "24_10a3",
   "dependencies": {
     "pyved_engine": [
-      "24_10a3",
+      "25_1a1",
       "pyv"
     ]
   },
   "description": "this is a placeholder so you can describe your game",
   "author": "thomas",
   "asset_list": [
-    "thumb_1.png",
-    "thumb_2.png"
   ],
   "asset_base_folder": ".",
   "sound_base_folder": ".",
