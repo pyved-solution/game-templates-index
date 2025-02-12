@@ -96,6 +96,7 @@ def new_ship(pos_xy):
         a.from_polar((1, deg(orientation - (2.0 * math.pi / 3))))
         b.from_polar((1, deg(orientation)))
         c.from_polar((1, deg(orientation + (2.0 * math.pi / 3))))
+
         temp = [a, b, c]
         for a_vector in temp:
             a_vector.y *= -1.0
@@ -104,14 +105,23 @@ def new_ship(pos_xy):
         temp[2] = (1.2 * SHIP_RAD) * temp[2]
         pt_li = [Vector2d(*pt_central),
                  Vector2d(*pt_central),
-                 Vector2d(*pt_central)]
+                 Vector2d(*pt_central), Vector2d(*pt_central)]
+        # use lines instead of polygons to avoid webctx bug
+        # for i in range(3):
+            # pt_li[i] += temp[i]
+        # for pt in pt_li:
+            # pt.x = round(pt.x)
+            # pt.y = round(pt.y)
+        # pt_li.reverse()
+        # pygame.draw.polygon(ev.screen, pyv.pal.punk.brightgreen, pt_li, 2)
         for i in range(3):
             pt_li[i] += temp[i]
         for pt in pt_li:
             pt.x = round(pt.x)
             pt.y = round(pt.y)
-        pt_li.reverse()
-        pygame.draw.polygon(ev.screen, pyv.pal.punk.brightgreen, pt_li, 2)
+        # Draw lines connecting consecutive points
+        for i in range(3):
+            pyv.draw_line(ev.screen, pyv.pal.punk.brightgreen, (pt_li[i].x, pt_li[i].y), (pt_li[(i + 1) % 3].x, pt_li[(i + 1) % 3].y), width=2)
     return pyv.new_actor('ship', locals())
 
 
@@ -153,7 +163,8 @@ def new_rockfield(quantity):
         for rockinfo in this.content:
             pos = int(rockinfo[0][0]), int(rockinfo[0][1])
             size = rockinfo[1]
-            pyv.draw_circle(ev.screen, pyv.pal.c64.lightgray, pos, size, LINE_THICKNESS)
+            pyv.draw_line(ev.screen, pyv.pal.c64.lightgray, pos, (pos[0],pos[1]+1), width=2)
+            pyv.draw_circle(ev.screen, pyv.pal.c64.lightgray, pos, size)#LINE_THICKNESS)
 
     def on_update(this, ev):
         for k in range(len(this.content)):
