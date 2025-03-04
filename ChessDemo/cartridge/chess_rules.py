@@ -56,14 +56,15 @@ class ChessRules:
         else:
             raise ValueError('ERR: invalid chesscolor arg. passed to ChessRules.is_checkmate!')
 
-        myColorValidMoves = list()
         for row in range(8):
             for col in range(8):
                 piece = board_obj.state[row][col]
                 if ch_color_sym in piece:
-                    myColorValidMoves.extend(ChessRules.get_valid_moves(board_obj, chesscolor, (row, col)))
-        return not len(myColorValidMoves)
-
+                    valid_moves = ChessRules.get_valid_moves(board_obj, chesscolor, (row, col))
+                    if len(valid_moves) > 0:
+                        return False
+        return True
+                    
     @staticmethod
     def get_valid_moves(board_obj, color, square_ij):
         board_hash = board_obj.serialize()
