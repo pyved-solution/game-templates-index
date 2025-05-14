@@ -8,6 +8,5 @@ Game Template Identifier,Template Name(=slug)
 7,Breakout
 8,Platformer
 9,ChessDemo
-10,TopDownZombies
-11,IsometricRpg
-12,RoguelikeECS
+10,IsometricRpg
+11,RoguelikeECS
