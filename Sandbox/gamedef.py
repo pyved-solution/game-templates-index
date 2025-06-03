@@ -3,15 +3,16 @@ from .glvars import pyv
 from .actors import *
 
 
-pyv.bootstrap_e()
+
+
 
 
 # -----
 #  declare the 3 main functions (mandatory)
-def init(vmst=None):
-    pyv.init(wcaption='Untitled, empty, and pyved-based demo')
+def init(**kwargs):
+    pyv.init(4)
     # declare your custom events here
-    pyv.declare_evs(
+    pyv.actors.declare_evs(
         'new_nb_pressed_keys', 'timer_start', 'timer_stop', 'color_change'
     )
     print('-' * 32)
@@ -40,29 +41,29 @@ def update(time_info=None):
     global pressed_keys, last_nb_keys, timer_active
     # <>
     # handle events, many operations here are mere forwarding
-    for ev in pyv.evsys0.get():
-        if ev.type == pyv.evsys0.QUIT:
+    for ev in pyv.event_get():
+        if ev.type == pyv.EngineEvTypes.Quit:
             pyv.vars.gameover = True
-        elif ev.type == pyv.evsys0.MOUSEBUTTONDOWN:
+        elif ev.type == pyv.EngineEvTypes.Mousedown:
             pyv.post_ev('mousedown', pos=ev.pos, button=ev.button)  # forward event (low level->game level)
-        elif ev.type == pyv.evsys0.MOUSEBUTTONUP:
+        elif ev.type == pyv.EngineEvTypes.Mouseup:
             pyv.post_ev('mouseup', pos=ev.pos, button=ev.button)  # forward event
-        elif ev.type == pyv.evsys0.MOUSEMOTION:
+        elif ev.type == pyv.EngineEvTypes.Mousemotion:
             pyv.post_ev('mousemotion', pos=ev.pos, rel=ev.rel)  # forward event
-        elif ev.type == pyv.evsys0.KEYDOWN and ev.key == pyv.evsys0.K_RETURN:
+        elif ev.type == pyv.EngineEvTypes.Keydown and ev.key == pyv.keycodes.K_RETURN:
             if not timer_active:
                 pyv.post_ev('timer_start')
                 timer_active = True
             else:
                 pyv.post_ev('timer_stop')
                 timer_active = False
-        elif ev.type == pyv.evsys0.KEYDOWN and ev.key == pyv.evsys0.K_SPACE:
+        elif ev.type == pyv.EngineEvTypes.Keydown and ev.key == pyv.keycodes.K_SPACE:
             pyv.post_ev('color_change')
         # other not important keys...
-        elif ev.type == pyv.evsys0.KEYDOWN:
+        elif ev.type == pyv.EngineEvTypes.Keydown:
             pressed_keys.add(ev.key)
-        elif ev.type == pyv.evsys0.KEYUP:
-            if ev.key not in (pyv.evsys0.K_RETURN, pyv.evsys0.K_SPACE):
+        elif ev.type == pyv.EngineEvTypes.Keyup:
+            if ev.key not in (pyv.keycodes.K_RETURN, pyv.keycodes.K_SPACE):
                 pressed_keys.remove(ev.key)
 
     # <>

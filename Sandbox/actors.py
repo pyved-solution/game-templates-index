@@ -9,7 +9,7 @@ important remark to use sprite sheets!
  To build a usable Spritesheet from a set of individual images, you can use this tool:
  https://www.codeandweb.com/tp-online then download both the .PNG and the .JSON
 you will need to list the JSON in your list of assets (that is declared in metadat.json)
-then, the data will be available from: pyv.vars.spritesheets[key] where key is the name given to your spritesheet
+then, the data will be available from: pyv.spritesheets[key] where key is the name given to your spritesheet
 
 if you need an animation, you may use
 pyv.gfx.AnimatedSprite()
@@ -24,7 +24,7 @@ from . import glvars
 def new_color_viewer():
     data = {
         'curr_color_name': 'medium_gray',
-        'square_position': (325, 400, 80, 80)
+        'square_position': (300, 96, 45, 45)
     }
 
     # - behavior
@@ -35,7 +35,7 @@ def new_color_viewer():
     def on_draw(this, ev):
         pyv.draw_rect(ev.screen, pyv.pal.yu[this.curr_color_name], this.square_position)
 
-    return pyv.new_actor('color_viewer', locals())
+    return pyv.actors.new_actor('color_viewer', locals())
 
 
 def new_solid_background():
@@ -46,7 +46,7 @@ def new_solid_background():
     def on_draw(this, ev):
         ev.screen.fill(this.color)
 
-    return pyv.new_actor('bg', locals())  # 1st argument = arbitrary name(used to debug) and 2nd arg is ALWAYS locals()
+    return pyv.actors.new_actor('bg', locals())  # 1st argument = arbitrary name(used to debug) and 2nd arg is ALWAYS locals()
 
 
 def new_entities_viewer():
@@ -72,7 +72,7 @@ def new_entities_viewer():
 
         'anim_sprite': pyv.gfx.AnimatedSprite(  # this line shows you how to use animated sprites!
             (32+glvars.screen_center[0], glvars.screen_center[1]),  # position x,y
-            pyv.vars.spritesheets['pokerchips'],  # first argument is a sprite sheet
+            pyv.spritesheets['pokerchips'],  # first argument is a sprite sheet
             anims_description  # second argument is the description of anymations
         )
     }
@@ -82,7 +82,7 @@ def new_entities_viewer():
     # - behavior
     def on_timer_start(this, ev):
         print('timer started')
-        this.saved_date = pyv.time()  # convenient way to retrieve current time
+        this.saved_date = pyv.get_time()  # convenient way to retrieve current time
 
     def on_timer_stop(this, ev):
         print('stop')
@@ -119,12 +119,12 @@ def new_entities_viewer():
         elif this.what_to_display == 'text':
             scr.blit(this.my_text, TEXT_POS)
         elif this.what_to_display == 'lion':
-            scr.blit(pyv.vars.images['lion'], this.my_rect)
+            scr.blit(pyv.images['lion'], this.my_rect)
         elif this.what_to_display == 'square':
             pyv.draw_rect(scr, 'orange', this.my_rect)
         # TODO ca serait intéressant de mettre aussi l'affichage d'un sprite animé
 
-    return pyv.new_actor('e_viewer', locals())
+    return pyv.actors.new_actor('e_viewer', locals())
 
 
 def new_movable_rect(init_position):
@@ -153,4 +153,4 @@ def new_movable_rect(init_position):
     def on_draw(this, ev):
         pyv.draw_rect(ev.screen, 'purple', this.rect, 4)  # 4 stands for line width
 
-    return pyv.new_actor('movable_rect', locals())
+    return pyv.actors.new_actor('movable_rect', locals())
